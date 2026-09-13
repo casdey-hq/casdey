@@ -181,7 +181,28 @@ its actions up and start, not just a headline a human would nod at.
    and at most the handful of headline figures from `casdey-hq.md`, never the
    whole text.
 
-5. **Signals & recommended actions — synthesized, not sourced.** Distinct
+5. **Recommended signals & this week's actions — synthesized, not sourced.**
+   **Recommendations, not the plan (Davide, 2026-09-13).** Title it exactly
+   "Recommended signals & this week's actions" in the artifact, with a line
+   saying the real plan is decided in the review. This section is what Claude
+   proposes going into the review; what actually gets done that week is
+   decided by Davide, together with Claude and the `/hormozi` lens, in the
+   Sunday review (or whenever the check-up is run with him). Record the
+   decided actions in the review, not here.
+
+   **Judge everything against Davide's current goals** and state the gap to
+   each one:
+   - **1% engaged leads**, set 2026-09-13 for the week ending 2026-09-20 (from
+     0.11%). **Measured on the week, not all time** (agreed 2026-09-13): new
+     interested gyms from that week's outreach over gyms first contacted that
+     week, so about 7 from about 700. The all-time rate is dragged down by
+     every earlier cohort and would need about 16.
+   - **2 paying gyms by 2026-10-13.** The monthly goal; the engaged-leads
+     rate is the lever Davide chose to reach it.
+   When a goal's date passes, say whether it was hit, and ask Davide for the
+   next one rather than inventing it.
+
+   Distinct
    from the four above: nothing here comes from an API, it's what the other
    four sections mean taken together. Skipping it (or reducing it to a
    generic "keep going") defeats the point of running this weekly — a
