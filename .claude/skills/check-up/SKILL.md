@@ -91,7 +91,8 @@ its actions up and start, not just a headline a human would nod at.
        to the email engaged leads, by source, and count both toward the ~7 a
        week. Flag any whose video has not been sent yet: a yes goes cold fast.
      - `igWeekly` — the `IG Weekly` tab: followers, accounts reached and
-       profile visits, one row a week, filled on Saturday so this Sunday
+       accounts engaged, one row a week, written automatically by the
+       Instagram publisher (`/api/cron/instagram`) on Saturday so this Sunday
        02:00 UTC run sees it. Growth is month on month in Hormozi's benchmarks
        (*$100M Leads* pg 145), so read week on week as noise and say so.
        `missingThisWeek` means the row wasn't filled; mention it, once.

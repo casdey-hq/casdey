@@ -34,7 +34,9 @@ const SHEET_ID = "1WOAIA1gvK6S1kWe_Vf4-d4XmjhnDLQZLtyU_ezvOu3w"; // Casdey-Gym-L
 const TABS = {
   "IG Content": ["#", "Planned date", "Pillar", "Format", "Hook (slide 1)", "Slides", "Caption", "Images (Drive)", "Status (Draft / Changes requested / Approved / Posted)", "Feedback (Davide)", "Posted (date)", "Post link"],
   "Inbound DMs": ["Date", "Instagram handle", "Gym / studio", "City", "Country", "Came from (post #, profile, cold DM)", "Video sent (date)", "Status (Interested / Committed / Dead)", "Notes"],
-  "IG Weekly": ["Week ending (Sunday)", "Followers", "Accounts reached (last 7 days)", "Profile visits (last 7 days)", "Notes"],
+  // Column D was "Profile visits" until 2026-09-13: Instagram's API no longer
+  // offers that metric, and accounts engaged is the closest one it does.
+  "IG Weekly": ["Week ending (Sunday)", "Followers", "Accounts reached (last 7 days)", "Accounts engaged (last 7 days)", "Notes"],
 };
 
 function serviceAccountKey() {

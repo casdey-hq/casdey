@@ -272,7 +272,9 @@ if (dmRows) {
   };
 }
 
-// IG Weekly: A=Week ending, B=Followers, C=Accounts reached, D=Profile visits.
+// IG Weekly: A=Week ending, B=Followers, C=Accounts reached, D=Accounts engaged
+// (was Profile visits until 2026-09-13, a metric Instagram's API dropped).
+// Written by the Instagram publisher's Saturday run.
 const weeklyRows = await optionalValues("IG Weekly!A2:E500");
 let igWeekly = null;
 if (weeklyRows) {
@@ -283,7 +285,7 @@ if (weeklyRows) {
   const rows = weeklyRows
     .filter((row) => parseDate(row[0]) !== null)
     .sort((a, b) => parseDate(a[0]) - parseDate(b[0]))
-    .map((row) => ({ weekEnding: row[0], followers: num(row[1]), reached: num(row[2]), profileVisits: num(row[3]) }));
+    .map((row) => ({ weekEnding: row[0], followers: num(row[1]), reached: num(row[2]), accountsEngaged: num(row[3]) }));
   const latest = rows.at(-1) ?? null;
   const previous = rows.at(-2) ?? null;
   const growth = (key) => (latest?.[key] != null && previous?.[key] ? +(((latest[key] - previous[key]) / previous[key]) * 100).toFixed(1) : null);
