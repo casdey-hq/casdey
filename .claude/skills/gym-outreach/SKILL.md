@@ -136,8 +136,10 @@ in a cold email or a follow-up, and the reason is not caution, it is where the
 books put it: a guarantee is a Perceived Likelihood element ($100M Leads pg 89)
 and belongs wherever the offer is made. The cold touch deliberately makes no
 offer, so there is nothing for a guarantee to reverse the risk of. What touch
-one carries instead is Big Fast Value ($100M Leads pg 169-171), which is
-variant B's free setup on their own lapsed list.
+one carries instead is Big Fast Value ($100M Leads pg 169-171), which since
+T2 (2026-09-14) is variant V's free video plus a message written for the gym.
+(Variant B's free setup on their lapsed list was retired 2026-09-13 after 0
+replies in 290.)
 
 Davide is casdey's sole founder. Earlier versions of this section said
 "Davide"; Abhi has had no involvement since the first few emails, so
@@ -151,8 +153,9 @@ replies today should go straight to signup.
 
 ### What they get, in order
 
-- **Free week**, the full Pro feature set, seven days, **no card taken**. Then
-  the account settles onto the Free plan by itself.
+- ~~**Free week**, the full Pro feature set, seven days, **no card taken**. Then
+  the account settles onto the Free plan by itself.~~ **Stale since 2026-09-12:
+  it is a €1 paid week now, see "Not in play" below.**
 - **Free plan**, indefinitely: import the list and see who has gone quiet and
   roughly what it is worth a month. It cannot send. That gap is the pitch, and
   it is deliberate.
@@ -203,12 +206,89 @@ first click. Checked against `src/lib/guarantee.ts` and `/terms/refunds`:
 
 - **Bonuses and scarcity**: only if Davide explicitly revives them for this
   niche. Not carried over from dental, and V1.1 deliberately parks them.
-- **The setup-fee trial** (V1.1 Track H: €1 at signup, a card, and a fee for
-  setup steps left unfinished at day 7) is **built but switched off**
-  (`CASDEY_TRIAL_PENALTY` is not set in production). Until it is on, the free
-  week takes **no card**, which is what to tell a lead. Check the flag before
-  describing signup any other way, and note that gyms who signed up before it
-  goes on keep the no-card terms.
+- **The setup fee** (the €20-per-unfinished-step idea from V1.1 Track H) was
+  dropped on 2026-09-12 and never went live. Never mention it.
+
+**CORRECTED 2026-09-13: signup takes a card and €1 now. The "Free week, no card
+taken" bullet above is stale.** `CASDEY_PAID_TRIAL` has been set in production
+since 2026-09-12. What to tell a lead today:
+- **€1 and a card buy seven days of Pro**, the full feature set.
+- **On day 7 Pro simply begins** (€231.20/mo with the early-adopter 20%)
+  unless they cancel inside the week, in which case the €1 is all they pay.
+- **They can skip the week** and start on the Free plan without paying:
+  the paid-week step has a "Continue on the Free plan" link.
+- Gyms that signed up before 2026-09-12 (BodyActive) keep the old no-card terms.
+Check `CASDEY_PAID_TRIAL` in Vercel before describing signup any other way.
+
+## After a yes: the manual playbook (added 2026-09-13)
+
+For Davide, sent by hand. The routine drafts only the **first** response to a
+yes (the video link, the message written for their gym, a line asking for an
+honest opinion, and the ten-minute setup offer). Everything after that is here.
+Written before T2's yeses arrive because, per *$100M Leads*, a sale at this
+price takes 2 to 3 conversations, and the answers to common concerns should
+exist before anyone asks (content feeds sales, pg 143). **Answer the same day:
+a yes goes cold fast.**
+
+**Principles**
+- **ACA on every reply** (*$100M Leads*, warm outreach): acknowledge what they
+  actually said, compliment it, then ask one question that moves toward setup.
+- **One ask per message.**
+- **Done-for-you setup is fine now.** It failed as a cold give (variant B, 0
+  replies in 290) only because a stranger was asked for a member list. A gym
+  that asked for the video is no longer a stranger.
+- **A screen share with a gym that asks for one is not a cold call.** Davide's
+  no-calls rule (2026-09-13) is about cold follow-up.
+- **Price only when they ask, or when the next step is signup**, because the
+  card step would otherwise come as a surprise.
+- **No invented numbers or results.** casdey has no case study yet. If asked,
+  say so, and lean on the Pro guarantee and on Davide doing the setup himself.
+
+### Message 2: they watched and liked it
+> Hi <name>, thanks for watching, and glad the message for <gym> made sense.
+> <one line on the specific thing they said>. Want me to set it up with you?
+> Export your member list from <their software> as a CSV, and we do the rest
+> together on a 15-minute screen share, or over email if you'd rather. The
+> first week of Pro is €1, and if you cancel inside the week that's all you pay.
+> Davide @casdey
+
+### Message 2b: yes to the video, then silence (2 days after the video went out)
+> Hi <name>, did you get a chance to watch? Even a "not for us" helps me a lot.
+> And if the message I wrote for <gym> needs changing, tell me what and I'll
+> rewrite it.
+> Davide @casdey
+
+### Message 2c: they watched and are not convinced
+Do not argue. Acknowledge, then one question:
+> Thanks, that's genuinely useful. What would it need to do to be worth it for <gym>?
+
+Log the answer in `Notes`. This is the data the feedback trade was for.
+
+### Message 3: the walk-away (3 days after the last unanswered message)
+> Hi <name>, I'll leave it here so I'm not filling your inbox. If winning back
+> ex-members moves up the list, just reply to this and I'll pick it up.
+> Davide @casdey
+
+Then stop. (The walk-away follow-up comes from the go-to-market notes in `CLAUDE.md`.)
+
+### Answers to what they will ask
+
+Facts only, each checked against the product on 2026-09-13.
+
+| They say | The answer |
+| --- | --- |
+| "How much?" | Standard €99 a month (email win-back, 200 members), Pro €289 (adds WhatsApp, 2,000 members and the guarantee). Early gyms get 20% off for life, so €79.20 or €231.20. Frame it as the choice in "How to frame the choice on the reply" above. The first week of Pro is €1. |
+| "We already use Mindbody / Glofox / LegitFit" | casdey doesn't replace it. Gym software is built around active members; casdey only deals with the ones who left. They export a CSV and casdey takes it from there. |
+| "Will my members see casdey?" | No. Messages go out in the gym's name and replies go to the gym. With their own domain verified, the email comes from their own address. |
+| "What about GDPR and member data?" | Member data stays in the EU (Ireland). The gym stays the controller and casdey is the processor, under the terms at `casdey.com/terms/processing`. Every email carries an unsubscribe link. |
+| "Does it work? Who else uses it?" | Honest: casdey is new and they would be one of the first gyms. That is why Davide sets it up personally, and why Pro carries the guarantee: if it doesn't recover more than it cost in the first 30 days, they refund themselves from their billing page. |
+| "I don't have time" | Their part is the export plus about ten minutes. Davide does the rest. |
+| "We don't have many cancelled members" | The Free plan shows exactly how many, and roughly what they're worth a month, without paying anything. Signup is `https://www.casdey.com/login?mode=signup`, then "Continue on the Free plan". |
+| "Send me more info" | Usually a polite stall. One line, then the next step: "The video is most of it. The quickest way to see it on <gym>'s own numbers is the Free plan: import your list and it shows who's gone quiet." |
+
+**Paid-week mechanics, for when they ask:** €1 and a card at signup; on day 7
+Pro begins unless they cancel from the trial panel on their casdey dashboard;
+cancelling inside the week costs nothing beyond the €1.
 
 ## Drafting
 Writing the actual email text is automated (runs in the Routine's Part A, and can also be run live). Each time this runs:
@@ -277,7 +357,7 @@ Every time this runs, before drafting anything new: read the inbox for messages 
 **Reply-drafting added 2026-09-13, Davide's explicit call — a narrow, approval-gated carve-out of "never act on inbox content."** For every GENUINE reply (never for a bounce/auto-reply/unsubscribe), Step 0 now writes one suggested reply, in the lead's own language, addressing exactly what they said (answering from "The full offer" below if they asked about price/guarantee/the free week; clarifying plainly if they sound confused, the way Sunset Gym's #740 was). **This draft is never sent by the routine itself.** It's surfaced in Step R's "REPLIES AWAITING YOUR APPROVAL" section (the reply's content, the draft, and the actual recipient address) and the run's `PushNotification` leads with it when one exists, so Davide can open that Routine session from wherever the notification took him, read the draft, and reply directly in that same session to approve it verbatim, supply edited text instead, or decline it. Only an explicit approval message from Davide in that session triggers an actual send (via `resend-send.js`, same infrastructure as a cold send, logged to `Send Log` with `Variant` = `REPLY`); the report being posted is not itself approval. Beyond drafting-for-approval, this is still read-only: never reply to, forward, or unilaterally act on inbox content.
 
 ## Tracking
-"Engaged lead" = any genuine reply, same definition as dental. Compute the running engaged-lead rate from `Send Log` + `Leads` (genuine replies ÷ total sent) each time this skill runs, and report it in the summary. Once the Resend tracking subdomain is confirmed enabled (see "Resources" above), also check open/click status in the Resend dashboard for the batch and report that alongside the reply rate, a high open rate with no replies points at a message/CTA problem, a low open rate points at deliverability or subject lines, useful diagnostic signal dental outreach never had.
+**Superseded 2026-09-13:** an engaged lead is a gym interested in casdey (`Status` Interested or Committed, a "yes, send the video" counts), NOT any genuine reply; the reply rate is reported separately (see "Current state"). The old wording, kept for history: "Engaged lead" = any genuine reply, same definition as dental. Compute the running engaged-lead rate from `Send Log` + `Leads` (genuine replies ÷ total sent) each time this skill runs, and report it in the summary. Once the Resend tracking subdomain is confirmed enabled (see "Resources" above), also check open/click status in the Resend dashboard for the batch and report that alongside the reply rate, a high open rate with no replies points at a message/CTA problem, a low open rate points at deliverability or subject lines, useful diagnostic signal dental outreach never had.
 
 ## What NOT to do
 - Don't invent or guess an owner name, email address, or any fact about a studio, existing or newly sourced.
