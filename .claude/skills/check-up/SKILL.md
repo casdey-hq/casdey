@@ -210,9 +210,13 @@ step is different from an on-demand run:
    top of the email body, then the recommended actions, then the same
    headline-numbers summary.
 
-Set up once via `/schedule`, weekly, Sunday, a time that doesn't collide with
-the two outreach routines' `05:05`/`06:00` UTC slots — see `CLAUDE.md`
-"Infrastructure" for the pattern (`RemoteTrigger`, not a repo cron).
+Set up once via `/schedule`, weekly, Sunday. **All three casdey routines now
+fire at the same `02:00` UTC slot (2026-09-13, Davide's call: 4am Italian
+time so the 5-hour usage window resets by ~9am, before he starts working)**
+— they run as independent cloud sessions in separate environments, so this
+is fine operationally, just worth knowing if their reports/emails ever land
+suspiciously close together. See `CLAUDE.md` "Infrastructure" for the
+pattern (`RemoteTrigger`, not a repo cron).
 
 **Credentials in a cloud routine.** A routine runs in its own cloud
 checkout, with no `web/.env.local` and no local service-account key file, so
