@@ -151,32 +151,46 @@ Measured monthly (pg 145), never judged on one post or one week.
 
 ## How posts get made, reviewed and tracked
 
-Settled 2026-09-13. Claude has no Instagram access, so it makes the posts and Davide
-publishes them.
+Revised 2026-09-13, same day, on Davide's call: he approves a week at a time and the posting
+is automatic. Claude has no access to Instagram's app or its DMs; publishing and the numbers
+go through Instagram's official API instead.
 
-1. **Claude writes a batch** in `content/instagram/<batch>.json` (slides, caption, planned
-   date, pillar) and renders it to images with `npm run ig:render -- <batch>` from `web/`.
-   Each slide is a 1080x1350 PNG in `content/instagram/out/<post #>/` (gitignored, rebuilt
-   from the JSON), and the images are sent to Davide in chat.
-2. **`npm run ig:sync -- <batch>`** writes the batch into the **`IG Content`** tab of the
-   Casdey-Gym-Leads sheet: columns A to I are Claude's (#, planned date, pillar, format,
-   hook, slide text, caption, where the images are, status).
-3. **Davide reviews** and leaves feedback in `IG Content` column J, or says it in any casdey
-   chat. Claude revises, re-renders and sets the status back to Draft.
-4. **Davide posts by hand** and fills column K (the date posted) and L (the post link).
+1. **Claude writes the week's batch** in `content/instagram/<batch>.json` (slides, caption,
+   planned date, pillar) and renders it with `npm run ig:render -- <batch>` from `web/`: one
+   1080x1350 PNG per slide in `content/instagram/out/<post #>/` (gitignored, rebuilt from the
+   JSON).
+2. **`npm run ig:drive -- <batch>`** uploads the images to Google Drive, as info@casdey.com:
+   `casdey Instagram / <batch> / <post # and title> / 1.png, 2.png ...`. Images are never sent
+   in chat.
+3. **`npm run ig:sync -- <batch>`** writes the batch into the **`IG Content`** tab, with a link
+   to each post's Drive folder.
+4. **Davide reviews the week:** Status **Approved**, or **Changes requested** with the reason in
+   column J (or in any casdey chat). Claude revises, re-renders, re-uploads.
+5. **The publisher posts each approved post on its planned date at 12:30 Italian time** and
+   fills K (date posted) and L (post link). Only Approved posts are ever published. Until the
+   Instagram API is connected, Davide posts by hand and fills K and L himself.
+
+**Why 12:30 Italian time:** gym owners coach early mornings and evenings, and the midday lull is
+when they scroll. 11:30 in Ireland and the UK, where most of the outreach goes. A starting
+choice, to be checked against reach at the day 30 review.
+
+**Hormozi's note, knowingly traded away:** he finds posts published by hand outperform scheduled
+ones (*$100M Leads* pg 144). Davide chose automation for the time it saves.
 
 Three tabs, created 2026-09-13, all read by the Sunday check-up:
 
 | Tab | Who fills it | What it holds |
 | --- | --- | --- |
-| `IG Content` | Claude (A to I), Davide (J to L) | Every post: draft, feedback, posted date |
-| `Inbound DMs` | Davide | Every gym that asks for the video on Instagram, from a post or a cold DM. Status Interested or Committed makes it an engaged lead |
-| `IG Weekly` | Davide, every Saturday | Followers, accounts reached and profile visits for the week, from Instagram's professional dashboard. Saturday, because the check-up runs Sunday at 04:00 Italian time |
+| `IG Content` | Claude (A to I), Davide (Status and J), the publisher (K and L) | Every post: draft, approval, feedback, posted date |
+| `Inbound DMs` | Davide, by hand | Every gym that asks for the video on Instagram, from a post or a cold DM. Status Interested or Committed makes it an engaged lead. Manual because reading DMs from strangers through the API needs Meta business verification, which needs a registered company |
+| `IG Weekly` | The API, weekly, once connected (Davide on Saturdays until then) | Followers, accounts reached and profile visits |
 
 ## Open
 
-- Nothing structural. The first review of batch 1's look and voice decides whether the rest
-  of the batch follows the samples.
+- **Connecting the Instagram API** (Davide's one-off setup: a professional account, a Meta
+  developer app with Instagram Login, a token). Everything that posts or reads numbers waits on it.
+- The first review of batch 1's look and voice decides whether the rest of the batch follows the
+  samples.
 
 ## Sources
 

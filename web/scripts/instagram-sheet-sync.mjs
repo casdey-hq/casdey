@@ -11,8 +11,11 @@
  *
  * Column ownership, same rule as the outreach tabs:
  *   IG Content   A-I are written here (A #, B Planned date, C Pillar, D Format,
- *                E Hook, F Slides, G Caption, H Images, I Status). J Feedback,
- *                K Posted (date) and L Post link are Davide's and never touched.
+ *                E Hook, F Slides, G Caption, H the post's Drive folder, I Status).
+ *                Status is shared: this writes Draft, Davide sets Approved or
+ *                Changes requested, and Approved or Posted is never overwritten.
+ *                J Feedback is Davide's; K Posted (date) and L Post link are
+ *                filled by whoever publishes the post.
  *   Inbound DMs  entirely Davide's: every gym that asks for the video on
  *                Instagram, from a post or from a cold DM.
  *   IG Weekly    entirely Davide's: one row a week, filled on Saturday so the
@@ -29,7 +32,7 @@ const repoRoot = path.resolve(here, "..", "..");
 const SHEET_ID = "1WOAIA1gvK6S1kWe_Vf4-d4XmjhnDLQZLtyU_ezvOu3w"; // Casdey-Gym-Leads
 
 const TABS = {
-  "IG Content": ["#", "Planned date", "Pillar", "Format", "Hook (slide 1)", "Slides", "Caption", "Images", "Status", "Feedback (Davide)", "Posted (date)", "Post link"],
+  "IG Content": ["#", "Planned date", "Pillar", "Format", "Hook (slide 1)", "Slides", "Caption", "Images (Drive)", "Status (Draft / Changes requested / Approved / Posted)", "Feedback (Davide)", "Posted (date)", "Post link"],
   "Inbound DMs": ["Date", "Instagram handle", "Gym / studio", "City", "Country", "Came from (post #, profile, cold DM)", "Video sent (date)", "Status (Interested / Committed / Dead)", "Notes"],
   "IG Weekly": ["Week ending (Sunday)", "Followers", "Accounts reached (last 7 days)", "Profile visits (last 7 days)", "Notes"],
 };
@@ -103,8 +106,12 @@ const batchArg = process.argv[2];
 if (batchArg) {
   const batchFile = batchArg.endsWith(".json") ? path.resolve(batchArg) : path.join(repoRoot, "content", "instagram", `${batchArg}.json`);
   const batch = JSON.parse(fs.readFileSync(batchFile, "utf8"));
-  const current = (await api(`/values/${range("IG Content", "A2:A2000")}`)).values ?? [];
+  const current = (await api(`/values/${range("IG Content", "A2:I2000")}`)).values ?? [];
   const rowOf = new Map(current.map((row, i) => [String(row[0] ?? ""), i + 2]));
+  const statusOf = new Map(current.map((row) => [String(row[0] ?? ""), (row[8] ?? "").trim()]));
+  // Where each post's images live on Drive, written by `npm run ig:drive`.
+  const driveFile = path.join(repoRoot, "content", "instagram", "out", "drive.json");
+  const drive = fs.existsSync(driveFile) ? JSON.parse(fs.readFileSync(driveFile, "utf8")) : { posts: {} };
   let nextRow = current.length + 2;
   const plain = (text = "") => text.replace(/\[\[(.+?)\]\]/g, "$1");
   const data = batch.posts.map((post) => {
@@ -115,9 +122,13 @@ if (batchArg) {
       })
       .join("\n\n");
     const row = rowOf.get(post.id) ?? nextRow++;
+    // Davide's approval sticks: a re-sync never turns Approved or Posted back into a draft.
+    const existing = statusOf.get(post.id) ?? "";
+    const status = /^(approved|posted)$/i.test(existing) ? existing : post.status ?? "Draft";
+    const images = drive.posts?.[post.id]?.link ?? `content/instagram/out/${post.id}/ (${post.slides.length} images, not on Drive yet)`;
     return {
       range: `'IG Content'!A${row}:I${row}`,
-      values: [[post.id, post.planned, post.pillar, post.format, plain(post.slides[0].title), slidesText, post.caption, `content/instagram/out/${post.id}/ (${post.slides.length} images)`, post.status ?? "Draft"]],
+      values: [[post.id, post.planned, post.pillar, post.format, plain(post.slides[0].title), slidesText, post.caption, images, status]],
     };
   });
   await api("/values:batchUpdate", { method: "POST", body: JSON.stringify({ valueInputOption: "RAW", data }) });
