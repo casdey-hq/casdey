@@ -1,0 +1,55 @@
+{
+  "batch": "batch-01",
+  "note": "Sample posts for Davide's review of look and voice, 2026-09-13. Numbers in post 1 are as of 2026-09-13 and must be refreshed from the check-up before it is posted.",
+  "posts": [
+    {
+      "id": "001",
+      "planned": "2026-09-16",
+      "pillar": "Founder log",
+      "format": "Carousel",
+      "status": "Draft",
+      "slides": [
+        { "type": "hook", "eyebrow": "Founder log 01", "title": "I emailed [[926 gyms]] about their ex-members.", "sub": "Here's what happened. Honestly." },
+        { "type": "stat", "big": "12", "label": "replied", "body": "That's 1.3%. And 11 of the 12 said no thanks." },
+        { "type": "stat", "big": "1", "label": "said yes", "body": "One gym owner wanted to see more. One, out of 926." },
+        { "type": "text", "title": "What I got wrong", "body": "My email asked busy owners for feedback on a tool they'd never heard of.\nThat's asking a stranger for a favour, and giving nothing back." },
+        { "type": "text", "title": "What I'm changing", "body": "Now I give first. A short video, plus the exact message I'd send a gym's ex-members, written for that gym.\nFree. All I ask back is an honest opinion." },
+        { "type": "cta", "title": "I'll post what happens [[right here]].", "body": "Follow along if you run a gym and wonder how many of your ex-members could come back." }
+      ],
+      "caption": "Founder log 01.\n\nI'm Davide, and I build casdey: it wins back gym members who cancelled, in the gym's own name.\n\nFor three weeks I've emailed gym owners across Europe. 926 of them. 12 replied. 11 said no thanks. 1 said yes.\n\nThe lesson: I was asking strangers for a favour and giving nothing back. So from this week the email gives first.\n\nI'll share the numbers here as they come in.\n\n#gymowner #gymbusiness #buildinpublic"
+    },
+    {
+      "id": "002",
+      "planned": "2026-09-16",
+      "pillar": "Win-back playbook",
+      "format": "Carousel",
+      "status": "Draft",
+      "slides": [
+        { "type": "hook", "eyebrow": "The win-back playbook", "title": "How I'd write to a member [[who cancelled]].", "sub": "Four rules, then the message itself. Save it for the next one who leaves." },
+        { "type": "text", "eyebrow": "Rule 1 of 4", "title": "Lead with them, not a discount.", "body": "Open with their name and what they came to you for.\nA discount in the first line reads as a sales email, not as a gym that noticed they're gone." },
+        { "type": "text", "eyebrow": "Rule 2 of 4", "title": "No guilt.", "body": "Skip \"we noticed you haven't been in.\"\nPeople leave for real reasons: work, an injury, money, a move. Assume it was a good one." },
+        { "type": "text", "eyebrow": "Rule 3 of 4", "title": "Give one reason to come back.", "body": "Something that changed since they left: a new class, a new coach, a time that suits them better.\nOne reason. Not five." },
+        { "type": "text", "eyebrow": "Rule 4 of 4", "title": "Make yes easy.", "body": "One link that books one session.\nNo forms, no calls, no \"let us know\"." },
+        { "type": "message", "eyebrow": "The message", "lines": ["Hi [first name],", "Hope things are good. Since you were last in we've added [new class or time], and I thought of you.", "Fancy a free session to see how it feels? Pick a time here: [booking link]", "[Your name], [gym]"] },
+        { "type": "cta", "title": "Save this for the next member [[who cancels]].", "body": "casdey writes and sends a message like this to every member who left, in your gym's name." }
+      ],
+      "caption": "Most win-back messages fail in the first line: they open with a discount, or with guilt.\n\nHere's how I'd write to a member who cancelled. Four rules, and the message itself at the end. Copy it, change the brackets, send it.\n\n#gymowner #gymbusiness #memberretention"
+    },
+    {
+      "id": "003",
+      "planned": "2026-09-17",
+      "pillar": "Cost of doing nothing",
+      "format": "Carousel",
+      "status": "Draft",
+      "slides": [
+        { "type": "hook", "eyebrow": "Two-minute maths", "title": "Your ex-members have a price. [[Find yours.]]", "sub": "All you need is your membership software and a calculator." },
+        { "type": "text", "eyebrow": "Step 1 of 3", "title": "Count who left.", "body": "Members who cancelled, or just stopped coming, in the last 12 months." },
+        { "type": "text", "eyebrow": "Step 2 of 3", "title": "Multiply by your monthly price.", "body": "Use your most common membership. That's what they were worth to you every month." },
+        { "type": "stat", "eyebrow": "For example", "big": "€3,600", "label": "a month", "body": "60 ex-members × €60 a month.\nThat money still lives in your town. It just trains somewhere else, or nowhere." },
+        { "type": "text", "eyebrow": "Step 3 of 3", "title": "Now the useful number.", "body": "You don't need all of them back. Work out what just 5 returning members are worth in a year.\n5 × €60 × 12 months = €3,600." },
+        { "type": "cta", "title": "Send this to whoever [[runs your memberships]].", "body": "Then work out your own number. It takes two minutes." }
+      ],
+      "caption": "Every gym has a number it never looks at: what the members who left were paying.\n\nThree steps, two minutes. The example uses 60 ex-members at €60 a month. Run it with your own.\n\n#gymowner #gymbusiness #fitnessbusiness"
+    }
+  ]
+}

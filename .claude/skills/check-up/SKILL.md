@@ -75,7 +75,26 @@ its actions up and start, not just a headline a human would nod at.
      the CTA variant (A/B) and subject-line variant (S1/S2) splits, plus a
      `sentThisWeek` cut. Sends before the Variant column existed (pre
      2026-09-02) land in `rowTypeCounts.other`, not a bug.
-   - `igOutreach` — the `IG Outreach` tab: sends, this-week sends, replies.
+   - `igOutreach` — the `IG Outreach` tab (cold DMs, sent by hand): sends,
+     this-week sends, replies, follow-ups sent, unsent drafts in the queue.
+   - **Instagram content, added 2026-09-13 (Davide: both the DMs and the
+     posting belong in the check-up).** The plan is `content-plan.md` at the
+     repo root: one post a day for 100 days from 2026-09-16. Three tabs, all
+     filled by hand because Claude has no Instagram access:
+     - `igContent` — the `IG Content` tab: posts drafted by Claude
+       (`npm run ig:render` / `npm run ig:sync`), what Davide marked posted,
+       `behindBy` against one a day since 2026-09-16, drafts awaiting his
+       review, and feedback he left that still needs acting on.
+     - `inboundDms` — the `Inbound DMs` tab: every gym that asks for the video
+       on Instagram, from a post or a cold DM. Interested or Committed is an
+       **engaged lead**, same definition as the email side; report them next
+       to the email engaged leads, by source, and count both toward the ~7 a
+       week. Flag any whose video has not been sent yet: a yes goes cold fast.
+     - `igWeekly` — the `IG Weekly` tab: followers, accounts reached and
+       profile visits, one row a week, filled on Saturday so this Sunday
+       02:00 UTC run sees it. Growth is month on month in Hormozi's benchmarks
+       (*$100M Leads* pg 145), so read week on week as noise and say so.
+       `missingThisWeek` means the row wasn't filled; mention it, once.
    - `testLog` — every `Test Log` row, and for each **running** test a
      `liveReview`, which is what section 1b is built from.
 
@@ -219,8 +238,13 @@ its actions up and start, not just a headline a human would nod at.
      before 2026-09-12. On a Sunday on-demand run the review is not just
      flagged, it is done in the same session (1b).
    - **Reply rate vs the 3% target**: state the gap in percentage points.
-   - **Engaged leads**: the count, the rate, and who they are. There is no
-     target on it yet; if Davide sets one, record it here.
+   - **Engaged leads**: the count, the rate, and who they are, email and
+     Instagram (`inboundDms`) shown by source.
+   - **Instagram posting cadence**: `igContent.behindBy`. The plan's one rule
+     is not to stop (*$100M Leads* pg 145), so a gap of 2+ days is worth an
+     action; also name drafts awaiting review and open feedback, since
+     unreviewed posts are what stalls the cadence. Judge content on inputs
+     (posts published) before day 30 (2026-10-15), not on reach.
    - **`casdey-hq.md` vs what Numbers/Marketing just found**: already
      flagged in section 4 above — surface it again here if it changes what
      Davide should actually do (e.g. a real paying gym now exists but the

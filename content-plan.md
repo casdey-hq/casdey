@@ -94,11 +94,11 @@ casdey sells.
 ### Week 0, 2026-09-14 to 2026-09-15: set up
 - [ ] **Profile.** Mark as the avatar. Bio in three lines: who it is for, the result, the
       action ("DM VIDEO"). Link to casdey.com.
-- [ ] **Three pinned posts** before anything else goes out: what casdey does (a cut of the
-      promo film), founder log #1, one playbook post. A stranger opening the profile from a DM
-      should understand casdey in ten seconds.
-- [ ] **Batch 1:** posts for days 1 to 15.
-- [ ] **Decide how VIDEO DMs get logged**, before the first ask post.
+- [ ] **Review batch 1.** Claude drafts the posts (see "How posts get made, reviewed and
+      tracked" below); Davide reviews them. Nothing is published before Wednesday.
+- [ ] **On Wednesday 2026-09-16, publish three posts and pin them:** the promo film (posted
+      as it is, a reel), founder log 01 and playbook 01. A stranger opening the profile from
+      a DM should understand casdey in ten seconds. From Thursday 2026-09-17, one post a day.
 
 ### Days 1 to 30, 2026-09-16 to 2026-10-15: hold the inputs
 - **Post by hand every day**, not pre-scheduled. Hormozi finds hand-posted content performs
@@ -149,12 +149,34 @@ Measured monthly (pg 145), never judged on one post or one week.
 
 ---
 
+## How posts get made, reviewed and tracked
+
+Settled 2026-09-13. Claude has no Instagram access, so it makes the posts and Davide
+publishes them.
+
+1. **Claude writes a batch** in `content/instagram/<batch>.json` (slides, caption, planned
+   date, pillar) and renders it to images with `npm run ig:render -- <batch>` from `web/`.
+   Each slide is a 1080x1350 PNG in `content/instagram/out/<post #>/` (gitignored, rebuilt
+   from the JSON), and the images are sent to Davide in chat.
+2. **`npm run ig:sync -- <batch>`** writes the batch into the **`IG Content`** tab of the
+   Casdey-Gym-Leads sheet: columns A to I are Claude's (#, planned date, pillar, format,
+   hook, slide text, caption, where the images are, status).
+3. **Davide reviews** and leaves feedback in `IG Content` column J, or says it in any casdey
+   chat. Claude revises, re-renders and sets the status back to Draft.
+4. **Davide posts by hand** and fills column K (the date posted) and L (the post link).
+
+Three tabs, created 2026-09-13, all read by the Sunday check-up:
+
+| Tab | Who fills it | What it holds |
+| --- | --- | --- |
+| `IG Content` | Claude (A to I), Davide (J to L) | Every post: draft, feedback, posted date |
+| `Inbound DMs` | Davide | Every gym that asks for the video on Instagram, from a post or a cold DM. Status Interested or Committed makes it an engaged lead |
+| `IG Weekly` | Davide, every Saturday | Followers, accounts reached and profile visits for the week, from Instagram's professional dashboard. Saturday, because the check-up runs Sunday at 04:00 Italian time |
+
 ## Open
 
-- How "VIDEO" DMs are logged, so they reach the engaged-lead count and the Sunday check-up.
-- Whether Instagram numbers join the Sunday `/check-up`.
-- Who makes the posts: Davide by hand, or Claude drafting each batch in brand for Davide to
-  check and post.
+- Nothing structural. The first review of batch 1's look and voice decides whether the rest
+  of the batch follows the samples.
 
 ## Sources
 

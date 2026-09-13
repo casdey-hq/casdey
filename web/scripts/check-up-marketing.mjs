@@ -6,7 +6,9 @@
  *
  *   node scripts/check-up-marketing.mjs
  *
- * Prints one JSON object: { leads, sendLog, igOutreach, testLog }.
+ * Prints one JSON object: { leads, sendLog, igOutreach, igContent, inboundDms,
+ * igWeekly, testLog }. The three Instagram content blocks come from tabs added
+ * 2026-09-13 for content-plan.md, and read as null if a tab is missing.
  *
  * Two outreach rates, kept apart on purpose (Davide, 2026-09-13), and computed
  * the same way src/lib/outreach-summary.ts computes them for /admin:
@@ -182,19 +184,117 @@ for (const row of sendRows) {
   if (subjectVariant) subjectVariantCounts[subjectVariant] = (subjectVariantCounts[subjectVariant] ?? 0) + 1;
 }
 
-// --- IG Outreach: I=Status, J=Date Sent, K=Reply? ---
+/** Dates Davide types by hand come back as he typed them: 16/09/2026 as often
+ *  as 2026-09-16. Day first, European style, when it isn't ISO. */
+const parseDate = (text) => {
+  const s = (text ?? "").trim();
+  if (!s) return null;
+  const dmy = /^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$/.exec(s);
+  const t = dmy ? Date.UTC(+dmy[3], +dmy[2] - 1, +dmy[1]) : Date.parse(s);
+  return Number.isNaN(t) ? null : t;
+};
+const recentDate = (text) => {
+  const t = parseDate(text);
+  return t !== null && t >= weekAgo;
+};
+
+/** A tab that may not exist yet reads as null rather than failing the run. */
+async function optionalValues(range) {
+  try {
+    return await values(token, range);
+  } catch {
+    return null;
+  }
+}
+
+// --- IG Outreach (cold DMs, sent by hand): H=Draft DM, I=Status, J=Date Sent,
+// K=Reply?, P=FU1 Sent?, S=FU2 Sent? ---
 const igRows = await values(token, "IG Outreach!A2:S3000");
 let igSentTotal = 0;
 let igSentThisWeek = 0;
 let igReplies = 0;
+let igFu1Sent = 0;
+let igFu2Sent = 0;
+let igUnsentDrafts = 0;
 for (const row of igRows) {
   const dateSent = row[9];
   if (dateSent) {
     igSentTotal += 1;
-    if (isRecent(dateSent)) igSentThisWeek += 1;
+    if (isRecent(dateSent) || recentDate(dateSent)) igSentThisWeek += 1;
+  } else if ((row[7] ?? "").trim()) {
+    igUnsentDrafts += 1;
   }
   const reply = (row[10] ?? "").trim().toLowerCase();
-  if (reply === "y" || reply === "replied") igReplies += 1;
+  if (reply && reply !== "n" && reply !== "no") igReplies += 1;
+  if ((row[15] ?? "").trim()) igFu1Sent += 1;
+  if ((row[18] ?? "").trim()) igFu2Sent += 1;
+}
+
+// --- Instagram content (content-plan.md, tabs added 2026-09-13) ---
+// IG Content: A=#, B=Planned date, I=Status, K=Posted (date).
+const CONTENT_START = Date.UTC(2026, 8, 16); // first post, 2026-09-16
+const contentRows = await optionalValues("IG Content!A2:L2000");
+let igContent = null;
+if (contentRows) {
+  const posted = contentRows.filter((row) => parseDate(row[10]) !== null);
+  const status = (row) => (row[8] ?? "").trim().toLowerCase();
+  const daysIn = Math.floor((now - CONTENT_START) / DAY) + 1;
+  const expectedSoFar = Math.max(0, Math.min(daysIn, 100));
+  igContent = {
+    day: daysIn > 0 ? Math.min(daysIn, 100) : null,
+    startsOn: "2026-09-16",
+    postsInSheet: contentRows.filter((row) => row[0]).length,
+    postedTotal: posted.length,
+    postedThisWeek: posted.filter((row) => recentDate(row[10])).length,
+    expectedSoFar,
+    behindBy: Math.max(0, expectedSoFar - posted.length),
+    awaitingReview: contentRows.filter((row) => row[0] && !parseDate(row[10]) && /draft|changes/.test(status(row))).length,
+    approvedNotPosted: contentRows.filter((row) => row[0] && !parseDate(row[10]) && status(row) === "approved").length,
+    feedbackOpen: contentRows.filter((row) => (row[9] ?? "").trim() && !parseDate(row[10]) && /changes/.test(status(row))).map((row) => ({ post: row[0], feedback: row[9] })),
+  };
+}
+
+// Inbound DMs: A=Date, B=Handle, C=Gym, F=Came from, G=Video sent, H=Status.
+// Every gym that asks for the video on Instagram. Interested or Committed is an
+// engaged lead, the same definition as the email side.
+const dmRows = await optionalValues("Inbound DMs!A2:I2000");
+let inboundDms = null;
+if (dmRows) {
+  const rows = dmRows.filter((row) => row[0] || row[1]);
+  const engagedRow = (row) => /interested|committed/i.test(row[7] ?? "");
+  inboundDms = {
+    total: rows.length,
+    thisWeek: rows.filter((row) => recentDate(row[0])).length,
+    engagedTotal: rows.filter(engagedRow).length,
+    engagedThisWeek: rows.filter((row) => engagedRow(row) && recentDate(row[0])).length,
+    videoNotSentYet: rows.filter((row) => !(row[6] ?? "").trim()).map((row) => ({ handle: row[1], gym: row[2], date: row[0] })),
+    thisWeekList: rows.filter((row) => recentDate(row[0])).map((row) => ({ handle: row[1], gym: row[2], cameFrom: row[5], status: row[7] })),
+  };
+}
+
+// IG Weekly: A=Week ending, B=Followers, C=Accounts reached, D=Profile visits.
+const weeklyRows = await optionalValues("IG Weekly!A2:E500");
+let igWeekly = null;
+if (weeklyRows) {
+  const num = (text) => {
+    const n = Number(String(text ?? "").replace(/[^\d.]/g, ""));
+    return String(text ?? "").trim() === "" || Number.isNaN(n) ? null : n;
+  };
+  const rows = weeklyRows
+    .filter((row) => parseDate(row[0]) !== null)
+    .sort((a, b) => parseDate(a[0]) - parseDate(b[0]))
+    .map((row) => ({ weekEnding: row[0], followers: num(row[1]), reached: num(row[2]), profileVisits: num(row[3]) }));
+  const latest = rows.at(-1) ?? null;
+  const previous = rows.at(-2) ?? null;
+  const growth = (key) => (latest?.[key] != null && previous?.[key] ? +(((latest[key] - previous[key]) / previous[key]) * 100).toFixed(1) : null);
+  igWeekly = {
+    latest,
+    previous,
+    followerGrowthPct: growth("followers"),
+    reachGrowthPct: growth("reached"),
+    // Filled on Saturday; a latest row older than 8 days means this week's is missing.
+    missingThisWeek: !latest || now - parseDate(latest.weekEnding) > 8 * DAY,
+  };
 }
 
 // --- Test Log + the weekly test review ---
@@ -320,7 +420,10 @@ console.log(
         engagedLeads,
       },
       sendLog: { totalSendRows, sentThisWeek, rowTypeCounts, rowTypeThisWeek, variantCounts, subjectVariantCounts },
-      igOutreach: { igSentTotal, igSentThisWeek, igReplies },
+      igOutreach: { igSentTotal, igSentThisWeek, igReplies, igFu1Sent, igFu2Sent, igUnsentDrafts },
+      igContent,
+      inboundDms,
+      igWeekly,
       testLog,
     },
     null,
