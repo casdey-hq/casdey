@@ -91,7 +91,7 @@ Infrastructure is not the constraint. Customers are.
 
 ---
 
-## 6. Where it stands, 12 September 2026
+## 6. Where it stands, 13 September 2026
 
 - casdey.com is published. The product is live and open to anyone.
 - V1 is complete. Every gate closed, including a live card checkout end to end.
@@ -101,8 +101,12 @@ Infrastructure is not the constraint. Customers are.
 - Built: import, lapse detection, campaigns, per-member writing, follow-ups, replies,
   booking into Google Calendar, the guarantee, three tiers, per-gym sending domains.
 - Outreach live at 100 first-touch emails a day plus every due follow-up, and a weekly
-  subject-line A/B test.
-- Strongest signal so far: 5 of the 6 genuine replies came from CrossFit and community boxes.
+  A/B test. 926 gyms contacted, 12 genuine replies (1.3%), 1 engaged lead (0.11%).
+- From 14 September the email sells the result and gives something first: a free short
+  video and the exact message casdey would send the gym's ex-members.
+- CrossFit and community boxes still reply best, 1.7% against 1.0% for other gyms.
+
+**Goals:** 1% engaged leads a week, from 20 September. 2 paying gyms by 13 October.
 
 ---
 
