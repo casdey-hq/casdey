@@ -2,6 +2,7 @@ import "server-only";
 
 import { change } from "./dashboard";
 import { periodBuckets } from "./admin-period";
+import { countryFromTimezone, regionName } from "./timezone-country";
 
 /**
  * Reading numbers back out of PostHog for /admin.
@@ -238,23 +239,47 @@ export function topReferrers(
   );
 }
 
-/** Visitors by country, from PostHog's GeoIP enrichment. */
-export function topCountries(
+/**
+ * Visitors by country. PostHog's GeoIP never fills this in on its own here:
+ * cookieless mode drops the IP before GeoIP can read it (2026-09-13, 0 of 516
+ * pageviews located). So the country is, in order: `visitor_country`, which
+ * posthog-provider.tsx registers from Vercel's edge lookup via /api/geo;
+ * PostHog's own GeoIP code, should it ever be present; and the browser's
+ * $timezone, which covers every visit from before /api/geo existed.
+ *
+ * Grouped by (code, zone) in HogQL and folded into countries here, so a hash
+ * seen under two zones is counted once per zone. At casdey's traffic that is
+ * a rounding error, not a bias.
+ */
+export async function topCountries(
   days = 84,
   limit = 12,
 ): Promise<RankedRow[] | null> {
-  return ranked(
-    `
-    SELECT properties.$geoip_country_name AS country,
+  const rows = await hogql(`
+    SELECT coalesce(properties.visitor_country, properties.$geoip_country_code) AS code,
+           properties.$timezone AS zone,
            count(DISTINCT distinct_id) AS visitors
     FROM events
     WHERE event = '$pageview' AND timestamp >= now() - INTERVAL ${days} DAY
-    GROUP BY country
-    ORDER BY visitors DESC
-    LIMIT ${limit}
-    `,
-    "Unknown",
-  );
+    GROUP BY code, zone
+  `);
+  if (rows === null) return null;
+
+  const totals = new Map<string, number>();
+  for (const [code, zone, visitors] of rows) {
+    const resolved =
+      typeof code === "string" && code !== ""
+        ? code
+        : countryFromTimezone(typeof zone === "string" ? zone : null);
+    const label = resolved ? regionName(resolved) : "Unknown";
+    totals.set(label, (totals.get(label) ?? 0) + Number(visitors));
+  }
+
+  return [...totals]
+    .map(([label, value]) => ({ label, value }))
+    .filter((row) => Number.isFinite(row.value) && row.value > 0)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, limit);
 }
 
 /** Desktop / Mobile / Tablet split. */

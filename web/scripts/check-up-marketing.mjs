@@ -7,6 +7,21 @@
  *   node scripts/check-up-marketing.mjs
  *
  * Prints one JSON object: { leads, sendLog, igOutreach, testLog }.
+ *
+ * Two outreach rates, kept apart on purpose (Davide, 2026-09-13), and computed
+ * the same way src/lib/outreach-summary.ts computes them for /admin:
+ *   - genuineReplyRatePct: gyms whose `Reply?` reads "Replied", over gyms
+ *     contacted. Most replies are a no thanks. Opt-outs ("Unsubscribed") are
+ *     counted separately.
+ *   - engagedRatePct: gyms actually interested in casdey, the way JD at
+ *     BodyActive is: a `Status` of Interested or Committed.
+ *
+ * testLog carries the weekly test review (the Sunday marketing analysis, see
+ * .claude/skills/check-up/SKILL.md "The weekly test review"): every running
+ * test gets `liveReview`, its per-variant sends, replies and engaged leads
+ * worked out from Send Log, plus a significance check and a
+ * `proposedTestLogUpdate` whose keys are the Test Log's own headers. The
+ * decision itself stays Davide's; nothing here writes.
  */
 
 import crypto from "node:crypto";
@@ -94,32 +109,51 @@ async function values(token, range) {
   return r.values ?? [];
 }
 
+const DAY = 86_400_000;
 const token = await accessToken();
 const now = Date.now();
-const weekAgo = now - 7 * 86_400_000;
+const weekAgo = now - 7 * DAY;
+const today = new Date(now).toISOString().slice(0, 10);
 const isRecent = (dateStr) => {
   if (!dateStr) return false;
   const t = Date.parse(dateStr);
   return !Number.isNaN(t) && t >= weekAgo;
 };
+const pct = (part, whole) => (whole ? +((part / whole) * 100).toFixed(2) : null);
 
-// --- Leads tab: # B..U, Status = col R (index 17), Reply? = col U (index 20) ---
+// --- Leads tab: A=#, B=Gym, R=Status (17), S=Date Contacted (18), U=Reply? (20).
+// Reply? holds "Replied" or "Unsubscribed", not Y/N: counting "Y" here read 0
+// replies for weeks (fixed 2026-09-13).
 const leadsRows = await values(token, "Leads!A2:U6000");
 const statusCounts = {};
-let repliedYes = 0;
 let contacted = 0;
+let genuineReplies = 0;
+let optOuts = 0;
+const repliedLeads = new Set();
+const engagedLeadNumbers = new Set();
+const engagedLeads = [];
 for (const row of leadsRows) {
   const status = (row[17] ?? "").trim() || "(blank)";
   statusCounts[status] = (statusCounts[status] ?? 0) + 1;
-  if (status !== "Not contacted" && status !== "(blank)") contacted += 1;
-  if ((row[20] ?? "").trim().toUpperCase() === "Y") repliedYes += 1;
+  if (status === "Not contacted" || status === "(blank)") continue;
+  contacted += 1;
+  const reply = (row[20] ?? "").trim().toLowerCase();
+  if (reply === "replied" || reply === "y") {
+    genuineReplies += 1;
+    repliedLeads.add(row[0]);
+  }
+  if (reply === "unsubscribed") optOuts += 1;
+  if (status === "Interested" || status === "Committed") {
+    engagedLeadNumbers.add(row[0]);
+    engagedLeads.push({ lead: row[0], gym: row[1], status, contacted: row[18] });
+  }
 }
-const responded = (statusCounts["Replied"] ?? 0) + (statusCounts["Interested"] ?? 0) + (statusCounts["Committed"] ?? 0);
 
-// --- Send Log: D=Date Sent, N=Variant (A/B on the first-touch row, FU1/FU2 on
-// a follow-up's own row — each actual send is its own row), Q=Subject Variant
-// (first-touch only). "Follow-up Sent (Y/N)" flags (H, P) are a per-lead
-// summary, not per-send, so counting rows is the accurate way to size volume.
+// --- Send Log: A=Lead #, D=Date Sent, N=Variant (A/B on the first-touch row,
+// FU1/FU2 on a follow-up's own row — each actual send is its own row),
+// Q=Subject Variant (first-touch only). "Follow-up Sent (Y/N)" flags (H, P) are
+// a per-lead summary, not per-send, so counting rows is the accurate way to
+// size volume.
 const sendRows = await values(token, "Send Log!A2:Q10000");
 let totalSendRows = 0;
 let sentThisWeek = 0;
@@ -127,6 +161,7 @@ const rowTypeCounts = { firstTouch: 0, fu1: 0, fu2: 0, other: 0 };
 const rowTypeThisWeek = { firstTouch: 0, fu1: 0, fu2: 0, other: 0 };
 const variantCounts = {}; // A / B, first-touch CTA framing
 const subjectVariantCounts = {}; // S1 / S2, first-touch subject line
+const firstTouches = [];
 for (const row of sendRows) {
   const dateSent = row[3];
   if (!dateSent) continue;
@@ -137,8 +172,11 @@ for (const row of sendRows) {
   const bucket = variant === "A" || variant === "B" ? "firstTouch" : variant === "FU1" ? "fu1" : variant === "FU2" ? "fu2" : "other";
   rowTypeCounts[bucket] += 1;
   if (recent) rowTypeThisWeek[bucket] += 1;
-  if (bucket === "firstTouch") variantCounts[variant] = (variantCounts[variant] ?? 0) + 1;
   const subjectVariant = (row[16] ?? "").trim();
+  if (bucket === "firstTouch") {
+    variantCounts[variant] = (variantCounts[variant] ?? 0) + 1;
+    firstTouches.push({ lead: row[0], date: dateSent, variant, subject: subjectVariant });
+  }
   if (subjectVariant) subjectVariantCounts[subjectVariant] = (subjectVariantCounts[subjectVariant] ?? 0) + 1;
 }
 
@@ -153,29 +191,132 @@ for (const row of igRows) {
     igSentTotal += 1;
     if (isRecent(dateSent)) igSentThisWeek += 1;
   }
-  if ((row[10] ?? "").trim().toUpperCase() === "Y") igReplies += 1;
+  const reply = (row[10] ?? "").trim().toLowerCase();
+  if (reply === "y" || reply === "replied") igReplies += 1;
 }
 
-// --- Test Log: as-is, the weekly review fills Sends/Replies/Winner by hand ---
+// --- Test Log + the weekly test review ---
+
+/** Two-sided p-value of a two-proportion z-test, or null when it cannot be
+ *  computed (an empty arm, or no replies anywhere). Normal CDF by the
+ *  Abramowitz-Stegun approximation, ample for a go/no-go call. */
+function twoProportionP(r1, n1, r2, n2) {
+  if (!n1 || !n2) return null;
+  const pooled = (r1 + r2) / (n1 + n2);
+  if (pooled === 0 || pooled === 1) return null;
+  const se = Math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2));
+  const z = Math.abs(r1 / n1 - r2 / n2) / se;
+  const t = 1 / (1 + 0.2316419 * z);
+  const density = 0.3989423 * Math.exp((-z * z) / 2);
+  const tail = density * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+  return +(2 * tail).toFixed(3);
+}
+
+/** "S1 = \"quick question…\"" → "S1". */
+const armKey = (text) => (text ?? "").split("=")[0].trim() || null;
+const ARM_LETTERS = ["A", "B", "C"];
+/** Replies this low cannot separate two arms, whatever the rates say. */
+const MIN_REPLIES_TO_CALL = 10;
+
 const testRows = await values(token, "Test Log!A2:W50");
 const testLog = testRows
   .filter((row) => row[0])
-  .map((row) => ({
-    id: row[0],
-    weekStarted: row[1],
-    asset: row[3],
-    component: row[4],
-    variantA: row[6],
-    variantB: row[7],
-    winner: row[18],
-    weeksUnbeaten: row[20],
-    status: row[21],
-  }));
+  .map((row) => {
+    const entry = {
+      id: row[0],
+      weekStarted: row[1],
+      weekEnded: row[2] || null,
+      asset: row[3],
+      component: row[4],
+      hypothesis: row[5] || null,
+      variantA: row[6],
+      variantB: row[7],
+      variantC: row[8] || null,
+      winner: row[18],
+      decision: row[19] || null,
+      weeksUnbeaten: row[20],
+      status: row[21],
+      notes: row[22] || null,
+    };
+    if ((row[21] ?? "").trim().toLowerCase() !== "running") return entry;
+
+    // Which Send Log column tells the arms apart: the subject variant for a
+    // subject-line test, the body/CTA variant otherwise.
+    const column = /subject/i.test(row[4] ?? "") ? "subject" : "variant";
+    const since = Date.parse(row[1]);
+    const arms = [row[6], row[7], row[8]]
+      .map((text, index) => ({ key: armKey(text), letter: ARM_LETTERS[index] }))
+      .filter((arm) => arm.key)
+      .map(({ key, letter }) => {
+        const sends = firstTouches.filter(
+          (ft) => ft[column] === key && (Number.isNaN(since) || Date.parse(ft.date) >= since),
+        );
+        // A reply is credited to the arm of the lead's first touch, even when
+        // it came in after a follow-up: the first touch is what the test varied.
+        const leads = new Set(sends.map((ft) => ft.lead));
+        const replies = [...leads].filter((lead) => repliedLeads.has(lead)).length;
+        const engaged = [...leads].filter((lead) => engagedLeadNumbers.has(lead)).length;
+        return { letter, key, sends: sends.length, replies, replyRatePct: pct(replies, sends.length), engaged };
+      });
+
+    const totalReplies = arms.reduce((sum, arm) => sum + arm.replies, 0);
+    const pValue = arms.length >= 2 ? twoProportionP(arms[0].replies, arms[0].sends, arms[1].replies, arms[1].sends) : null;
+    const leader = [...arms].sort((a, b) => (b.replyRatePct ?? 0) - (a.replyRatePct ?? 0))[0] ?? null;
+    const tied = arms.length >= 2 && arms[0].replyRatePct === arms[1].replyRatePct;
+
+    let verdict;
+    if (totalReplies < MIN_REPLIES_TO_CALL) {
+      verdict = `too few replies to call (${totalReplies} across all arms, want ${MIN_REPLIES_TO_CALL}+)`;
+    } else if (pValue !== null && pValue < 0.05) {
+      verdict = `${leader.key} wins (p=${pValue})`;
+    } else if (tied) {
+      verdict = "dead heat";
+    } else {
+      verdict = `${leader.key} leads but not significantly (p=${pValue})`;
+    }
+
+    // Last review = the Week ended date if one was ever written, else the start.
+    const lastReviewed = Date.parse(row[2] || row[1]);
+    const daysSinceReview = Number.isNaN(lastReviewed) ? null : Math.floor((now - lastReviewed) / DAY);
+
+    const proposedTestLogUpdate = { "Week ended": today };
+    for (const arm of arms) {
+      proposedTestLogUpdate[`Sends ${arm.letter}`] = String(arm.sends);
+      proposedTestLogUpdate[`Replies ${arm.letter}`] = String(arm.replies);
+      proposedTestLogUpdate[`Reply-rate ${arm.letter}`] = arm.replyRatePct === null ? "" : `${arm.replyRatePct}%`;
+    }
+
+    return {
+      ...entry,
+      liveReview: {
+        column,
+        daysRunning: Number.isNaN(since) ? null : Math.floor((now - since) / DAY),
+        daysSinceReview,
+        reviewOverdueDays: daysSinceReview === null ? null : Math.max(0, daysSinceReview - 7),
+        arms,
+        totalReplies,
+        pValue,
+        leader: leader?.key ?? null,
+        verdict,
+        proposedTestLogUpdate,
+      },
+    };
+  });
 
 console.log(
   JSON.stringify(
     {
-      leads: { total: leadsRows.length, contacted, statusCounts, responded, repliedYes, replyRatePct: contacted ? +((responded / contacted) * 100).toFixed(2) : null },
+      leads: {
+        total: leadsRows.length,
+        contacted,
+        statusCounts,
+        genuineReplies,
+        optOuts,
+        genuineReplyRatePct: pct(genuineReplies, contacted),
+        engaged: engagedLeads.length,
+        engagedRatePct: pct(engagedLeads.length, contacted),
+        engagedLeads,
+      },
       sendLog: { totalSendRows, sentThisWeek, rowTypeCounts, rowTypeThisWeek, variantCounts, subjectVariantCounts },
       igOutreach: { igSentTotal, igSentThisWeek, igReplies },
       testLog,

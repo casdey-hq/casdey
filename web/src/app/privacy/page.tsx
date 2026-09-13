@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const LAST_UPDATED = "8 September 2026";
+const LAST_UPDATED = "13 September 2026";
 
 function H2({ children }: { children: React.ReactNode }) {
   return <h2 className="display mt-14 text-[1.5rem] text-ink">{children}</h2>;
@@ -104,7 +104,11 @@ export default function PrivacyPage() {
             <H2>Analytics on this website</H2>
             <P>
               We use PostHog, hosted in the EU, to see roughly how many people
-              visit casdey.com and which pages they land on. It runs
+              visit casdey.com, which pages they land on, and roughly which
+              country a visit comes from. The country is worked out by our
+              hosting provider from your connection, or from your
+              browser&apos;s time zone, and only the country is passed on: your
+              IP address is not sent to PostHog or stored. It runs
               cookieless: no cookie is set, nothing is written to your
               browser&apos;s storage, and you are counted by a rotating,
               privacy-preserving hash PostHog computes on its own servers

@@ -25,6 +25,7 @@ import {
   topReferrers,
   visitorTrend,
 } from "@/lib/posthog-query";
+import { Suspense } from "react";
 import { formatMoney } from "@/lib/money";
 import { Funnel, LineChart, Split } from "@/components/app/chart";
 import {
@@ -36,6 +37,7 @@ import {
   formatDate,
 } from "@/components/app/ui";
 import { PeriodNav, RankedList, Section, periodFrom } from "./parts";
+import { OutreachSection } from "./outreach-section";
 
 export const metadata = { title: "Business overview" };
 
@@ -201,6 +203,17 @@ export default async function AdminPage(props: PageProps<"/admin">) {
           hint={priorCount(churn.previous)}
         />
       </div>
+
+      {/* -------------------------------------------------- Outreach */}
+      <Suspense
+        fallback={
+          <Section title="Outreach" sub="Reading the leads sheet…">
+            <div className="h-28" />
+          </Section>
+        }
+      >
+        <OutreachSection period={period} />
+      </Suspense>
 
       {/* -------------------------------------------------- Traffic */}
       <Section

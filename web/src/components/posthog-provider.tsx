@@ -21,17 +21,27 @@ import posthog from "posthog-js";
  * does client-side route transitions that never reload the page, so the
  * library's own "fires once on load" pageview would miss every navigation
  * after the first.
+ *
+ * The country is registered before the first pageview goes out, from
+ * /api/geo. Cookieless mode discards the connection's IP before PostHog's
+ * GeoIP step can read it, so until 2026-09-13 not one pageview carried a
+ * country (see that route for how it was pinned down). Only the two-letter
+ * code Vercel resolved at the edge is sent, never the address.
  */
 
 let initialised = false;
+/** Settles once the country is registered, or the lookup has given up.
+ *  Pageviews wait on it so the first one carries the country too. */
+let countryReady: Promise<void> = Promise.resolve();
+const COUNTRY_LOOKUP_TIMEOUT_MS = 1500;
 
-function initPosthog(): void {
-  if (initialised) return;
+function initPosthog(): boolean {
+  if (initialised) return true;
   const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
   const host = process.env.NEXT_PUBLIC_POSTHOG_HOST;
   // Not configured (e.g. a preview environment with no PostHog project) — the
   // site works exactly as it did before this existed, it just is not measured.
-  if (!key || !host) return;
+  if (!key || !host) return false;
 
   posthog.init(key, {
     api_host: host,
@@ -40,6 +50,27 @@ function initPosthog(): void {
     autocapture: true,
   });
   initialised = true;
+  countryReady = registerCountry();
+  return true;
+}
+
+async function registerCountry(): Promise<void> {
+  const lookup = fetch("/api/geo", { cache: "no-store" })
+    .then((response) => (response.ok ? response.json() : null))
+    .then((body: { country?: unknown } | null) => {
+      const country = body?.country;
+      if (typeof country === "string" && /^[A-Z]{2}$/.test(country)) {
+        posthog.register({ visitor_country: country });
+      }
+    })
+    .catch(() => {});
+  // A slow lookup must never cost the pageview itself.
+  await Promise.race([
+    lookup,
+    new Promise<void>((resolve) =>
+      setTimeout(resolve, COUNTRY_LOOKUP_TIMEOUT_MS),
+    ),
+  ]);
 }
 
 function PageviewTracker() {
@@ -47,10 +78,13 @@ function PageviewTracker() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!initialised) return;
+    // Initialised here too, not only in the provider: React runs a child's
+    // effects before its parent's, so this is the first code to run on load.
+    if (!initPosthog()) return;
     const query = searchParams.toString();
-    posthog.capture("$pageview", {
-      $current_url: query ? `${pathname}?${query}` : pathname,
+    const url = query ? `${pathname}?${query}` : pathname;
+    void countryReady.then(() => {
+      posthog.capture("$pageview", { $current_url: url });
     });
   }, [pathname, searchParams]);
 
