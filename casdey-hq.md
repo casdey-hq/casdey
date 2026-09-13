@@ -105,6 +105,8 @@ Infrastructure is not the constraint. Customers are.
 - From 14 September the email sells the result and gives something first: a free short
   video and the exact message casdey would send the gym's ex-members.
 - CrossFit and community boxes still reply best, 1.7% against 1.0% for other gyms.
+- Instagram: cold DMs up to 20 a day, sent by hand. From 16 September, one post a day for
+  100 days, drafted by Claude, approved weekly, published automatically.
 
 **Goals:** 1% engaged leads a week, from 20 September. 2 paying gyms by 13 October.
 

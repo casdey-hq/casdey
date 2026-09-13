@@ -259,9 +259,11 @@ Keep in sync with the "Marketing plan (Hormozi)" and "Stage 1" sections of
 - **Channel choice** — casdey runs **cold outreach** (email + IG DM) as
   primary, deliberately skipping warm. Recorded, accepted divergence (Davide
   has no warm gym-owner list; see the ledger). Don't re-suggest warm as an
-  oversight. Content/IG exists but is thin — not yet a real second channel;
-  per "one channel first", keep pushing cold email to predictable before
-  treating content as channel #2.
+  oversight. **Organic Instagram content became channel #2 on 2026-09-13**
+  (one faceless post a day for 100 days, `content-plan.md`), a deliberate
+  partial divergence from "one channel first": the rule protects founder
+  attention, and the automated email machine needs about an hour a week of
+  it. See the ledger entry "The founder's idle week".
 - **Lead magnet** — the **Free tier** is casdey's lead magnet, and a
   well-formed one: complete small win (the recovered-revenue number), reveals
   the next problem (now actually win them back), which the paid tiers solve.
