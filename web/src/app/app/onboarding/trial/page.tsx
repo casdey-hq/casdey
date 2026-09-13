@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { requireGym } from "@/lib/dal";
@@ -101,6 +102,25 @@ export default async function TrialStartPage(
 
       <p className="mt-5 text-[0.8125rem] text-stone">
         Card details go straight to Stripe. casdey never sees them.
+      </p>
+
+      {/* The pricing page's Free column says "Start free" and leads here, so
+          the Free plan has to be reachable from this page without paying
+          (Davide, 2026-09-13). The week stays the main path; this is the way
+          out for someone who came for Free. It can still be started later
+          from the dashboard's trial panel. */}
+      <p className="mt-8 border-t border-ash pt-6 text-center text-[0.9375rem] text-graphite">
+        Not ready to pay anything?{" "}
+        <Link
+          href="/app"
+          className="font-medium text-teal underline underline-offset-4 hover:text-ink"
+        >
+          Continue on the Free plan
+        </Link>
+        <span className="mt-1 block text-[0.8125rem] text-stone">
+          Import your list and see who has lapsed, with no card. You can start
+          the week later from your dashboard.
+        </span>
       </p>
     </div>
   );
