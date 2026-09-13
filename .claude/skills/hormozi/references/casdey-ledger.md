@@ -349,3 +349,43 @@ it wins. The "too salesy" worry of 2026-08-23 was checked against Hormozi's own
 cold email template (claims, an offer and a call request in one email); V has
 no price, no link, no discount and no call, so it stays well inside that. Not
 settled here: whether calls return once email and DMs are running at the goal.
+
+## 2026-09-13 — The founder's idle week: proof, the post-yes path, and organic content (reverses the "New" deferral for content only)
+Framework: $100M Leads / "100 conversations or 10,000 emails before tweaking"
+(pg 171), the case-study lead magnet (pg 46), Core Four "more time than money,
+post content" (pg 245), Post Free Content (pg 113-147: content unit, give:ask,
+"How I", puddles, reminders, greatest hits, benchmarks); $100M Offers / Starving
+Crowd > Offer > Persuasion (pg ~62)
+Decision: with outreach fully automated and V1.1 done, Davide asked whether there
+is real work for him or whether he should honestly rest. Verdict: roughly 10 to 15
+hours of real work, all where the automations cannot reach, and nothing beyond it.
+Davide took all four:
+  1. **JD / BodyActive to a first result**, follow-up Tuesday 2026-09-15 or
+     Wednesday 2026-09-16, with the ask reduced to one export. The model is
+     Hormozi's own breakthrough: a 13-minute recording of one gym's real numbers.
+  2. **The post-yes path**, written before T2's yeses arrive: the second and third
+     messages and the objection answers (Leads: 2 to 3 conversations before a
+     close; content feeds sales). Done-for-you setup is fine once a gym has said
+     yes; T0's variant B failed only because it asked a stranger for a member list.
+  3. **A believable Instagram profile**, because 105 DMs from an empty brand
+     account got 0 replies and a stranger checks the profile first.
+  4. **Organic content**, committed as a 100-day cadence, plan still to be made.
+Explicitly not touched: T2, the routines, volume and copy (casdey is at about
+1,800 emails and 12 conversations against the pg 171 threshold), software, and
+every item in the V1.1 "deliberately not" list. Davide also settled the niche
+question for now: the gym niche is not binned until more outreach methods have
+been tested and the machine has had its 60 to 90 days.
+Follows or diverges: **Follows** on 1 to 3. **Partial divergence** on 4: the
+2026-09-10 diagnosis deferred "New", and Hormozi's rule is to max out one channel
+before adding another. For casdey the reason behind that rule is weaker than the
+book assumes, because the rule protects founder attention and the email machine
+now needs about an hour a week of it. Hormozi's own sequencing ("if I have more
+time than money, I move to posting content") describes Davide exactly, and content
+also lifts the cold channel directly ("if you reach out to someone and they can't
+find content related to your services, they're less likely to buy", pg 114).
+Reason: Davide's call, made against the numbers pulled live on 2026-09-13 (926
+contacted, 12 replies, 1 engaged, IG 105 sent / 0 replies). The one condition
+attached, from pg 145: pick a cadence that can be held, then do not stop. A burst
+that ends when the week gets busy is worth nothing. Watch item, not acted on: 11
+of 12 replies being a no is a small signal about the market, not only the message,
+and T2 is the test that separates the two.
