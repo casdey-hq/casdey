@@ -169,7 +169,9 @@ for (const row of sendRows) {
   const recent = isRecent(dateSent);
   if (recent) sentThisWeek += 1;
   const variant = (row[13] ?? "").trim();
-  const bucket = variant === "A" || variant === "B" ? "firstTouch" : variant === "FU1" ? "fu1" : variant === "FU2" ? "fu2" : "other";
+  // Any body variant letter is a first touch (A/B for T0, A/V for T2 from
+  // 2026-09-14); FU1/FU2 are follow-ups; blank predates the Variant column.
+  const bucket = variant === "FU1" ? "fu1" : variant === "FU2" ? "fu2" : /^[A-Z]$/.test(variant) ? "firstTouch" : "other";
   rowTypeCounts[bucket] += 1;
   if (recent) rowTypeThisWeek[bucket] += 1;
   const subjectVariant = (row[16] ?? "").trim();

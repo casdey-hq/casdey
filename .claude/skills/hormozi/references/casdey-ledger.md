@@ -315,3 +315,37 @@ something other than money, such as reduced functionality. That keeps the
 stakes without the chargeback, the cross-border enforceability question or the
 category weirdness. Worth taking seriously whenever activation is the
 constraint again.
+
+## 2026-09-13 — Sunday review: engaged leads are the goal, the cold email sells the result and gives first
+Framework: $100M Offers / Dream Outcome, "sell the vacation, not the plane
+flight" (pg 96); $100M Leads / big fast value (pg 169-170), free in exchange
+for feedback (pg 94), hidden costs make "free" too expensive (pg 97), More
+Better New and the weekly test log; $100M Leads Cold Outreach pack
+Decision: Davide set two goals: **1% engaged leads** for the week ending
+2026-09-20, measured on that week's contacts (about 7 interested gyms from
+about 700), and **2 paying gyms by 2026-10-13**. An engaged lead is a gym
+interested in the product, not a reply; a "yes, send me the video" counts.
+The review closed T0 (A, the permission ask, on direction only: B's free setup
+got 0 replies in 290) and T1 (no winner, S1 kept). T2, live from 2026-09-14,
+tests A against **V**: an outcome-led first email ("what if the members who
+left your gym started paying you again", about ten minutes to set up, nothing
+to do after) that gives a free general video plus the exact message casdey
+would send that gym's ex-members, asking only for an honest opinion in return.
+Instagram DMs switch to the same framing outright. **No cold calls**, Davide's
+call: outreach stays email and Instagram.
+Follows or diverges: **Follows** on the copy and the give. **Diverges** on
+channel: Hormozi's "follow up more times, more ways" (pg 174-175) points at
+phone follow-up on the email, and Davide declined it for now.
+Reason: 12 genuine replies from 926 gyms had produced one interested gym. Two
+readings of the data drove it. First, the free-setup give failed because it
+carried a hidden cost, handing a member list to a stranger, exactly the pg 97
+failure; a video costs the gym nothing. Second, the feedback-first email asked
+strangers for something and gave nothing back, which the 2026-09-10 entry
+already called an ask, not a give; pg 94 is Hormozi's own fix, where feedback
+becomes the fair price of something free. The email changes several things at
+once on purpose: at about 7 replies a week a single-variable test cannot move a
+weekly goal, so the big swing comes first and refinement happens inside V if
+it wins. The "too salesy" worry of 2026-08-23 was checked against Hormozi's own
+cold email template (claims, an offer and a call request in one email); V has
+no price, no link, no discount and no call, so it stays well inside that. Not
+settled here: whether calls return once email and DMs are running at the goal.
