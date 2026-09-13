@@ -1,12 +1,14 @@
 import type { NextRequest } from "next/server";
 
 import { appendRow, readRange, sheetsWriteToken, writeRange } from "@/lib/google-sheets";
-import { loadAccount, publishPost, refreshTokenIfDue, stagedSlideUrls, weeklyNumbers } from "@/lib/instagram";
-import { duePosts, romeDate, weeklyRowDue } from "@/lib/instagram-schedule";
+import { loadAccount, publishPost, publishReel, refreshTokenIfDue, stagedReel, stagedSlideUrls, weeklyNumbers } from "@/lib/instagram";
+import { duePosts, isReel, romeDate, weeklyRowDue } from "@/lib/instagram-schedule";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+// Vercel Hobby's ceiling with Fluid compute. A reel waits on Instagram to fetch
+// and transcode the video, which can take minutes.
+export const maxDuration = 300;
 
 /**
  * The daily Instagram job (content-plan.md). Scheduled for 10:30 UTC, 12:30 in
@@ -35,7 +37,9 @@ function authorized(request: NextRequest): boolean {
 }
 
 /** Stop starting new posts after this, leaving time to finish one and write back. */
-const START_BUDGET_MS = 25_000;
+const START_BUDGET_MS = 120_000;
+/** Give up waiting on Instagram here, with time left to mark the row Failed. */
+const PUBLISH_DEADLINE_MS = 270_000;
 
 async function run(request: NextRequest): Promise<Response> {
   if (!authorized(request)) return new Response("Unauthorized", { status: 401 });
@@ -86,9 +90,16 @@ async function run(request: NextRequest): Promise<Response> {
       if (Date.now() - started > START_BUDGET_MS) break;
       await writeRange(sheetToken, `IG Content!I${post.rowNumber}`, [["Publishing"]]);
       try {
-        const slides = await stagedSlideUrls(post.id);
-        if (slides.length === 0) throw new Error(`no staged slides for post ${post.id} (npm run ig:stage)`);
-        const link = await publishPost(account, slides, post.caption, started + 50_000);
+        let link: string;
+        if (isReel(post)) {
+          const reel = await stagedReel(post.id);
+          if (!reel) throw new Error(`no staged reel for post ${post.id} (npm run ig:stage)`);
+          link = await publishReel(account, reel, post.caption, started + PUBLISH_DEADLINE_MS);
+        } else {
+          const slides = await stagedSlideUrls(post.id);
+          if (slides.length === 0) throw new Error(`no staged slides for post ${post.id} (npm run ig:stage)`);
+          link = await publishPost(account, slides, post.caption, started + PUBLISH_DEADLINE_MS);
+        }
         await writeRange(sheetToken, `IG Content!I${post.rowNumber}`, [["Posted"]]);
         await writeRange(sheetToken, `IG Content!K${post.rowNumber}:L${post.rowNumber}`, [[today, link]]);
         result.published.push({ id: post.id, link });

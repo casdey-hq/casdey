@@ -29,3 +29,9 @@ Alex Hormozi/
 
 # Rendered Instagram post images, regenerated from content/instagram/*.json
 content/instagram/out/
+# Stock clips behind the reels. Each is named after its Pexels id, and the batch
+# JSON names the clip, so it can always be downloaded again.
+content/instagram/footage/
+# Licensed music tracks mixed into the reels (Meta Sound Collection or Pixabay),
+# named in each post's `music` field.
+content/instagram/music/

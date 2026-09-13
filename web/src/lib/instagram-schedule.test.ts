@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { duePosts, parseSheetDate, romeDate, weeklyRowDue } from "./instagram-schedule";
+import { duePosts, isReel, parseSheetDate, romeDate, weeklyRowDue } from "./instagram-schedule";
 
-/** An IG Content row: # (A), planned (B), caption (G), status (I), posted (K). */
-function post(id: string, planned: string, status: string, posted = "", caption = `caption ${id}`): string[] {
+/** An IG Content row: # (A), planned (B), format (D), caption (G), status (I), posted (K). */
+function post(id: string, planned: string, status: string, posted = "", caption = `caption ${id}`, format = "Carousel"): string[] {
   const row = Array<string>(12).fill("");
   row[0] = id;
   row[1] = planned;
+  row[3] = format;
   row[6] = caption;
   row[8] = status;
   row[10] = posted;
@@ -58,7 +59,14 @@ describe("duePosts", () => {
 
   it("gives the sheet row number and caption for writing back", () => {
     const rows = [post("001", "16/09/2026", "Approved", "", "hello")];
-    expect(duePosts(rows, "2026-09-16")).toEqual([{ rowNumber: 2, id: "001", planned: "2026-09-16", caption: "hello" }]);
+    expect(duePosts(rows, "2026-09-16")).toEqual([{ rowNumber: 2, id: "001", planned: "2026-09-16", caption: "hello", format: "Carousel" }]);
+  });
+
+  it("carries the format so a reel is published as a reel", () => {
+    const [reel, carousel] = duePosts([post("001", "2026-09-16", "Approved", "", "c", " Reel "), post("002", "2026-09-16", "Approved")], "2026-09-16");
+    expect(isReel(reel)).toBe(true);
+    expect(isReel(carousel)).toBe(false);
+    expect(isReel({ format: "" })).toBe(false);
   });
 
   it("skips rows with no usable planned date", () => {

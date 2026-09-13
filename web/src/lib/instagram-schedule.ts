@@ -14,7 +14,14 @@ export type DuePost = {
   id: string;
   planned: string;
   caption: string;
+  /** Column D as written by ig:sync: "Reel" or "Carousel". */
+  format: string;
 };
+
+/** Whether a post goes out as a reel rather than images. */
+export function isReel(post: Pick<DuePost, "format">): boolean {
+  return /^\s*reel/i.test(post.format);
+}
 
 /** At most this many posts in one run: the plan's launch day is three pinned posts. */
 export const MAX_POSTS_PER_RUN = 3;
@@ -59,7 +66,7 @@ export function duePosts(rows: string[][], today: string, limit = MAX_POSTS_PER_
     .filter(({ row }) => (row[0] ?? "").trim() !== "")
     .filter(({ row }) => (row[8] ?? "").trim().toLowerCase() === "approved")
     .filter(({ row }) => parseSheetDate(row[10]) === null)
-    .map(({ row, rowNumber }) => ({ rowNumber, id: row[0].trim(), planned: parseSheetDate(row[1]), caption: row[6] ?? "" }))
+    .map(({ row, rowNumber }) => ({ rowNumber, id: row[0].trim(), planned: parseSheetDate(row[1]), caption: row[6] ?? "", format: (row[3] ?? "").trim() }))
     .filter((post): post is DuePost => post.planned !== null && post.planned <= today)
     .sort((a, b) => a.planned.localeCompare(b.planned) || a.rowNumber - b.rowNumber)
     .slice(0, limit);

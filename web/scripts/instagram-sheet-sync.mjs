@@ -32,7 +32,7 @@ const repoRoot = path.resolve(here, "..", "..");
 const SHEET_ID = "1WOAIA1gvK6S1kWe_Vf4-d4XmjhnDLQZLtyU_ezvOu3w"; // Casdey-Gym-Leads
 
 const TABS = {
-  "IG Content": ["#", "Planned date", "Pillar", "Format", "Hook (slide 1)", "Slides", "Caption", "Images (Drive)", "Status (Draft / Changes requested / Approved / Posted)", "Feedback (Davide)", "Posted (date)", "Post link"],
+  "IG Content": ["#", "Planned date", "Pillar", "Format", "Hook", "Slides / reel text", "Caption", "Files (Drive)", "Status (Draft / Changes requested / Approved / Posted)", "Feedback (Davide)", "Posted (date)", "Post link"],
   "Inbound DMs": ["Date", "Instagram handle", "Gym / studio", "City", "Country", "Came from (post #, profile, cold DM)", "Video sent (date)", "Status (Interested / Committed / Dead)", "Notes"],
   // Column D was "Profile visits" until 2026-09-13: Instagram's API no longer
   // offers that metric, and accounts engaged is the closest one it does.
@@ -116,21 +116,29 @@ if (batchArg) {
   const drive = fs.existsSync(driveFile) ? JSON.parse(fs.readFileSync(driveFile, "utf8")) : { posts: {} };
   let nextRow = current.length + 2;
   const plain = (text = "") => text.replace(/\[\[(.+?)\]\]/g, "$1");
+  const reelText = (reel) =>
+    reel.kind === "pov"
+      ? `${reel.texts.map((b) => `at ${b.from}s: ${plain(b.text)}`).join("\n")}\n\n${reel.duration}s over ${reel.source ?? reel.clip}`
+      : `${reel.duration}s demo. ${reel.summary ?? ""}`.trim();
   const data = batch.posts.map((post) => {
-    const slidesText = post.slides
-      .map((s, i) => {
-        const parts = [s.eyebrow, s.title && plain(s.title), s.big && `${s.big} ${s.label ?? ""}`.trim(), s.sub && plain(s.sub), s.body, s.lines?.join("\n")].filter(Boolean);
-        return `${i + 1}. ${parts.join(" / ")}`;
-      })
-      .join("\n\n");
+    const slidesText = post.reel
+      ? reelText(post.reel)
+      : post.slides
+          .map((s, i) => {
+            const parts = [s.eyebrow, s.title && plain(s.title), s.big && `${s.big} ${s.label ?? ""}`.trim(), s.sub && plain(s.sub), s.body, s.lines?.join("\n")].filter(Boolean);
+            return `${i + 1}. ${parts.join(" / ")}`;
+          })
+          .join("\n\n");
+    const hook = post.reel ? plain(post.reel.hook ?? post.reel.texts?.map((b) => b.text).join(" ") ?? "") : plain(post.slides[0].title);
     const row = rowOf.get(post.id) ?? nextRow++;
     // Davide's approval sticks: a re-sync never turns Approved or Posted back into a draft.
     const existing = statusOf.get(post.id) ?? "";
     const status = /^(approved|posted)$/i.test(existing) ? existing : post.status ?? "Draft";
-    const images = drive.posts?.[post.id]?.link ?? `content/instagram/out/${post.id}/ (${post.slides.length} images, not on Drive yet)`;
+    const files = post.reel ? "reel.mp4" : `${post.slides.length} images`;
+    const images = drive.posts?.[post.id]?.link ?? `content/instagram/out/${post.id}/ (${files}, not on Drive yet)`;
     return {
       range: `'IG Content'!A${row}:I${row}`,
-      values: [[post.id, post.planned, post.pillar, post.format, plain(post.slides[0].title), slidesText, post.caption, images, status]],
+      values: [[post.id, post.planned, post.pillar, post.format, hook, slidesText, post.caption, images, status]],
     };
   });
   await api("/values:batchUpdate", { method: "POST", body: JSON.stringify({ valueInputOption: "RAW", data }) });

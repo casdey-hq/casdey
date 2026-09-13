@@ -2,7 +2,8 @@
  * Stages a batch's rendered slides for the publisher: converts each PNG in
  * content/instagram/out/<post #>/ to JPEG (Instagram's API accepts JPEG only)
  * and uploads it to the public Supabase bucket "instagram" as <post #>/<n>.jpg,
- * removing any old slides a revision left behind. Checks every public URL
+ * or for a reel uploads reel.mp4 and cover.jpg as they are, removing anything
+ * an earlier revision left behind. Checks every public URL
  * answers before finishing, because Instagram fetches them at publish time.
  *
  *   npm run ig:stage -- batch-01 [post id ...]
@@ -24,23 +25,37 @@ const batch = JSON.parse(fs.readFileSync(batchFile, "utf8"));
 const posts = batch.posts.filter((post) => onlyIds.length === 0 || onlyIds.includes(post.id));
 const { url, headers } = supabase();
 
+async function put(postId, name, contentType, body) {
+  const res = await fetch(`${url}/storage/v1/object/${BUCKET}/${postId}/${name}`, {
+    method: "POST",
+    headers: { ...headers, "content-type": contentType, "x-upsert": "true", "cache-control": "no-cache" },
+    body,
+  });
+  if (!res.ok) throw new Error(`${postId}/${name} upload failed (${res.status}): ${await res.text()}`);
+}
+
 for (const post of posts) {
   const dir = path.join(contentDir, "out", post.id);
-  const pngs = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /^\d+\.png$/.test(f)).sort((a, b) => parseInt(a) - parseInt(b)) : [];
-  if (pngs.length === 0) throw new Error(`${post.id}: nothing rendered, run npm run ig:render -- ${batch.batch} ${post.id}`);
-  if (pngs.length > 10) throw new Error(`${post.id}: ${pngs.length} slides, Instagram allows 10`);
-
   const keep = new Set();
-  for (const png of pngs) {
-    const name = png.replace(/\.png$/, ".jpg");
-    keep.add(name);
-    const jpeg = await sharp(path.join(dir, png)).flatten({ background: "#F7F7F4" }).jpeg({ quality: 92, mozjpeg: true }).toBuffer();
-    const res = await fetch(`${url}/storage/v1/object/${BUCKET}/${post.id}/${name}`, {
-      method: "POST",
-      headers: { ...headers, "content-type": "image/jpeg", "x-upsert": "true", "cache-control": "no-cache" },
-      body: jpeg,
-    });
-    if (!res.ok) throw new Error(`${post.id}/${name} upload failed (${res.status}): ${await res.text()}`);
+
+  if (post.reel) {
+    // A reel goes up as it was rendered: reel.mp4 plus the cover Instagram shows in the grid.
+    for (const [name, type] of [["reel.mp4", "video/mp4"], ["cover.jpg", "image/jpeg"]]) {
+      const file = path.join(dir, name);
+      if (!fs.existsSync(file)) throw new Error(`${post.id}: no ${name}, run npm run ig:render -- ${batch.batch} ${post.id}`);
+      await put(post.id, name, type, fs.readFileSync(file));
+      keep.add(name);
+    }
+  } else {
+    const pngs = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /^\d+\.png$/.test(f)).sort((a, b) => parseInt(a) - parseInt(b)) : [];
+    if (pngs.length === 0) throw new Error(`${post.id}: nothing rendered, run npm run ig:render -- ${batch.batch} ${post.id}`);
+    if (pngs.length > 10) throw new Error(`${post.id}: ${pngs.length} slides, Instagram allows 10`);
+    for (const png of pngs) {
+      const name = png.replace(/\.png$/, ".jpg");
+      keep.add(name);
+      const jpeg = await sharp(path.join(dir, png)).flatten({ background: "#F7F7F4" }).jpeg({ quality: 92, mozjpeg: true }).toBuffer();
+      await put(post.id, name, "image/jpeg", jpeg);
+    }
   }
 
   const listed = await fetch(`${url}/storage/v1/object/list/${BUCKET}`, {
@@ -62,5 +77,5 @@ for (const post of posts) {
     const check = await fetch(publicUrl, { method: "HEAD" });
     if (!check.ok) throw new Error(`${publicUrl} is not publicly reachable (${check.status})`);
   }
-  console.log(`${post.id}: ${keep.size} slides staged${stale.length ? `, ${stale.length} old removed` : ""}`);
+  console.log(`${post.id}: ${post.reel ? "reel and cover" : `${keep.size} slides`} staged${stale.length ? `, ${stale.length} old removed` : ""}`);
 }

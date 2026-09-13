@@ -13,11 +13,17 @@
  * Slide types: hook, text, stat, message, cta. In any title, [[words]] get the
  * Leaf highlight bar, the one gold accent a slide is allowed; in a message,
  * [brackets] mark the parts a gym fills in.
+ *
+ * A post with a `reel` instead of `slides` renders to out/<post id>/reel.mp4
+ * (1080x1920, H.264 + AAC) and cover.jpg, drawn by scripts/instagram-reel.html:
+ * `pov` puts text over a stock clip from content/instagram/footage/ (gitignored,
+ * each clip's Pexels page is in the post's `source`), `demo` draws casdey's own
+ * UI. Encoded frame by frame with WebCodecs in headless Chrome, so no ffmpeg.
  */
 
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import puppeteer from "puppeteer";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -117,10 +123,11 @@ mark::before { content: ""; position: absolute; left: -0.08em; right: -0.08em; b
  * the renders, and every slide loads with no network at all.
  */
 async function fontCss() {
-  const cache = path.join(contentDir, "out", ".fonts.css");
+  // Inter is for reel text only: the plain sans a post typed on a phone reads as.
+  const cache = path.join(contentDir, "out", ".fonts-v2.css");
   if (fs.existsSync(cache)) return fs.readFileSync(cache, "utf8");
   const url =
-    "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500&family=Outfit:wght@600;700&display=block";
+    "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500&family=Inter:wght@600;700&family=Outfit:wght@600;700&display=block";
   // A modern browser user agent, or Google serves TTF instead of woff2.
   const ua = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36";
   let css = await fetch(url, { headers: { "user-agent": ua } }).then((r) => r.text());
@@ -175,13 +182,15 @@ function slideHtml(slide, index, total) {
 }
 
 async function launch() {
+  // A reel encode is one long evaluate call, well past puppeteer's 3-minute default.
+  const options = { headless: true, protocolTimeout: 900_000 };
   try {
-    return await puppeteer.launch({ headless: true });
+    return await puppeteer.launch(options);
   } catch (error) {
     // Fall back to an installed Chrome if puppeteer's own browser was never downloaded.
     const chrome = ["C:/Program Files/Google/Chrome/Application/chrome.exe", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/usr/bin/google-chrome"].find((p) => fs.existsSync(p));
     if (!chrome) throw error;
-    return puppeteer.launch({ headless: true, executablePath: chrome });
+    return puppeteer.launch({ ...options, executablePath: chrome });
   }
 }
 
@@ -189,7 +198,7 @@ const browser = await launch();
 const page = await browser.newPage();
 await page.setViewport({ width: 1080, height: 1350, deviceScaleFactor: 1 });
 const problems = [];
-for (const post of posts) {
+for (const post of posts.filter((p) => !p.reel)) {
   const dir = path.join(contentDir, "out", post.id);
   fs.rmSync(dir, { recursive: true, force: true });
   fs.mkdirSync(dir, { recursive: true });
@@ -207,8 +216,46 @@ for (const post of posts) {
   }
   console.log(`${post.id}: ${post.slides.length} slides -> ${path.relative(repoRoot, dir)}`);
 }
+
+const reels = posts.filter((p) => p.reel);
+if (reels.length) {
+  const footageDir = path.join(contentDir, "footage");
+  const musicDir = path.join(contentDir, "music");
+  let sink = null;
+  const reelPage = await browser.newPage();
+  reelPage.on("pageerror", (error) => console.error("[reel page]", error.message));
+  await reelPage.exposeFunction("__chunk", (b64) => fs.appendFileSync(sink, Buffer.from(b64, "base64")));
+  // Clips and tracks travel as bytes into the page: a file:// video drawn to a
+  // canvas taints it, and a tainted canvas cannot be encoded.
+  await reelPage.exposeFunction("__asset", (kind, name) => fs.readFileSync(path.join(kind === "music" ? musicDir : footageDir, name)).toString("base64"));
+  await reelPage.goto(pathToFileURL(path.join(here, "instagram-reel.html")).href);
+  await reelPage.addStyleTag({ content: FONTS });
+  await reelPage.addScriptTag({ path: path.join(here, "..", "node_modules", "mp4-muxer", "build", "mp4-muxer.js") });
+
+  for (const post of reels) {
+    if (post.reel.clip && !fs.existsSync(path.join(footageDir, post.reel.clip))) {
+      throw new Error(`${post.id}: missing content/instagram/footage/${post.reel.clip}, download it from ${post.reel.source ?? "its Pexels page"}`);
+    }
+    if (post.reel.music && !fs.existsSync(path.join(musicDir, post.reel.music))) {
+      throw new Error(`${post.id}: missing content/instagram/music/${post.reel.music}, get it from ${post.reel.musicSource ?? "its library page"}`);
+    }
+    const dir = path.join(contentDir, "out", post.id);
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.mkdirSync(dir, { recursive: true });
+    sink = path.join(dir, "reel.mp4.part");
+    fs.writeFileSync(sink, Buffer.alloc(0));
+    const started = Date.now();
+    const result = await reelPage.evaluate((spec) => window.renderReel(spec), post.reel);
+    fs.renameSync(sink, path.join(dir, "reel.mp4"));
+    fs.writeFileSync(path.join(dir, "cover.jpg"), Buffer.from(result.cover.split(",")[1], "base64"));
+    for (const problem of result.problems) problems.push(`${post.id} ${problem}`);
+    const mb = (result.bytes / 1_000_000).toFixed(1);
+    const sound = result.audio ? post.reel.music : "silent";
+    console.log(`${post.id}: reel, ${post.reel.duration}s, ${sound}, ${mb} MB in ${Math.round((Date.now() - started) / 1000)}s -> ${path.relative(repoRoot, dir)}`);
+  }
+}
 await browser.close();
 if (problems.length) {
-  console.error(`\nCopy too long:\n  ${problems.join("\n  ")}`);
+  console.error(`\nCopy does not fit:\n  ${problems.join("\n  ")}`);
   process.exitCode = 1;
 }

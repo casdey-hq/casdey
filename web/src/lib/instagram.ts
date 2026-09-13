@@ -82,14 +82,52 @@ export async function stagedSlideUrls(postId: string): Promise<string[]> {
     .map((name) => storage.getPublicUrl(`${postId}/${name}`).data.publicUrl);
 }
 
-async function waitUntilFinished(account: InstagramAccount, containerId: string, deadline: number): Promise<void> {
+export type StagedReel = { videoUrl: string; coverUrl: string | null };
+
+/** Public URLs of a post's staged reel and cover, or null if it has none. */
+export async function stagedReel(postId: string): Promise<StagedReel | null> {
+  const storage = supabaseAdmin().storage.from(INSTAGRAM_BUCKET);
+  const { data, error } = await storage.list(postId, { limit: 100 });
+  if (error) throw new Error(`storage list ${postId} failed: ${error.message}`);
+  const names = new Set((data ?? []).map((file) => file.name));
+  if (!names.has("reel.mp4")) return null;
+  const url = (name: string) => storage.getPublicUrl(`${postId}/${name}`).data.publicUrl;
+  return { videoUrl: url("reel.mp4"), coverUrl: names.has("cover.jpg") ? url("cover.jpg") : null };
+}
+
+async function waitUntilFinished(account: InstagramAccount, containerId: string, deadline: number, pollMs = 2500): Promise<void> {
   for (;;) {
     const { status_code } = await graph<{ status_code?: string }>(containerId, { fields: "status_code", access_token: account.token });
     if (status_code === "FINISHED") return;
     if (status_code === "ERROR" || status_code === "EXPIRED") throw new Error(`container ${containerId} ${status_code}`);
     if (Date.now() > deadline) throw new Error(`container ${containerId} still ${status_code ?? "unknown"} at deadline`);
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+    await new Promise((resolve) => setTimeout(resolve, pollMs));
   }
+}
+
+async function publishContainer(account: InstagramAccount, creationId: string): Promise<string> {
+  const published = await graph<{ id: string }>(`${account.igUserId}/media_publish`, { creation_id: creationId, access_token: account.token }, "POST");
+  const { permalink } = await graph<{ permalink?: string }>(published.id, { fields: "permalink", access_token: account.token });
+  return permalink ?? `https://www.instagram.com/${account.username}/`;
+}
+
+/**
+ * Publishes a reel, shared to the feed as well as the Reels tab. Instagram
+ * downloads and transcodes the video before the container is ready, which
+ * takes far longer than an image, so it is polled more patiently.
+ */
+export async function publishReel(account: InstagramAccount, reel: StagedReel, caption: string, deadline: number): Promise<string> {
+  const params: Record<string, string> = {
+    media_type: "REELS",
+    video_url: reel.videoUrl,
+    caption,
+    share_to_feed: "true",
+    access_token: account.token,
+  };
+  if (reel.coverUrl) params.cover_url = reel.coverUrl;
+  const { id } = await graph<{ id: string }>(`${account.igUserId}/media`, params, "POST");
+  await waitUntilFinished(account, id, deadline, 8000);
+  return publishContainer(account, id);
 }
 
 /**
@@ -118,9 +156,7 @@ export async function publishPost(account: InstagramAccount, slideUrls: string[]
   }
 
   await waitUntilFinished(account, creationId, deadline);
-  const published = await graph<{ id: string }>(`${account.igUserId}/media_publish`, { creation_id: creationId, access_token: account.token }, "POST");
-  const { permalink } = await graph<{ permalink?: string }>(published.id, { fields: "permalink", access_token: account.token });
-  return permalink ?? `https://www.instagram.com/${account.username}/`;
+  return publishContainer(account, creationId);
 }
 
 export type WeeklyNumbers = { followers: number; reach: number | null; accountsEngaged: number | null };

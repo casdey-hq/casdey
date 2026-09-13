@@ -80,6 +80,17 @@ async function folder(name, parent) {
 }
 
 async function upload(name, mimeType, bytes, parent) {
+  // Drive's multipart upload stops at 5 MB; a reel is bigger, so it goes resumable.
+  if (bytes.length > 5_000_000) {
+    const start = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "content-type": "application/json; charset=UTF-8", "x-upload-content-type": mimeType, "x-upload-content-length": String(bytes.length) },
+      body: JSON.stringify({ name, parents: [parent] }),
+    });
+    const session = start.headers.get("location");
+    if (!start.ok || !session) throw new Error(`Drive ${start.status}: could not start upload of ${name}`);
+    return drive(session, { method: "PUT", headers: { "content-type": mimeType }, body: bytes });
+  }
   const boundary = `casdey${Date.now()}`;
   const head = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({ name, parents: [parent] })}\r\n--${boundary}\r\nContent-Type: ${mimeType}\r\n\r\n`;
   const body = Buffer.concat([Buffer.from(head), bytes, Buffer.from(`\r\n--${boundary}--`)]);
@@ -102,23 +113,27 @@ map.batches = { ...map.batches, [batch.batch]: link(batchId) };
 
 for (const post of posts) {
   const slidesDir = path.join(contentDir, "out", post.id);
-  const images = fs.existsSync(slidesDir)
-    ? fs.readdirSync(slidesDir).filter((f) => /^\d+\.png$/.test(f)).sort((a, b) => parseInt(a) - parseInt(b))
-    : [];
-  if (images.length === 0) throw new Error(`${post.id}: nothing rendered yet, run npm run ig:render -- ${batch.batch} ${post.id}`);
+  const rendered = fs.existsSync(slidesDir) ? fs.readdirSync(slidesDir) : [];
+  const images = post.reel
+    ? ["reel.mp4", "cover.jpg"].filter((f) => rendered.includes(f))
+    : rendered.filter((f) => /^\d+\.png$/.test(f)).sort((a, b) => parseInt(a) - parseInt(b));
+  if (images.length === 0 || (post.reel && !images.includes("reel.mp4"))) {
+    throw new Error(`${post.id}: nothing rendered yet, run npm run ig:render -- ${batch.batch} ${post.id}`);
+  }
 
   const postId = await folder(`${post.id} ${post.format}, ${post.pillar}`, batchId);
   const old = await drive(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${postId}' in parents and trashed=false`)}&fields=files(id)`);
   for (const file of old.files ?? []) {
     await drive(`https://www.googleapis.com/drive/v3/files/${file.id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ trashed: true }) });
   }
+  const types = { ".png": "image/png", ".jpg": "image/jpeg", ".mp4": "video/mp4" };
   for (const image of images) {
-    await upload(image, "image/png", fs.readFileSync(path.join(slidesDir, image)), postId);
+    await upload(image, types[path.extname(image)], fs.readFileSync(path.join(slidesDir, image)), postId);
   }
   await upload("caption.txt", "text/plain", Buffer.from(post.caption ?? "", "utf8"), postId);
 
   map.posts[post.id] = { folderId: postId, link: link(postId) };
-  console.log(`${post.id}: ${images.length} slides + caption -> ${link(postId)}`);
+  console.log(`${post.id}: ${post.reel ? "reel + cover" : `${images.length} slides`} + caption -> ${link(postId)}`);
 }
 
 fs.writeFileSync(mapFile, JSON.stringify(map, null, 2));

@@ -12,7 +12,7 @@ send volume.
 | | |
 | --- | --- |
 | Platform | Instagram only, on casdey's existing account (the one the cold DMs come from) |
-| Format | Faceless for now: no face, no voice. Carousels, text graphics, captioned screen recordings of casdey, cuts of the promo film |
+| Format | Faceless for now: no face, no voice. **Reels first** (changed 2026-09-13, see "Formats" below): POV reels over stock gym clips, and demo reels of casdey's own UI. Carousels only if reels flop |
 | Cadence | 1 post a day for 100 days. First post Wednesday 2026-09-16, day 100 is 2026-12-24 |
 | Language | English |
 | Audience | Owners of independent gyms, CrossFit and community boxes, and studios in Ireland, the UK and Europe |
@@ -79,13 +79,62 @@ casdey sells.
 - A "VIDEO" DM is an **engaged lead** and counts toward the weekly 1% goal. Deliver the video
   and the gym's message the same day.
 
-## Anatomy of a carousel
+## Formats: what the gym-software accounts actually post
 
-1. **Slide 1, the hook:** the promise, specific, in few words (hook, retain, reward, pg 115).
-2. **Slide 2, who is talking:** one line, e.g. "I'm Davide. I build casdey, and I've emailed
-   926 gym owners about their ex-members." Assume the viewer has never heard of casdey.
-3. **Slides 3 to 7, the reward:** one idea per slide.
-4. **Last slide:** the one CTA.
+**Changed 2026-09-13, Davide's call.** He rejected the first three samples, which were
+carousels, and asked for content modelled on what other software businesses post. So the
+first batch was researched against the Instagram accounts of companies selling to gym owners,
+checked on their public profiles that day:
+
+| Account | Followers | Typical reel views | Share of followers |
+| --- | --- | --- | --- |
+| Trainerize (coaching app) | 23.9k | 1k to 12.5k | 5 to 50% |
+| PushPress (gym software) | 12.5k | 900 to 4.1k | 10 to 30% |
+| Glofox (studio software) | 7.7k | 200 to 2.2k | 3 to 28% |
+| Wodify (gym software) | 29k | 470 to 3.7k | 2 to 12% |
+| Two-Brain Business (gym-owner coaching) | 26.2k | 750 to 1.9k | 3 to 7% |
+| Gym Launch (Hormozi's gym company) | 44.2k | 1.0k to 1.4k | about 3% |
+| Zen Planner (gym software) | not read | 29 to 92 | dead |
+
+What came out of it:
+- **Nearly everything they post is reels.** Carousels are rare.
+- **They are established businesses, but their Instagram is middling.** Most reels reach well
+  under the roughly 30% of followers a business account's reels are said to reach. They win
+  customers through sales teams, search and ads. Instagram is a side channel for them, and it
+  will be a slow, small one for casdey too.
+- **So copy their outliers, not their averages.** Two formats beat their own account's norm:
+  Glofox's POV reels (text over a short gym clip: "POV: you're a fitness instructor watching the
+  IG story of the member who late cancelled at 3am", about 28% of followers, several times its
+  usual) and reels made with a creator (Trainerize, 12.5k views). Glofox's POV topics are almost
+  exactly casdey's: regulars not booking, members leaving.
+- Also common, and faceless-friendly: short product demos (Glofox's cancel flow and follow-up
+  sequence, as screens).
+
+**What casdey posts, faceless** (revised the same evening: Davide rejected a first set of POV
+reels with a casdey logo, gold highlight boxes and synthesised music as "very promotional"):
+1. **Relatable reels, 6 to 7 seconds, the six give posts a week.** One line a gym owner
+   recognises ("gym owners at 11pm checking who hasn't been in this month"), set the way
+   Instagram's own editor sets text: plain white, centred, over footage with people in it. No
+   logo, no brand colour, no pitch in the video or the caption; the caption is a short aside
+   and a question for the comments, the way Glofox writes them. The person on screen is always
+   the owner or coach, never a member who left, because Pexels' licence forbids showing someone
+   in a bad light.
+2. **The demo reel, about 17 seconds, the one ask post a week.** casdey's loop drawn as its own
+   UI: the lapsed list, the message in the gym's name, the booking, ending on "DM VIDEO". The
+   only branded post. Always tagged on screen as a demo with an example gym.
+3. Tip lists over a clip, now and then.
+
+**Music** (same evening, checked against the accounts themselves): 15 of 16 recent reels from
+Glofox, PushPress and Trainerize carry "Original audio", meaning the sound was built into the
+video file, and one PushPress reel used a sound picked in the app. Trending label music is not
+an option anyway: business accounts only get Meta's Sound Collection, the API cannot attach any
+Instagram audio, and a downloaded viral song would be muted by Instagram's audio matching and
+count as original audio, so it would earn none of the trending-audio reach. So every reel gets a
+real licensed track mixed in, from **Pixabay Music** (commercial use, no credit), picked by
+Claude and judged by Davide at review, and **never a track marked "Content ID Registered"**
+(Pixabay's shield icon), because those can be flagged. Never the promo film's synthesised music.
+
+Judged on casdey's own numbers after 2 to 3 weeks (`IG Weekly`), not on these accounts'.
 
 ---
 
@@ -106,8 +155,8 @@ casdey sells.
   minutes, including replying to comments, next to the daily DMs.
 - **Batch twice a month**, which is Hormozi's own routine (pg 140): a batch around
   2026-09-15 and 2026-09-30.
-- **Test formats, never topics:** carousel against captioned reel against single graphic,
-  inside the same pillars.
+- **Test formats, never topics:** POV reel against demo reel against tip-list reel, inside the
+  same pillars.
 - Change nothing else before day 30.
 
 ### Day 30 review, 2026-10-15
@@ -155,19 +204,25 @@ Revised 2026-09-13, same day, on Davide's call: he approves a week at a time and
 is automatic. Claude has no access to Instagram's app or its DMs; publishing and the numbers
 go through Instagram's official API instead.
 
-1. **Claude writes the week's batch** in `content/instagram/<batch>.json` (slides, caption,
-   planned date, pillar) and renders it with `npm run ig:render -- <batch>` from `web/`: one
-   1080x1350 PNG per slide in `content/instagram/out/<post #>/` (gitignored, rebuilt from the
-   JSON).
-2. **`npm run ig:drive -- <batch>`** uploads the images to Google Drive, as info@casdey.com:
-   `casdey Instagram / <batch> / <post # and title> / 1.png, 2.png ...`. Images are never sent
-   in chat.
+1. **Claude writes the week's batch** in `content/instagram/<batch>.json` (a `reel` or `slides`,
+   caption, planned date, pillar) and renders it with `npm run ig:render -- <batch>` from `web/`
+   into `content/instagram/out/<post #>/` (gitignored, rebuilt from the JSON). A reel becomes
+   `reel.mp4` (1080x1920, H.264 and AAC, synthesised music) plus `cover.jpg`, drawn by
+   `web/scripts/instagram-reel.html` and encoded in headless Chrome, so no ffmpeg is needed. A
+   carousel becomes one 1080x1350 PNG per slide. Stock clips live in
+   `content/instagram/footage/` (gitignored, named after their Pexels id, each post's `source`
+   links the clip's page). Every new clip is asked for before it is downloaded.
+2. **`npm run ig:drive -- <batch>`** uploads the files to Google Drive, as info@casdey.com:
+   `casdey Instagram / <batch> / <post # and title> / reel.mp4, cover.jpg` (or `1.png, 2.png ...`)
+   and `caption.txt`. Files are never sent in chat.
 3. **`npm run ig:sync -- <batch>`** writes the batch into the **`IG Content`** tab, with a link
    to each post's Drive folder.
 4. **Davide reviews the week:** Status **Approved**, or **Changes requested** with the reason in
    column J (or in any casdey chat). Claude revises, re-renders, re-uploads.
-5. **`npm run ig:stage -- <batch>`** uploads the slides as JPEGs to the public Supabase bucket
-   `instagram`, because Instagram fetches each image from a public address at publish time.
+5. **`npm run ig:stage -- <batch>`** uploads each reel and its cover (or the slides as JPEGs) to
+   the public Supabase bucket `instagram`, because Instagram fetches the file from a public
+   address at publish time. A reel is published as a Reel shared to the feed; Instagram then
+   transcodes it, which is why the cron may run for up to 300 seconds, Vercel Hobby's ceiling.
 6. **The publisher posts each approved post on its planned date around 12:30 Italian time**
    (`/api/cron/instagram`, a daily Vercel cron at 10:30 UTC, which Vercel Hobby runs somewhere
    in that hour) and fills K (date posted) and L (post link). Only Approved posts are ever
@@ -198,7 +253,11 @@ Three tabs, created 2026-09-13, all read by the Sunday check-up:
 ## Open
 
 - The first review of batch 1's look and voice decides whether the rest of the batch follows the
-  samples.
+  samples. The carousel samples were rejected on 2026-09-13; the three reel samples (two POV, one
+  demo) are what is under review now.
+- Instagram cannot attach its own trending audio through the API, so API-published reels carry
+  casdey's synthesised music. If reach suffers for that, posting a reel by hand with trending
+  audio is the fallback to test.
 
 ## Sources
 
