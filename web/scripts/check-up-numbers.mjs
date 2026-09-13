@@ -177,11 +177,22 @@ async function postHogSnapshot() {
     from events
     where event = '$pageview' and timestamp > now() - interval 7 day
   `;
-  const res = await fetch(`${host}/api/projects/${projectId}/query/`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-    body: JSON.stringify({ query: { kind: "HogQLQuery", query } }),
-  }).then((r) => r.json());
+  // A PostHog gateway error comes back as an HTML page, not JSON (seen
+  // 2026-09-13): parsing it blindly crashed the whole snapshot, taking the
+  // Supabase and Stripe numbers down with it. Degrade this one source instead.
+  let res;
+  try {
+    const response = await fetch(`${host}/api/projects/${projectId}/query/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+      body: JSON.stringify({ query: { kind: "HogQLQuery", query } }),
+      signal: AbortSignal.timeout(60_000),
+    });
+    if (!response.ok) return { error: `PostHog HTTP ${response.status}` };
+    res = await response.json();
+  } catch (e) {
+    return { error: `PostHog query failed: ${e.message}` };
+  }
   if (res.error) return { error: res.error };
   const [visitors, pageviews] = res.results?.[0] ?? [null, null];
   return { visitors, pageviews };
