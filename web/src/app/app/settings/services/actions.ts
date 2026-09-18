@@ -115,7 +115,14 @@ export async function saveServices(
   }));
 
   if (toUpsert.length > 0) {
-    const { error } = await client.from("services").upsert(toUpsert);
+    // defaultToNull: false is load-bearing. A batch mixing saved rows (with an
+    // id) and new ones (without) is sent with the union of their columns, and
+    // by default the missing id on a new row goes to Postgres as an explicit
+    // null, which violates the not-null constraint and fails the whole save.
+    // Off, a new row gets the column default (gen_random_uuid()) instead.
+    const { error } = await client
+      .from("services")
+      .upsert(toUpsert, { defaultToNull: false });
     if (error) {
       console.error("[services] upsert failed", error.message);
       return { error: "We could not save that. Try again.", saved: false };
