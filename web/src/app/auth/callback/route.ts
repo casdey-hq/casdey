@@ -1,10 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import {
-  RECOVERY_COOKIE,
-  RECOVERY_WINDOW_SECONDS,
-  RESET_PATH,
-} from "@/lib/password-recovery";
+import { markRecovery, RESET_PATH } from "@/lib/password-recovery";
 import { supabaseServer } from "@/lib/supabase-server";
 import { safeNextPath } from "@/lib/safe-redirect";
 
@@ -59,15 +55,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   //
   // Short-lived on purpose: it grants the weaker check, so it should outlive
   // the click and nothing more.
-  if (next === RESET_PATH) {
-    response.cookies.set(RECOVERY_COOKIE, "1", {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: RECOVERY_WINDOW_SECONDS,
-    });
-  }
+  if (next === RESET_PATH) markRecovery(response);
 
   return response;
 }

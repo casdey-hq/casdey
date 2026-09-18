@@ -32,3 +32,32 @@ export const RECOVERY_WINDOW_SECONDS = 15 * 60;
 
 /** The shortest password casdey will store. Matches Supabase's own floor. */
 export const MIN_PASSWORD_LENGTH = 8;
+
+/**
+ * Sets the recovery marker on a redirect. Shared by /auth/callback and
+ * /auth/confirm, the two ways a recovery link can land, so the marker cannot
+ * drift between them.
+ */
+export function markRecovery(response: {
+  cookies: {
+    set: (
+      name: string,
+      value: string,
+      options: {
+        httpOnly: boolean;
+        sameSite: "lax";
+        secure: boolean;
+        path: string;
+        maxAge: number;
+      },
+    ) => unknown;
+  };
+}): void {
+  response.cookies.set(RECOVERY_COOKIE, "1", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: RECOVERY_WINDOW_SECONDS,
+  });
+}
