@@ -97,7 +97,8 @@ export default function PricingPage() {
             </div>
 
             <p className="mt-5 text-center text-[0.8125rem] text-stone">
-              Prices exclude VAT. Gyms joining now keep a lifetime 20% discount
+              The price you see is what you pay, nothing is added at checkout.
+              Gyms joining now keep a lifetime 20% discount
               on either paid tier.
             </p>
           </Container>
