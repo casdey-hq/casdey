@@ -2,6 +2,10 @@
   "regions": ["dub1"],
   "crons": [
     { "path": "/api/cron/send", "schedule": "0 3 * * *" },
+    { "path": "/api/cron/send", "schedule": "0 8 * * *" },
+    { "path": "/api/cron/send", "schedule": "0 13 * * *" },
+    { "path": "/api/cron/send", "schedule": "0 16 * * *" },
+    { "path": "/api/cron/send", "schedule": "0 19 * * *" },
     { "path": "/api/cron/instagram", "schedule": "30 10 * * *" }
   ]
 }

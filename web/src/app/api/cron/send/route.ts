@@ -22,6 +22,9 @@ export const maxDuration = 60;
  * accepted and both are authenticated the same way.
  */
 
+/** The one schedule in web/vercel.json that also runs the trial job. */
+const TRIAL_JOB_SCHEDULE = "0 3 * * *";
+
 function authorized(request: NextRequest): boolean {
   const secret = process.env.CRON_SECRET;
   // Refusing when unset is the safe default: an unauthenticated endpoint that
@@ -60,6 +63,16 @@ async function run(request: NextRequest): Promise<Response> {
     console.error("[cron] send failed", detail);
     result.ok = false;
     result.errors.push(`send: ${detail}`);
+  }
+
+  // This route fires several times a day (web/vercel.json) so each gym sends
+  // in its own daytime, but the trial job is a once-a-day job: its nudges are
+  // written for "day 2", "day 5", and a second run the same day is only a
+  // second chance to get that wrong. Vercel names the schedule that fired; a
+  // manual call carries none and runs both, as it always has.
+  const schedule = request.headers.get("x-vercel-cron-schedule");
+  if (schedule && schedule !== TRIAL_JOB_SCHEDULE) {
+    return Response.json(result, { status: result.ok ? 200 : 500 });
   }
 
   try {

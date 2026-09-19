@@ -10,6 +10,7 @@ import { capabilities } from "./plan";
 import { isProviderThrottled } from "./send-throttle";
 import { nextStep, parseFollowUps, type FollowUp } from "./follow-ups";
 import { personalise } from "./personalise";
+import { inSendWindow } from "./send-window";
 import type { Gym } from "./types";
 
 /**
@@ -43,11 +44,12 @@ import type { Gym } from "./types";
  * that paces a campaign.
  *
  * Two ceilings sit above all of this and neither is in this file:
- *   - Vercel Hobby allows one cron a day (web/vercel.json). Pro allows hourly,
- *     which multiplies everything here by 24.
- *   - Resend Free allows 100 emails a day across the whole account, and the
- *     cold outreach already takes ~75 of them. Until that account is on Pro,
- *     ~25 a day is the real ceiling no matter what this code does.
+ *   - Vercel Hobby allows each cron to run once a day. Since 2026-09-19 the
+ *     drain has five daily schedules (web/vercel.json), and each gym sends
+ *     only in the ones that fall in its own daytime (src/lib/send-window.ts),
+ *     so a US gym's members are not emailed at 11pm.
+ *   - Resend is on Pro since 2026-09-07 (50,000 a month, no daily cap), shared
+ *     with the cold outreach.
  */
 
 /** How many rows are read from the queue at once. Not a limit on a run. */
@@ -123,6 +125,11 @@ export async function drainQueue(
   // not claimed and re-leased over and over: claiming a row costs a round trip
   // and buys nothing once the gym is done for the day.
   const cappedGyms = new Set<string>();
+  // Gyms outside their own daytime right now (src/lib/send-window.ts). Their
+  // rows are left unclaimed and still due, for the drain that falls in their
+  // morning, and excluded from later reads for the same reason as a capped gym.
+  const restingGyms = new Set<string>();
+  const runAt = new Date(clock());
   // Rows this run actually took. The loop's stop condition, because report
   // counters also move for rows nobody claimed.
   let claimed = 0;
@@ -145,8 +152,9 @@ export async function drainQueue(
     // unclaimed and still due, so they sort to the top of every later page and
     // would fill each one, and the run would spend its whole budget reading
     // the same rows it has already decided not to send.
-    if (cappedGyms.size > 0) {
-      query = query.not("gym_id", "in", `(${[...cappedGyms].join(",")})`);
+    const excluded = [...cappedGyms, ...restingGyms];
+    if (excluded.length > 0) {
+      query = query.not("gym_id", "in", `(${excluded.join(",")})`);
     }
 
     const { data, error } = await query
@@ -159,11 +167,17 @@ export async function drainQueue(
     if (messages.length === 0) break;
 
     const before = claimed;
+    const setAsideBefore = cappedGyms.size + restingGyms.size;
     await sendBatch(messages);
 
-    // Progress means rows were actually taken. A page where every row was lost
-    // to another drain would otherwise be read again unchanged, forever.
-    if (claimed === before) break;
+    // Progress means rows were actually taken, or a gym was set aside, which
+    // changes what the next read returns. A page where every row was lost to
+    // another drain would otherwise be read again unchanged, forever. Counting
+    // only claims would end the run on a first page that is all one gym
+    // outside its daytime, and every other gym's rows behind it would wait a
+    // day for nothing. The set-aside sets only grow, so this still ends.
+    const setAside = cappedGyms.size + restingGyms.size > setAsideBefore;
+    if (claimed === before && !setAside) break;
   }
 
   await closeFinishedCampaigns();
@@ -175,7 +189,24 @@ export async function drainQueue(
 
       // Already at its ceiling for today: leave the row untouched and due, so
       // tomorrow's run finds it without a wasted claim.
-      if (cappedGyms.has(message.gym_id)) {
+      if (cappedGyms.has(message.gym_id) || restingGyms.has(message.gym_id)) {
+        report.skipped += 1;
+        continue;
+      }
+
+      // Read before the claim, so a gym outside its daytime costs nothing:
+      // its row is never leased, and stays due for the next drain.
+      const gym = await cached(gyms, message.gym_id, async () => {
+        const { data: row } = await client
+          .from("gyms")
+          .select("*")
+          .eq("id", message.gym_id)
+          .maybeSingle();
+        return (row as Gym) ?? null;
+      });
+
+      if (gym && !inSendWindow(gym.timezone, runAt)) {
+        restingGyms.add(message.gym_id);
         report.skipped += 1;
         continue;
       }
@@ -196,16 +227,7 @@ export async function drainQueue(
         .maybeSingle();
 
       if (!claimedRow) continue; // another drain already took this message
-    claimed += 1;
-
-      const gym = await cached(gyms, message.gym_id, async () => {
-        const { data: row } = await client
-          .from("gyms")
-          .select("*")
-          .eq("id", message.gym_id)
-          .maybeSingle();
-        return (row as Gym) ?? null;
-      });
+      claimed += 1;
 
       const reasons = await cached(reasonsByGym, message.gym_id, () =>
         gymReasons(message.gym_id),

@@ -51,8 +51,8 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 - Stripe test mode has the four USD prices (ids in `web/.env.local`). A test-mode paid-week checkout in dollars was built and expired: $1 due today, 20% coupon applied to Pro only.
 
 **Still open, in order:**
-1. Live Stripe USD prices (`npm run setup:stripe -- --live`) and the four `STRIPE_PRICE_*_USD_*` vars in Vercel Production and Preview. Until then a US gym can sign up but checkout errors.
-2. Campaign send time. Sends run once a day at 03:00 UTC, which is 11pm in New York. Send in each gym's local morning instead. Touches the send pipeline, so done as its own tested step.
+1. ~~Live Stripe USD prices and the four `STRIPE_PRICE_*_USD_*` vars in Vercel.~~ **Done 2026-09-19**: created with `npm run setup:stripe -- --live` (the eight existing prices untouched), set in Vercel Production and Preview, deployed.
+2. ~~Campaign send time.~~ **Built 2026-09-19**: a gym's campaign email only leaves between 8am and 8pm in its own timezone (`src/lib/send-window.ts`), and the drain now runs at 03, 08, 13, 16 and 19 UTC (`web/vercel.json`), so every zone a gym can pick gets a daytime run. The trial job still runs once, on the 03:00 schedule only. Tested in `send-window.test.ts` and `sender.test.ts`, including a mutation check that the drain does not stop on a first page full of one resting gym.
 3. The postal address for CAN-SPAM (Davide, decided later). Gates everything below.
 4. The outreach routine: US-only sourcing (big metros, CrossFit boxes and boutique studios first), a Country column in the Leads sheet, US emails scheduled for about 9am local with Resend's `scheduled_at`, the postal address and opt-out line on US emails. Europe keeps running until this is switched on; EU leads already contacted still get their follow-ups.
 5. Import guides for US gym software (Mindbody, PushPress, Wodify, Zen Planner, ABC Glofox), which overlaps with item #7.
