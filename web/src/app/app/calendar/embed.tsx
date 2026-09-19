@@ -68,6 +68,7 @@ export function GoogleEmbed({
   const src = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(
     email,
   )}&ctz=${encodeURIComponent(timeZone)}&mode=WEEK&showTitle=0&showPrint=0&showTabs=1&showCalendars=0`;
+  const googleCalendarUrl = `https://calendar.google.com/calendar/u/0/r/week?ctz=${encodeURIComponent(timeZone)}`;
 
   return (
     <Card className="mt-6">
@@ -94,6 +95,20 @@ export function GoogleEmbed({
 
       {on ? (
         <div className="mt-5 overflow-hidden rounded-[12px] border border-ash">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ash bg-mist/40 px-4 py-3">
+            <p className="text-[0.8125rem] text-graphite">
+              If this browser blocks Google&apos;s embedded calendar, open the
+              same calendar directly instead.
+            </p>
+            <a
+              href={googleCalendarUrl}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex shrink-0 items-center justify-center rounded-[9px] border border-ash bg-white px-3 py-1.5 text-[0.8125rem] font-semibold text-ink transition-[border-color,background-color] duration-200 hover:border-stone hover:bg-mist"
+            >
+              Open Google Calendar
+            </a>
+          </div>
           <iframe
             src={src}
             title={`Google Calendar for ${email}`}

@@ -231,7 +231,21 @@ export default async function BillingPage(
           <PlanPill plan={planLabel(plan)} />
         </div>
 
-        {plan === "trial" ? (
+        {gym.internal_plan_tier ? (
+          <p className="text-[0.9375rem] text-graphite">
+            This is a permanent casdey {planLabel(plan)} account. Its access
+            does not depend on Stripe. {gym.current_period_end ? (
+              <>
+                Stripe still has an existing renewal scheduled for{" "}
+                <span className="literal text-ink">
+                  {formatDate(gym.current_period_end)}
+                </span>
+                . Cancel that subscription in Manage billing if it should no
+                longer be charged.
+              </>
+            ) : null}
+          </p>
+        ) : plan === "trial" ? (
           <p className="text-[0.9375rem] text-graphite">
             You are on the free week of Pro{" "}
             {daysLeft !== null ? (

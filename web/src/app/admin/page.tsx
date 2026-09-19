@@ -9,6 +9,7 @@ import { TodayTab } from "./today-tab";
 import { MarketingTab } from "./marketing-tab";
 import { BusinessTab } from "./business-tab";
 import { CheckupTab } from "./checkup-tab";
+import { SupportTab } from "./support-tab";
 
 export const metadata = { title: "casdey HQ" };
 
@@ -40,6 +41,7 @@ const TABS = [
   { id: "marketing", label: "Marketing" },
   { id: "business", label: "Business" },
   { id: "checkup", label: "Check-up" },
+  { id: "support", label: "Support" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -106,6 +108,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
         {tab === "marketing" ? <MarketingTab period={period} /> : null}
         {tab === "business" ? <BusinessTab /> : null}
         {tab === "checkup" ? <CheckupTab /> : null}
+        {tab === "support" ? <SupportTab /> : null}
       </Suspense>
     </>
   );

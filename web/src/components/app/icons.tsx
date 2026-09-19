@@ -68,8 +68,8 @@ export function IconUpload(props: IconProps) {
 export function IconSettings(props: IconProps) {
   return (
     <Svg {...props}>
-      <circle cx="12" cy="12" r="3" />
-      <path d="M12 3v2.2M12 18.8V21M4.2 7.5l1.9 1.1M17.9 15.4l1.9 1.1M4.2 16.5l1.9-1.1M17.9 8.6l1.9-1.1" />
+      <path d="M10.3 3.4h3.4l.5 2.1c.5.2 1 .5 1.4.8l2-.6 1.7 2.9-1.5 1.4c.1.5.1 1.1 0 1.6l1.5 1.4-1.7 2.9-2-.6c-.4.4-.9.6-1.4.8l-.5 2.1h-3.4l-.5-2.1c-.5-.2-1-.5-1.4-.8l-2 .6-1.7-2.9 1.5-1.4a7 7 0 0 1 0-1.6L4.8 8.6l1.7-2.9 2 .6c.4-.4.9-.6 1.4-.8l.4-2.1Z" />
+      <circle cx="12" cy="12" r="2.75" />
     </Svg>
   );
 }

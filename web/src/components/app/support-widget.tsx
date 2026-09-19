@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
 } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
@@ -17,6 +16,8 @@ import {
 } from "@/app/app/feedback-actions";
 import { IconClose, IconHelp } from "./icons";
 import { SUPPORT_TOPICS, type SupportTopic } from "./support-topics";
+import { SupportChat } from "./support-chat";
+import type { SupportThread } from "@/lib/support-types";
 
 /**
  * The always-there help launcher (roadmap #5).
@@ -36,8 +37,6 @@ import { SUPPORT_TOPICS, type SupportTopic } from "./support-topics";
  * they have something to say, and a second launcher would only compete with
  * this one for the same corner and the same intent.
  */
-
-const SUPPORT_EMAIL = "info@casdey.com";
 
 const FEEDBACK_INITIAL: FeedbackState = { error: null, sent: false };
 
@@ -164,9 +163,9 @@ function FeedbackView({
   );
 }
 
-export function SupportWidget() {
+export function SupportWidget({ initialThread }: { initialThread: SupportThread }) {
   const [open, setOpen] = useState(false);
-  const [view, setView] = useState<"help" | "feedback">("help");
+  const [view, setView] = useState<"help" | "feedback" | "support">("help");
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -188,6 +187,10 @@ export function SupportWidget() {
   function leaveFeedback() {
     setView("help");
     setFeedbackKey((n) => n + 1);
+  }
+
+  function leaveSupport() {
+    setView("help");
   }
 
   const results = useMemo(
@@ -246,10 +249,12 @@ export function SupportWidget() {
           ref={panelRef}
           id={panelId}
           role="dialog"
-          aria-label={view === "feedback" ? "Send feedback" : "Help and support"}
+          aria-label={view === "feedback" ? "Send feedback" : view === "support" ? "Chat with support" : "Help and support"}
           className="fixed bottom-[5.75rem] right-4 z-50 flex max-h-[min(34rem,calc(100dvh-7rem))] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[20px] border border-[color-mix(in_srgb,var(--ash)_60%,transparent)] bg-white shadow-[0_18px_50px_-12px_rgba(0,0,0,0.45)] sm:right-6"
         >
-          {view === "feedback" ? (
+          {view === "support" ? (
+            <SupportChat initialThread={initialThread} onBack={leaveSupport} />
+          ) : view === "feedback" ? (
             <FeedbackView
               key={feedbackKey}
               panelId={panelId}
@@ -337,24 +342,13 @@ export function SupportWidget() {
                 >
                   Tell us what you think
                 </button>
-                <Link
-                  href="/app/support"
-                  className="mt-2 block text-center text-[0.875rem] font-semibold text-teal underline underline-offset-4 hover:no-underline"
+                <button
+                  type="button"
+                  onClick={() => setView("support")}
+                  className="mt-2 w-full rounded-[12px] bg-teal-bright px-3 py-2.5 text-[0.9375rem] font-semibold text-deep transition-[filter,opacity] duration-200 hover:brightness-[1.06]"
                 >
-                  Get help from Davide
-                </Link>
-                <p className="mt-3 text-[0.8125rem] text-graphite">
-                  Or email{" "}
-                  <a
-                    href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
-                      "casdey support",
-                    )}`}
-                    className="font-semibold text-teal underline underline-offset-4 hover:no-underline"
-                  >
-                    {SUPPORT_EMAIL}
-                  </a>
-                  .
-                </p>
+                  Chat with support
+                </button>
               </footer>
             </>
           )}

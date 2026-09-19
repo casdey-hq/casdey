@@ -39,6 +39,8 @@ type Integration = {
    *  and it is what a gym owner will recognise. */
   href: string;
   hrefLabel: string;
+  /** The shortest useful route through the software's own navigation. */
+  route: string;
   guide: readonly string[];
 };
 
@@ -51,10 +53,11 @@ const INTEGRATIONS: Integration[] = [
     href: "https://support.mindbodyonline.com/s/?language=en_US",
     hrefLabel: "Mindbody support",
     guide: [
-      "Open Mindbody support and find the partner and integration guidance for your studio.",
-      "Tell casdey you use Mindbody so we can start the approval and activation steps with you.",
-      "Export a CSV in the meantime if you want to see your lapsed members now.",
+      "Set As of Date to today, choose All Memberships, then choose Detail View.",
+      "Select Export to Excel. Save the downloaded file as a CSV before you upload it to casdey.",
+      "Keep every membership, including paused and expired ones, so casdey can find the people who stopped coming.",
     ],
+    route: "Insights → Reports → Clients → Membership",
   },
   {
     name: "TeamUp",
@@ -64,10 +67,11 @@ const INTEGRATIONS: Integration[] = [
     href: "https://support.goteamup.com/",
     hrefLabel: "TeamUp support",
     guide: [
-      "Open TeamUp support and find the API key steps for your account.",
-      "Tell casdey you use TeamUp so we can connect your key when the sync is ready.",
-      "Export a CSV in the meantime if you want to see your lapsed members now.",
+      "Open your member report and include inactive or cancelled members, not only current ones.",
+      "Export the complete list as CSV, including name, email and last attendance where TeamUp provides it.",
+      "Upload that export here while we prepare a direct connection for TeamUp gyms.",
     ],
+    route: "Reports → Members → export CSV",
   },
   {
     name: "Glofox",
@@ -77,10 +81,11 @@ const INTEGRATIONS: Integration[] = [
     href: "https://support.glofox.com/",
     hrefLabel: "Glofox support",
     guide: [
-      "Open Glofox support and look for the member export or reports guidance.",
-      "Export your full member list as a CSV.",
-      "Upload the CSV above, then check the column matching before you finish.",
+      "Open Members under Memberships, then use the Download button in the top right.",
+      "Choose the member report, not a leads report. It includes name, email, membership, plan and status.",
+      "Upload the CSV here and map the last-attendance column if your export includes one.",
     ],
+    route: "Reports → Memberships → Members → Download",
   },
   {
     name: "LegitFit",
@@ -90,10 +95,11 @@ const INTEGRATIONS: Integration[] = [
     href: "https://www.legitfit.com/support",
     hrefLabel: "LegitFit support",
     guide: [
-      "Open LegitFit business support and ask for a full member export.",
-      "Request a CSV with each member's name, email address and last visit where available.",
-      "Upload the CSV above, then check the column matching before you finish.",
+      "Open the support link and request a full member export from the LegitFit team.",
+      "Ask for names, email addresses and the last attendance or visit date for each member.",
+      "When the CSV arrives, upload it here and check casdey's column matching before importing.",
     ],
+    route: "LegitFit support → request full member export",
   },
   {
     name: "PushPress",
@@ -102,10 +108,11 @@ const INTEGRATIONS: Integration[] = [
     href: "https://help.pushpress.com/",
     hrefLabel: "PushPress help",
     guide: [
-      "Open PushPress help and look for the member export or reports guidance.",
-      "Export your full member list as a CSV.",
-      "Upload the CSV above, then check the column matching before you finish.",
+      "Open People, then Clients, and use the filters to include former members as well as active clients.",
+      "Select the clients you want, open the three-dot menu and choose Export to CSV.",
+      "Upload the exported CSV here. Include last check-in where your report offers it.",
     ],
+    route: "People → Clients → select → ⋯ → Export",
   },
   {
     name: "Wodify",
@@ -115,10 +122,11 @@ const INTEGRATIONS: Integration[] = [
     href: "https://help.wodify.com/",
     hrefLabel: "Wodify help",
     guide: [
-      "Open Wodify help and look for the member export or reports guidance.",
-      "Export your full member list as a CSV.",
-      "Upload the CSV above, then check the column matching before you finish.",
+      "Open People, then Clients. Select the clients you need, or use the top checkbox to select the whole filtered list.",
+      "Open the three-dot menu and choose Export. Wodify downloads an Excel file.",
+      "Open that file in Excel or Sheets and save it as CSV, then upload it here. The export includes last attendance.",
     ],
+    route: "People → Clients → select → ⋯ → Export",
   },
   {
     name: "Virtuagym",
@@ -127,10 +135,11 @@ const INTEGRATIONS: Integration[] = [
     href: "https://help.virtuagym.com/",
     hrefLabel: "Virtuagym help",
     guide: [
-      "Open Virtuagym help and look for the member export or reports guidance.",
-      "Export your full member list as a CSV.",
-      "Upload the CSV above, then check the column matching before you finish.",
+      "Open the members or clients report in your club portal and include former members if the report offers a status filter.",
+      "Download the full result as CSV.",
+      "Upload it here and map name, email and last visit before importing.",
     ],
+    route: "Club portal → Members or Clients → export CSV",
   },
   {
     name: "ABC Fitness",
@@ -139,10 +148,11 @@ const INTEGRATIONS: Integration[] = [
     href: "https://help.abcfitness.com/",
     hrefLabel: "ABC Fitness help",
     guide: [
-      "Open ABC Fitness help and look for the member export or reports guidance.",
-      "Export your full member list as a CSV.",
-      "Upload the CSV above, then check the column matching before you finish.",
+      "Open the member report in your ABC Fitness dashboard and include inactive members where the report offers that filter.",
+      "Download the full result as CSV.",
+      "Upload it here and map name, email and last visit before importing.",
     ],
+    route: "Reports → Members → export CSV",
   },
   {
     name: "Anything else",
@@ -152,10 +162,11 @@ const INTEGRATIONS: Integration[] = [
     href: "/contact",
     hrefLabel: "Tell us what you use",
     guide: [
-      "Look in your gym software for a members, contacts or reports export.",
-      "Export your full member list as a CSV with names, email addresses and last visit dates where available.",
-      "Upload the CSV above, then check the column matching before you finish.",
+      "Look for Members, Clients, Contacts or Reports in your software's main menu.",
+      "Export the complete list as CSV, including people who have cancelled or gone inactive.",
+      "Upload it here. casdey needs a name, email address and last visit date where available.",
     ],
+    route: "Members, Clients or Reports → export CSV",
   },
 ];
 
@@ -245,13 +256,21 @@ export default async function ImportPage() {
                     >
                       {row.hrefLabel}
                     </a>
-                    <details className="mt-2 max-w-72 text-[0.8125rem] text-graphite">
-                      <summary className="cursor-pointer text-teal underline underline-offset-4">
-                        Show guide
+                    <details className="mt-3 max-w-sm rounded-lg border border-ash bg-mist/35 p-3 text-[0.8125rem] text-graphite">
+                      <summary className="cursor-pointer font-semibold text-teal marker:text-teal">
+                        Show exact export steps
                       </summary>
-                      <ol className="mt-2 list-decimal space-y-1 pl-4">
+                      <p className="literal mt-3 rounded-md border border-ash bg-white px-2.5 py-2 text-[0.75rem] text-graphite">
+                        {row.route}
+                      </p>
+                      <ol className="mt-3 space-y-2">
                         {row.guide.map((step) => (
-                          <li key={step}>{step}</li>
+                          <li key={step} className="flex gap-2">
+                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-shallow text-[0.6875rem] font-semibold text-teal">
+                              {row.guide.indexOf(step) + 1}
+                            </span>
+                            <span>{step}</span>
+                          </li>
                         ))}
                       </ol>
                     </details>

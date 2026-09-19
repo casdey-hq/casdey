@@ -139,11 +139,25 @@ export function ServicesForm({
   }
 
   function save() {
-    // A row with neither a name nor a price is just an empty line the gym
-    // left behind. Drop it rather than making them tidy up before saving.
-    const kept = rows.filter(
-      (row) => row.name.trim() !== "" || row.price.trim() !== "",
+    // A visible service is an intent to create a service. Silently dropping a
+    // blank row made the screen say "Saved" while creating nothing, which is
+    // worse than stopping at the missing field.
+    const incomplete = rows.find(
+      (row) => row.name.trim() === "" || row.price.trim() === "",
     );
+    if (incomplete) {
+      setExpanded(incomplete.key);
+      setState({
+        error:
+          incomplete.name.trim() === ""
+            ? "Give this service a name before saving."
+            : "Enter a price for this service before saving.",
+        saved: false,
+      });
+      return;
+    }
+
+    const kept = rows;
 
     const payload = kept.map((row) => ({
       id: row.id,
@@ -197,7 +211,7 @@ export function ServicesForm({
         const custom = recurring && Number(row.billingInterval) > 1;
         const open = expanded === row.key;
         const priceLine = row.price
-          ? `${symbol}${row.price}${recurring ? " " + periodLabel(row.billingPeriod, Number(row.billingInterval) || 1) : ""}`
+          ? `${symbol}${row.price} ${recurring ? periodLabel(row.billingPeriod, Number(row.billingInterval) || 1) : "one off"}`
           : "No price yet";
         return (
           <Card key={row.key}>

@@ -8,6 +8,9 @@ export const metadata = { title: "WhatsApp" };
 export default async function WhatsAppSettingsPage() {
   const { gym, role } = await requireGym();
   const canUseWhatsApp = capabilities(gym).canUseWhatsApp;
+  const isReady = Boolean(
+    gym.whatsapp_enabled && gym.whatsapp_from && gym.whatsapp_template_name,
+  );
 
   return (
     <div className="max-w-[42rem] space-y-6">
@@ -27,6 +30,7 @@ export default async function WhatsAppSettingsPage() {
         </Notice>
       ) : null}
 
+      {!isReady ? (
       <Card>
         <CardTitle>Set up WhatsApp in three steps</CardTitle>
         <ol className="mt-4 list-decimal space-y-2 pl-5 text-[0.9375rem] text-graphite">
@@ -64,6 +68,12 @@ export default async function WhatsAppSettingsPage() {
           </li>
         </ol>
       </Card>
+      ) : (
+        <p className="px-1 text-[0.8125rem] text-stone">
+          WhatsApp is set up. To replace the number or template later, edit the
+          details below and save.
+        </p>
+      )}
       <WhatsAppSettingsForm gym={gym} readOnly={role !== "owner"} />
     </div>
   );

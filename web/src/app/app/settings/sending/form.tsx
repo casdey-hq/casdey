@@ -61,6 +61,7 @@ export function SendingSettingsForm({
 
   return (
     <div className="space-y-6">
+      {!verified ? (
       <Card>
         <CardTitle>Set up your sending domain</CardTitle>
         <ol className="mt-4 list-decimal space-y-2 pl-5 text-[0.9375rem] text-graphite">
@@ -76,6 +77,12 @@ export function SendingSettingsForm({
           </li>
         </ol>
       </Card>
+      ) : (
+        <p className="px-1 text-[0.8125rem] text-stone">
+          Your domain is verified. To replace it later, change the address below
+          and reconnect it.
+        </p>
+      )}
 
       <Card>
         <div className="mb-1 flex items-center justify-between gap-3">

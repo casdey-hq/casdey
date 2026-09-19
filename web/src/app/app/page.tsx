@@ -297,9 +297,10 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           on every tier (the size of the opportunity is never hidden) and
           deliberately set smaller than Recovered so it does not compete with
           the number the product is actually judged on. */}
-      {opportunity.priced && opportunity.lapsedMembers > 0 ? (
-        <Card className="mt-4">
-          <p className="label text-stone">Recurring revenue lapsed</p>
+      <Card className="mt-4">
+        <p className="label text-stone">Recurring revenue lapsed</p>
+        {opportunity.priced && opportunity.lapsedMembers > 0 ? (
+          <>
           <p className="literal mt-2 text-[1.75rem] leading-none font-medium text-ink">
             {formatMoney(opportunity.monthlyMinor, currency)}
             <span className="text-[0.9375rem] font-normal text-stone">
@@ -314,8 +315,19 @@ export default async function DashboardPage(props: PageProps<"/app">) {
               ? `That figure is weighted by the ${opportunity.weightedMembers} current members you recorded across your memberships.`
               : "Add current-member counts to every recurring membership to weight this figure by your actual membership mix."} A rough measure of the opportunity, not a promise, and some may already have cancelled with you.
           </p>
-        </Card>
-      ) : null}
+          </>
+        ) : (
+          <p className="mt-3 max-w-xl text-[0.8125rem] text-stone">
+            Add an active recurring membership, such as one charged weekly or
+            monthly, in{" "}
+            <Link href="/app/settings/services" className="text-teal underline underline-offset-4">
+              Services
+            </Link>{" "}
+            to estimate the recurring value of members who have gone quiet.
+            One-off classes and sessions are deliberately left out.
+          </p>
+        )}
+      </Card>
 
       {/* Recovered revenue belongs with the counts above it, not at the bottom
           of the page: it is the one number the whole product is judged on and

@@ -10,6 +10,7 @@ import { BillingBanner } from "@/components/app/billing-banner";
 import { SupportWidget } from "@/components/app/support-widget";
 import { UnsavedChangesGuard } from "@/components/app/unsaved-changes";
 import { ThemeToggle, THEME_COOKIE } from "@/components/app/theme-toggle";
+import { supportThreadForGym } from "@/lib/support";
 
 import "@/styles/product.css";
 
@@ -39,6 +40,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AppLayout({ children }: LayoutProps<"/app">) {
   const context = await getGymContext();
+  const supportThread = context ? await supportThreadForGym(context.gym.id) : null;
 
   // Read here rather than guessed in the browser, so the first paint is
   // already the theme the gym owner chose and React never has to reconcile a
@@ -114,7 +116,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
         </main>
       </div>
 
-      <SupportWidget />
+      <SupportWidget initialThread={supportThread ?? { conversationId: null, status: null, messages: [] }} />
       <UnsavedChangesGuard />
     </div>
   );

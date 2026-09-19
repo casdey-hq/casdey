@@ -73,6 +73,11 @@ export function ReasonsAndOffers({
   const message =
     reasonState.message ?? assignState.message ?? variantState.message;
 
+  // Saving the reason list leaves the editor open so the success notice can be
+  // read. After that, its second action is close, not cancel: the rows are
+  // already committed and there is nothing left to discard.
+  const reasonsSaved = Boolean(reasonState.message) && !reasonState.error;
+
   return (
     <section id="reasons">
     <Card>
@@ -426,7 +431,7 @@ export function ReasonsAndOffers({
                 setEditing(false);
               }}
             >
-              Cancel
+              {reasonsSaved ? "Close" : "Cancel"}
             </Button>
           </div>
         </form>
