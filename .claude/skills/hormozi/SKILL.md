@@ -63,8 +63,9 @@ framework plus a casdey-specific section. They are notes, not the books.
    state, not hypotheticals. Sources on hand:
    - `CLAUDE.md` — pricing, costs, unit economics, outreach status, decisions
    - `web/SAAS_V1_PLAN.md` §F0 — the tier/price/cost basis
-   - `casdey-hq.md` — the one-page business summary (offer, prices, per-gym
-     economics, break-even, status)
+   - casdey HQ, `/admin` — the offer, prices, per-gym economics, break-even,
+     goals and to-dos, live; `npm run hq -- summary` from `web/` prints the
+     written half
    - the "Marketing plan (Hormozi)" section of `CLAUDE.md` — current outreach
      volume and the weekly test loop
    - the live leads sheet (`Casdey-Gym-Leads`) for outreach performance

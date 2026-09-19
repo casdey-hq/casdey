@@ -12,7 +12,7 @@ import { LEADS_SHEET_ID } from "./google-sheets";
  *
  * Authenticates as the service account the outreach routines write with
  * (casdey-routine@casdey-gws-cli.iam.gserviceaccount.com), minting a token with
- * the JWT Bearer grant the way scripts/google-doc.mjs does, but with the
+ * the JWT Bearer grant, with the
  * read-only Sheets scope: /admin can never change a lead. The key arrives as
  * GOOGLE_SERVICE_ACCOUNT_JSON, the key file's whole contents.
  */

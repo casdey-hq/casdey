@@ -216,7 +216,7 @@ problem.
 ## casdey application
 
 Confirm specifics against the book before betting on them. Keep in sync with
-`web/SAAS_V1_PLAN.md` §F0, `casdey-hq.md`, and the ledger.
+`web/SAAS_V1_PLAN.md` §F0, casdey HQ (`/admin`), and the ledger.
 
 - **Current model shape** — basically **attraction + continuity**, no active
   upsell, no downsell:

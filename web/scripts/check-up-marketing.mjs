@@ -1,7 +1,7 @@
 /**
  * Marketing snapshot for /check-up: pulls live numbers out of the
  * Casdey-Gym-Leads sheet (id in CLAUDE.md "Stage 1 progress") via the same
- * service-account JWT pattern as scripts/google-doc.mjs / sheet-read.mjs.
+ * service-account JWT pattern as scripts/sheet-read.mjs.
  *
  * KEEP IN STEP with src/lib/marketing-summary.ts, its port for /admin
  * (2026-09-19). Both decide who is engaged and whether a test is called; a

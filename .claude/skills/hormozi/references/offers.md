@@ -225,7 +225,7 @@ fatigue fastest because the addressable radius is small.
 ## casdey application
 
 Keep in sync with `casdey-ledger.md`, `CLAUDE.md`, `web/SAAS_V1_PLAN.md` §F0,
-`casdey-hq.md`.
+casdey HQ (`/admin`).
 
 - **Market screen** — gyms/studios in Europe, targeting *cancelled/lapsed*
   members. Pain: real and quantified (documented reactivation rates). Power:

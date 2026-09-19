@@ -8,7 +8,7 @@ import { readSheetRanges, sheetsConfigured } from "./sheets-read";
  *
  * Authenticates as the same service account the outreach routines write with
  * (casdey-routine@casdey-gws-cli.iam.gserviceaccount.com), minting a token
- * with the JWT Bearer grant the way scripts/google-doc.mjs does, but with the
+ * with the JWT Bearer grant (src/lib/sheets-read.ts), with the
  * read-only Sheets scope: /admin can never change a lead. The key arrives as
  * GOOGLE_SERVICE_ACCOUNT_JSON, the key file's whole contents, the same name
  * the check-up routine's cloud environment already uses.

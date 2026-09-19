@@ -7,7 +7,7 @@
  *
  * Prints the range as JSON: { range, values: string[][] }.
  *
- * Same JWT Bearer pattern as scripts/google-doc.mjs — see that file's header
+ * The JWT Bearer grant, as in src/lib/sheets-read.ts — see that file's header
  * for why a service account rather than the Drive connector.
  */
 

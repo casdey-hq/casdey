@@ -10,8 +10,8 @@ there, so all agents work from the same knowledge. `CLAUDE.md` is long (over
 1. Run `npm run hq -- summary` from `web/`. It prints everything written in
    casdey HQ (`/admin`, the one place for the business since 2026-09-19):
    the goals, open to-dos, who does what, costs, the offer, the marketing
-   plan and the latest Sunday check-up. `casdey-hq.md` is retired; do not
-   read it as current. Live numbers are on `/admin` itself, or from
+   plan and the latest Sunday check-up. The old `casdey-hq.md` and its
+   Google Doc were deleted on 2026-09-19. Live numbers are on `/admin` itself, or from
    `npm run checkup:marketing` and `npm run checkup:numbers`.
 2. Read the parts of `CLAUDE.md` your task touches. For "where do things
    stand", the most current sections are "Marketing plan", "Stage 1

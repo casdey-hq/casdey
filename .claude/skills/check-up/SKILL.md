@@ -204,8 +204,8 @@ its actions up and start, not just a headline a human would nod at.
    live on `/admin`'s Business tab (`src/lib/unit-economics.ts` against
    `src/lib/pricing.ts` and the cost lines), so do not recompute them here;
    flag only if a cost line or the offer text looks out of date against what
-   sections 1-3 found. `casdey-hq.md` is retired (2026-09-19): do not read it
-   as current, and never edit it.
+   sections 1-3 found. `casdey-hq.md` and its Google Doc were deleted on
+   2026-09-19; `/admin` replaced them.
 
 5. **Recommended signals & this week's actions — synthesized, not sourced.**
    **Recommendations, not the plan (Davide, 2026-09-13).** Title it exactly
