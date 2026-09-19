@@ -62,6 +62,22 @@ export function SendingSettingsForm({
   return (
     <div className="space-y-6">
       <Card>
+        <CardTitle>Set up your sending domain</CardTitle>
+        <ol className="mt-4 list-decimal space-y-2 pl-5 text-[0.9375rem] text-graphite">
+          <li>Use a domain your gym already owns, such as the one on your website.</li>
+          <li>Enter the address you want to send as below and select Connect domain.</li>
+          <li>
+            Copy the DNS records casdey gives you into the company that hosts
+            your domain, such as GoDaddy, Cloudflare or Squarespace.
+          </li>
+          <li>
+            Return here and select Check again. Once the status says Verified,
+            campaigns send from your own address.
+          </li>
+        </ol>
+      </Card>
+
+      <Card>
         <div className="mb-1 flex items-center justify-between gap-3">
           <CardTitle>Where your emails come from</CardTitle>
           <StatusPill gym={gym} />
