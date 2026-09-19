@@ -41,7 +41,7 @@ const Schema = z.object({
     .number()
     .int()
     .min(7, "A week is the shortest at-risk window casdey will use.")
-    .max(180, "Six months is the longest at-risk window casdey will use."),
+    .max(1825, "Five years is the longest check-in timing casdey will use."),
   dailySendCap: z.coerce
     .number()
     .int()
@@ -72,17 +72,6 @@ const Schema = z.object({
     {
       message: "A week is the shortest window casdey will use.",
       path: ["lapseWindow"],
-    },
-  )
-  .refine(
-    (value) =>
-      value.atRiskAfterDays <
-      (value.lapseUnit === "days"
-        ? value.lapseWindow
-        : value.lapseWindow * 30),
-    {
-      message: "The check-in window must be shorter than the lapse window.",
-      path: ["atRiskAfterDays"],
     },
   );
 

@@ -298,10 +298,10 @@ describe("isAtRisk", () => {
     ).toBe(false);
   });
 
-  it("defers to isLapsed once a member crosses the full lapse cutoff", () => {
+  it("can include a lapsed member when its own check-in timing comes later", () => {
     const lapsed = member({ last_visit_at: lapseCutoff(RULE, NOW) });
     expect(isLapsed(lapsed, RULE, NOW)).toBe(true);
-    expect(isAtRisk(lapsed, AT_RISK_RULE, NOW)).toBe(false);
+    expect(isAtRisk(lapsed, AT_RISK_RULE, NOW)).toBe(true);
   });
 
   it("only applies to members nobody has campaigned yet", () => {
@@ -331,7 +331,7 @@ describe("isAtRisk", () => {
 });
 
 describe("applyAtRiskFilter", () => {
-  it("applies the active-status and two-sided date range, and no visit cap", () => {
+  it("applies the active status and its own check-in cutoff, with no visit cap", () => {
     const calls: string[] = [];
     const query = {
       eq(column: string, value: string) {
@@ -352,7 +352,6 @@ describe("applyAtRiskFilter", () => {
 
     expect(calls).toEqual([
       "eq:status:active",
-      "gt:last_visit_at:2025-08-13",
       "lte:last_visit_at:2026-06-29",
     ]);
   });

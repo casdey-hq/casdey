@@ -235,11 +235,12 @@ export function applyLapseFilter<T extends FilterableQuery<T>>(
 /**
  * What "at risk" means.
  *
- * Same recency signal as lapse, just an earlier, configurable window, and
- * only for members nobody has touched yet (status still 'active'). The
- * gyms_at_risk_before_lapse DB constraint guarantees atRiskAfterDays is
- * strictly shorter than the lapse window, so this range and isLapsed's never
- * overlap, a member is one or the other, never both.
+ * Same recency signal as lapse, with its own configurable timing, and only for
+ * members nobody has touched yet (status still 'active'). The check-in timing
+ * is deliberately independent from the lapse window: a gym might want a
+ * gentle check-in at 120 days while it calls a member lapsed at 90. In that
+ * case the member appears in both campaign lists, which the settings page
+ * makes explicit so the gym can choose timing that does not compete.
  *
  * Deliberately NOT capped by rule.maxVisits, unlike isLapsed. The visit cap
  * exists to keep win-back aimed at people who tried the place and drifted,
@@ -272,7 +273,7 @@ export function isAtRisk(
   if (!member.last_visit_at) return false;
 
   const lastVisit = member.last_visit_at.slice(0, 10);
-  return lastVisit > lapseCutoff(rule, now) && lastVisit <= atRiskCutoff(rule, now);
+  return lastVisit <= atRiskCutoff(rule, now);
 }
 
 export function applyAtRiskFilter<
@@ -284,7 +285,6 @@ export function applyAtRiskFilter<
 >(query: T, rule: AtRiskRule, now: Date = new Date()): T {
   return query
     .eq("status", "active")
-    .gt("last_visit_at", lapseCutoff(rule, now))
     .lte("last_visit_at", atRiskCutoff(rule, now));
 }
 
