@@ -21,12 +21,14 @@ import { requireSession, type Session } from "./dal";
  * The default covers both of Davide's own addresses, not just davide@casdey.com:
  * his day-to-day dev/testing login is his personal Gmail
  * (07davide.longo@gmail.com, see CLAUDE.md's userEmail), which would
- * otherwise get bounced to /app on his own machine.
+ * otherwise get bounced to /app on his own machine. info@casdey.com was added
+ * on 2026-09-19 at his request: it is casdey's own business account, and he
+ * signs in with it through Google.
  */
 function adminEmails(): string[] {
   const raw =
     process.env.CASDEY_ADMIN_EMAILS ??
-    "davide@casdey.com,07davide.longo@gmail.com";
+    "davide@casdey.com,07davide.longo@gmail.com,info@casdey.com";
   return raw
     .split(",")
     .map((email) => email.trim().toLowerCase())
