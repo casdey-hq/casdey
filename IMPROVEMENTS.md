@@ -32,8 +32,8 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 | # | Item | Status | Notes |
 |---|---|---|---|
 | 3 | US market | in progress | priority 1. Decisions (2026-09-19): **$99 / $299** a month; **all 100 first-touch emails a day go to the US** once live; postal address for US law (CAN-SPAM) decided later, and **US sending stays off until it exists**; Instagram DMs to the US later, after a separate discussion. **Product side built 2026-09-19** (see below). |
-| 2 | One live place for everything | built 2026-09-19 | `/admin` is casdey HQ, four tabs. See the notes below. |
-| 4 | To-dos section | built 2026-09-19 | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
+| 2 | One live place for everything | done 2026-09-19, live | `/admin` is casdey HQ, four tabs. See the notes below. |
+| 4 | To-dos section | done 2026-09-19, live | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
 | 1, 5–17 | the rest | open | order to be agreed |
 
 ## #3 US market, working notes
@@ -77,5 +77,5 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 - `npm run hq` (`web/scripts/hq.mjs`) writes all of it from a session or the Sunday routine; `npm run hq -- summary` prints it for any agent starting a session.
 - Seeded from the old sources: Davide's inputs verbatim, the two current goals, the marketing plan verbatim, the offer (updated for the US and the VAT line), the cost lines, and the HQ doc's open items as to-dos.
 - The Sunday check-up now writes its analysis (one note per week, shown on a fifth tab, **Check-up**, with earlier weeks kept) and proposed to-dos, and sends a short "ready" email (`.claude/skills/check-up/SKILL.md`). Added the same day at Davide's request, along with an **Added** and a **Due** date on every to-do (an automatic to-do's Added date is when `/admin` first saw it).
-- `casdey-hq.md` carries a retirement line. The two Google Docs and the check-up artifact get a pointer to `/admin` once this is live.
+- Retired and removed, at Davide's request (2026-09-19, "I don't want my stuff to be messy"): `casdey-hq.md`, `npm run doc:push` and `web/scripts/google-doc.mjs` deleted from the repo (in git history); the casdey HQ and Marketing Plan Google Docs moved to info@casdey.com's Drive trash (recoverable until Drive empties it, 30 days). The old check-up artifact needs Davide to delete it himself (a delete needs his confirmation), so it is a to-do on `/admin`.
 - Tested: 490 tests (new: `marketing-summary`, `hq-signals`, `unit-economics`), and every tab checked in the browser against live data, including phone width and adding and ticking off a to-do.
