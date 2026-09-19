@@ -39,6 +39,7 @@ type Integration = {
    *  and it is what a gym owner will recognise. */
   href: string;
   hrefLabel: string;
+  guide: readonly string[];
 };
 
 const INTEGRATIONS: Integration[] = [
@@ -49,6 +50,11 @@ const INTEGRATIONS: Integration[] = [
     state: "request",
     href: "https://support.mindbodyonline.com/s/?language=en_US",
     hrefLabel: "Mindbody support",
+    guide: [
+      "Open Mindbody support and find the partner and integration guidance for your studio.",
+      "Tell casdey you use Mindbody so we can start the approval and activation steps with you.",
+      "Export a CSV in the meantime if you want to see your lapsed members now.",
+    ],
   },
   {
     name: "TeamUp",
@@ -57,6 +63,11 @@ const INTEGRATIONS: Integration[] = [
     state: "request",
     href: "https://support.goteamup.com/",
     hrefLabel: "TeamUp support",
+    guide: [
+      "Open TeamUp support and find the API key steps for your account.",
+      "Tell casdey you use TeamUp so we can connect your key when the sync is ready.",
+      "Export a CSV in the meantime if you want to see your lapsed members now.",
+    ],
   },
   {
     name: "Glofox",
@@ -65,14 +76,24 @@ const INTEGRATIONS: Integration[] = [
     state: "csv",
     href: "https://support.glofox.com/",
     hrefLabel: "Glofox support",
+    guide: [
+      "Open Glofox support and look for the member export or reports guidance.",
+      "Export your full member list as a CSV.",
+      "Upload the CSV above, then check the column matching before you finish.",
+    ],
   },
   {
     name: "LegitFit",
     status:
       "Publishes no API, and its Zapier app can only report bookings from now on, never the members who already lapsed. The export is the only way in.",
     state: "csv",
-    href: "https://www.legitfit.com/help",
-    hrefLabel: "LegitFit help",
+    href: "https://www.legitfit.com/support",
+    hrefLabel: "LegitFit support",
+    guide: [
+      "Open LegitFit business support and ask for a full member export.",
+      "Request a CSV with each member's name, email address and last visit where available.",
+      "Upload the CSV above, then check the column matching before you finish.",
+    ],
   },
   {
     name: "PushPress",
@@ -80,6 +101,11 @@ const INTEGRATIONS: Integration[] = [
     state: "csv",
     href: "https://help.pushpress.com/",
     hrefLabel: "PushPress help",
+    guide: [
+      "Open PushPress help and look for the member export or reports guidance.",
+      "Export your full member list as a CSV.",
+      "Upload the CSV above, then check the column matching before you finish.",
+    ],
   },
   {
     name: "Wodify",
@@ -88,6 +114,11 @@ const INTEGRATIONS: Integration[] = [
     state: "csv",
     href: "https://help.wodify.com/",
     hrefLabel: "Wodify help",
+    guide: [
+      "Open Wodify help and look for the member export or reports guidance.",
+      "Export your full member list as a CSV.",
+      "Upload the CSV above, then check the column matching before you finish.",
+    ],
   },
   {
     name: "Virtuagym",
@@ -95,6 +126,11 @@ const INTEGRATIONS: Integration[] = [
     state: "csv",
     href: "https://help.virtuagym.com/",
     hrefLabel: "Virtuagym help",
+    guide: [
+      "Open Virtuagym help and look for the member export or reports guidance.",
+      "Export your full member list as a CSV.",
+      "Upload the CSV above, then check the column matching before you finish.",
+    ],
   },
   {
     name: "ABC Fitness",
@@ -102,6 +138,11 @@ const INTEGRATIONS: Integration[] = [
     state: "csv",
     href: "https://help.abcfitness.com/",
     hrefLabel: "ABC Fitness help",
+    guide: [
+      "Open ABC Fitness help and look for the member export or reports guidance.",
+      "Export your full member list as a CSV.",
+      "Upload the CSV above, then check the column matching before you finish.",
+    ],
   },
   {
     name: "Anything else",
@@ -110,6 +151,11 @@ const INTEGRATIONS: Integration[] = [
     state: "csv",
     href: "/contact",
     hrefLabel: "Tell us what you use",
+    guide: [
+      "Look in your gym software for a members, contacts or reports export.",
+      "Export your full member list as a CSV with names, email addresses and last visit dates where available.",
+      "Upload the CSV above, then check the column matching before you finish.",
+    ],
   },
 ];
 
@@ -199,6 +245,16 @@ export default async function ImportPage() {
                     >
                       {row.hrefLabel}
                     </a>
+                    <details className="mt-2 max-w-72 text-[0.8125rem] text-graphite">
+                      <summary className="cursor-pointer text-teal underline underline-offset-4">
+                        Show guide
+                      </summary>
+                      <ol className="mt-2 list-decimal space-y-1 pl-4">
+                        {row.guide.map((step) => (
+                          <li key={step}>{step}</li>
+                        ))}
+                      </ol>
+                    </details>
                   </td>
                 </tr>
               ))}
