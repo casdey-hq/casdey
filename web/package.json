@@ -23,7 +23,8 @@
     "ig:sync": "node scripts/instagram-sheet-sync.mjs",
     "ig:drive": "node scripts/instagram-drive-upload.mjs",
     "ig:stage": "node scripts/instagram-stage.mjs",
-    "ig:token": "node scripts/instagram-token.mjs"
+    "ig:token": "node scripts/instagram-token.mjs",
+    "hq": "node scripts/hq.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

@@ -32,8 +32,8 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 | # | Item | Status | Notes |
 |---|---|---|---|
 | 3 | US market | in progress | priority 1. Decisions (2026-09-19): **$99 / $299** a month; **all 100 first-touch emails a day go to the US** once live; postal address for US law (CAN-SPAM) decided later, and **US sending stays off until it exists**; Instagram DMs to the US later, after a separate discussion. **Product side built 2026-09-19** (see below). |
-| 2 | One live place for everything | in progress | priority 2, with #4 |
-| 4 | To-dos section | in progress | depends on #2 |
+| 2 | One live place for everything | built 2026-09-19 | `/admin` is casdey HQ, four tabs. See the notes below. |
+| 4 | To-dos section | built 2026-09-19 | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
 | 1, 5–17 | the rest | open | order to be agreed |
 
 ## #3 US market, working notes
@@ -57,3 +57,25 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 4. The outreach routine: US-only sourcing (big metros, CrossFit boxes and boutique studios first), a Country column in the Leads sheet, US emails scheduled for about 9am local with Resend's `scheduled_at`, the postal address and opt-out line on US emails. Europe keeps running until this is switched on; EU leads already contacted still get their follow-ups.
 5. Import guides for US gym software (Mindbody, PushPress, Wodify, Zen Planner, ABC Glofox), which overlaps with item #7.
 6. Known and accepted for now: US gyms text members by SMS, not WhatsApp, so Pro's WhatsApp channel is worth less there. Email is the core product.
+
+## #2 + #4 One live place, with to-dos: working notes
+
+**Decided with Davide, 2026-09-19:**
+- `/admin` becomes the one place. Nothing in it is pushed by hand: each piece is either computed live (numbers, the weekly test review, prices from the code, per-gym economics, break-even, status) or stored in the database and shown instantly (marketing plan, cost lines, goals, inputs, to-dos, the Sunday analysis). Claude writes to it with a script in a session, Davide edits or ticks things off in `/admin`.
+- The **casdey HQ** and **Marketing Plan** Google Docs and the **check-up artifact** are retired once their content is in `/admin`: each gets a final line pointing there, nothing is deleted.
+- The Sunday check-up keeps running and writes its analysis and proposed actions into `/admin`. Davide gets a **short "ready" email**: the top 1-3 actions and a link, no numbers.
+- **Goals:** Davide gives them in each Sunday review; Claude stores them in `/admin`. Not linked to Notion.
+- **To-dos (#4)** come from three places: live signals (an interested gym waiting for a reply, an overdue test review, Instagram posts to approve, a trial about to end), proposals from the Sunday check-up that Davide accepts or dismisses, and ones Davide or Claude add directly.
+- **Inputs, as Davide gave them (verbatim, to seed `/admin`; update when things change):**
+  - My inputs: Approve email responses; Send IG DMs; Approve Instagram posts (every sunday or whenever); Sunday's check-up; And of course look for improvements and updates
+  - AI inputs: Finding leads, drafting emails and sending cold email outreaches (both first touches and follow ups); Finding IG leads, drafting DMs; Drafting batches of IG posts
+  - Inputs collaboration (where we work together): Improving the software; Improving the marketing side system; Reasoning on what to improve
+
+**Built 2026-09-19:**
+- `/admin` has four tabs. **Overview**: to-dos, goals with live progress, the latest Sunday analysis, who does what. **Numbers**: the previous `/admin`, unchanged. **Marketing**: outreach, this week's cohort, the weekly test review and its history, Instagram, the plan (editable). **Business**: where it stands, the offer (editable), prices from the checkout's catalogue in all three currencies, per-gym economics, cost lines, break-even.
+- Migration `0041_hq.sql` (applied live): `hq_notes`, `hq_todos`, `hq_goals`, `hq_inputs`, `hq_costs`, readable and writable by the server only.
+- `npm run hq` (`web/scripts/hq.mjs`) writes all of it from a session or the Sunday routine; `npm run hq -- summary` prints it for any agent starting a session.
+- Seeded from the old sources: Davide's inputs verbatim, the two current goals, the marketing plan verbatim, the offer (updated for the US and the VAT line), the cost lines, and the HQ doc's open items as to-dos.
+- The Sunday check-up now writes the `checkup` note and proposed to-dos, and sends a short "ready" email (`.claude/skills/check-up/SKILL.md`).
+- `casdey-hq.md` carries a retirement line. The two Google Docs and the check-up artifact get a pointer to `/admin` once this is live.
+- Tested: 490 tests (new: `marketing-summary`, `hq-signals`, `unit-economics`), and every tab checked in the browser against live data, including phone width and adding and ticking off a to-do.

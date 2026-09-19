@@ -1,5 +1,7 @@
 # casdey HQ
 
+> **Retired on 19 September 2026. casdey HQ now lives at https://www.casdey.com/admin**, live: the offer, prices, costs, per-gym economics, break-even, goals, to-dos and the marketing plan, all in one place and updated the moment anything changes. This page is kept as it stood that day and is no longer updated.
+
 The one page that says what casdey sells, what it costs to run, and what it earns.
 Everything else lives in the repo. Keep this short.
 

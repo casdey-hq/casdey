@@ -5,8 +5,7 @@ description: >-
   now — marketing/outreach performance including the weekly outreach A/B test
   review (the Sunday marketing analysis), product and revenue numbers, what
   shipped in the codebase lately plus what's still open, and the business
-  summary (unit economics, break-even, with a link to the casdey HQ doc) —
-  then closes with a verdict: what's overdue, what's off target, and 1-3
+  view kept in /admin (goals, to-dos, the plan) — then closes with a verdict: what's overdue, what's off target, and 1-3
   concrete actions for the week ahead. Invoke on "/check-up", or when Davide
   asks how the business is going, wants a status check, a pulse check, a
   health check, the weekly review, the weekly test review, or "where do things
@@ -17,29 +16,40 @@ description: >-
 
 # casdey check-up
 
+**Since 2026-09-19 the check-up writes into `/admin`, not into a report
+(IMPROVEMENTS.md #2 and #4, Davide's call).** `/admin` is casdey HQ: the one
+place for how the business is doing, live. Its numbers are computed on every
+load, and everything written (goals, to-dos, the marketing plan, the offer,
+cost lines, and this check-up's weekly analysis) lives in casdey's own tables
+(migration `0041`), written with `npm run hq` from `web/`. So the check-up
+no longer publishes an artifact, and the casdey HQ and Marketing Plan Google
+Docs are retired. What it still does is the thinking: read the sources, judge
+them against the goals, and propose next week's actions. See "Composing the
+output" for where each part now goes. `npm run hq -- summary` prints
+everything written in `/admin` in one read; start there.
+
 One pass across every part of the business, read live from the actual
 sources, not from memory or from `CLAUDE.md` (which is a decision record, not
 a live dashboard, and goes stale between sessions). Built 2026-09-11 at
-Davide's request, output "both" (chat summary + a redeployed artifact link
-each run) and cadence "on-demand + every Sunday" — see the two scripts and
-the artifact this skill maintains for how that's wired.
+Davide's request, cadence "on-demand + every Sunday". Output: a chat summary
+on demand, and every run writes into `/admin` (see the note at the top).
 
 **One place for the whole week (Davide, 2026-09-13).** The Sunday outreach
 A/B test review used to be its own manual chat session, separate from this
-check-up. It now lives inside it (section 1b below), so Davide opens one
-artifact and has everything: the marketing analysis, the numbers, the
-engineering, the business summary with a button to the casdey HQ doc, and the
-verdict. The review's own mechanics did not change in the merge, see 1b.
+check-up. It now lives inside it (section 1b below). Since 2026-09-19 the
+live half of it is also on `/admin`'s Marketing tab, computed by the same
+rules (`src/lib/marketing-summary.ts`, ported from
+`check-up-marketing.mjs`; the two must stay in step). The review's own
+mechanics did not change, see 1b.
 
 **Audience: Davide and Claude both, not Davide alone (Davide, 2026-09-13).**
 This isn't a report to skim and file away — it's the shared, current picture
 of the business that any casdey session (interactive or a cloud routine)
 should treat as live context for deciding what to work on next, the same way
 `CLAUDE.md` is treated as the decision record. When a session opens and
-Davide wants to continue casdey work without saying exactly what, checking
-whether a check-up artifact exists and reading its "Signals & recommended
-actions" (section 5 below) is a reasonable way to ground that, the same way
-this session read `web/SAAS_V1_PLAN.md` for open tracks. Write section 5
+Davide wants to continue casdey work without saying exactly what,
+`npm run hq -- summary` (the latest `checkup` note and the open to-dos) is
+the way to ground that. Write section 5
 accordingly: concrete and specific enough (file paths, track names, tab
 names) that a fresh Claude session with no other context could pick one of
 its actions up and start, not just a headline a human would nod at.
@@ -188,22 +198,18 @@ its actions up and start, not just a headline a human would nod at.
      itself are fair game too, but don't re-read the whole file every run —
      the plan docs are the maintained source for open items.
 
-4. **Business overview** — read `casdey-hq.md` at the repo root directly
-   (it's already the short, current-state summary: the offer, prices, cost
-   table, unit economics, break-even, "Where it stands", and "Open"). Don't
-   recompute unit economics here, just reflect what it says and flag if a
-   number in it looks stale against what sections 1-3 just found (e.g. if it
-   says "Paying customers: 0" but Numbers just found 1, that document is due
-   an edit — say so, don't silently carry the contradiction). **Link the
-   casdey HQ Google Doc, don't paste it** (Davide, 2026-09-13): the artifact
-   carries a button to
-   https://docs.google.com/document/d/1qJWaqeWSjsG_osRH8NmS2JxP2URtfccCsRaPWypTGOI/edit
-   and at most the handful of headline figures from `casdey-hq.md`, never the
-   whole text.
+4. **Business overview** — `npm run hq -- summary` (from `web/`) for the
+   goals, open to-dos, who does what, the fixed monthly cost, the offer and
+   the marketing plan. Prices, per-gym economics and break-even are computed
+   live on `/admin`'s Business tab (`src/lib/unit-economics.ts` against
+   `src/lib/pricing.ts` and the cost lines), so do not recompute them here;
+   flag only if a cost line or the offer text looks out of date against what
+   sections 1-3 found. `casdey-hq.md` is retired (2026-09-19): do not read it
+   as current, and never edit it.
 
 5. **Recommended signals & this week's actions — synthesized, not sourced.**
    **Recommendations, not the plan (Davide, 2026-09-13).** Title it exactly
-   "Recommended signals & this week's actions" in the artifact, with a line
+   "Recommended signals & this week's actions" in the `checkup` note, with a line
    saying the real plan is decided in the review. This section is what Claude
    proposes going into the review; what actually gets done that week is
    decided by Davide, together with Claude and the `/hormozi` lens, in the
@@ -246,15 +252,15 @@ its actions up and start, not just a headline a human would nod at.
      action; also name drafts awaiting review and open feedback, since
      unreviewed posts are what stalls the cadence. Judge content on inputs
      (posts published) before day 30 (2026-10-15), not on reach.
-   - **`casdey-hq.md` vs what Numbers/Marketing just found**: already
+   - **`/admin`'s written notes vs what Numbers/Marketing just found**: already
      flagged in section 4 above — surface it again here if it changes what
-     Davide should actually do (e.g. a real paying gym now exists but the
-     doc still says "0 paying customers", which is worth a `/update-project`
-     pass, not just a footnote).
-   - **Plan-doc items stuck across multiple runs**: before overwriting the
-     artifact, `Artifact action:"read"` the current version (already a
-     required step below) and compare its open-items/action list against
-     what this run just found in `SAAS_V1_PLAN.md`/`SAAS_V1_1_PLAN.md`. An
+     Davide should actually do (e.g. the offer note still describes a price
+     that has changed), which is worth an `npm run hq -- note set offer`, not
+     just a footnote.
+   - **Items stuck across multiple runs**: before overwriting the `checkup`
+     note, read the current one (`npm run hq -- note get checkup`) and the
+     open to-dos (`npm run hq -- todo list`), and compare them against what
+     this run just found in `SAAS_V1_PLAN.md`/`SAAS_V1_1_PLAN.md`. An
      item that reads "still open"/"todo" two check-ups running is itself a
      signal worth naming, distinct from an item that's simply new this week.
 
@@ -277,37 +283,34 @@ its actions up and start, not just a headline a human would nod at.
 worth reading first. Then short, headline numbers only, one or two lines of
 takeaway per section, and call out anything that looks wrong or
 contradictory across sources (the Stripe-vs-`is_internal` MRR check above is
-exactly this kind of thing). End with the artifact link.
+exactly this kind of thing). End with a link to https://www.casdey.com/admin.
 
-**Artifact** (every run, on-demand or weekly): the fuller version, one page,
-all sections, with the actual figures rather than just the takeaway. Give
-section 5 its own clearly separated block (not folded into the Business
-section) since it's the part both Davide and a future Claude session should
-be able to find at a glance, and give the weekly test review (1b) its own
-block too, with a per-arm table (sends, replies, reply rate, engaged) and
-the proposed verdict. Put a row of **link buttons** near the top: **casdey
-HQ** (the Google Doc above), **Marketing Plan**
-(https://docs.google.com/document/d/1dd6GLXQ2_4ZKCpY43HtUV9YgJVRWGH5AJiJ-Qfpm4J0/edit),
-**Leads sheet**
-(https://docs.google.com/spreadsheets/d/1WOAIA1gvK6S1kWe_Vf4-d4XmjhnDLQZLtyU_ezvOu3w/edit)
-and **/admin** (https://www.casdey.com/admin). Load `artifact-design` before
-writing it, same as any artifact. Keep it skimmable on a phone, since
-that's the point of publishing it rather than only printing to chat. Match
-the brand guide's current tokens, including the product dark ground
-(`#09090a`, not pure black).
+**Into `/admin`** (every run, on-demand or weekly), all from `web/`:
 
-**Same URL every time.** Before publishing, check whether this skill has
-already published one: `Artifact action:"list"` and look for the title
-"casdey check-up" (or read the URL noted below, once one exists). If found,
-`action:"read"` it first (the tool requires reading before republishing to a
-URL this session hasn't touched), then publish to that same `url` so it
-redeploys in place rather than creating a new artifact. If this is genuinely
-the first run ever, publish fresh and then **edit this file** to record the
-URL in the line below, so every future run (including the unattended weekly
-one) knows where to redeploy without having to search:
+1. **This week's analysis** as the `checkup` note, shown on `/admin`'s
+   Overview tab. Write it in the small Markdown `/admin` renders (## headings,
+   - lists, **bold**): the ranked actions first, then one or two lines per
+   section, then the proposed test verdict. Keep it short; the numbers
+   themselves are live on `/admin` and must not be copied into it, or they go
+   stale the moment the page reloads.
+   `npm run hq -- note set checkup "This week, from the Sunday check-up" <file.md>`
+2. **The recommended actions as proposed to-dos**, one each, so Davide can
+   accept or dismiss them on `/admin`:
+   `npm run hq -- todo add "<imperative title>" --detail "<why, one line>" --source checkup --proposed`
+   In an interactive review with Davide, add only the ones he agrees to, and
+   without `--proposed`. Do not add a to-do for anything `/admin` already
+   raises by itself as a live signal (an engaged lead, an overdue test review,
+   Instagram posts to approve, DMs to send, a first week ending, a goal past
+   its deadline): see `web/src/lib/hq-signals.ts`.
+3. **Goals** (interactive review only). Davide gives the week's goals in the
+   Sunday review. Close the old ones and add the new:
+   `npm run hq -- goal close <id> hit|missed|retired`, then
+   `npm run hq -- goal add "<label>" --metric engaged_rate_week|paying_gyms|reply_rate_week --target N --unit percent|count --deadline YYYY-MM-DD`
+   (`goal list` shows ids). A goal `/admin` cannot measure gets no `--metric`.
+   Never set or change a goal from the unattended routine.
 
-> **Artifact URL:** https://claude.ai/code/artifact/e527486a-6a23-4267-8d4e-f9722adbdbbe
-> (first published 2026-09-11)
+**The old artifact is retired.** It was https://claude.ai/code/artifact/e527486a-6a23-4267-8d4e-f9722adbdbbe
+(first published 2026-09-11). Do not republish it.
 
 ## The weekly routine
 
@@ -322,17 +325,17 @@ step is different from an on-demand run:
    `checkup:numbers` failed with `Cannot find package 'pg'`). Local runs
    already have it installed, so this is a no-op there.
 1. Do everything above (all sections including the prepared test review and
-   the recommended actions, compose chat-style summary text,
-   publish/redeploy the artifact). **Never run `testlog:update` from the
+   the recommended actions), and write them into `/admin` as "Composing the
+   output" describes: the `checkup` note, and each recommended action as a
+   *proposed* to-do. Goals are never set from the routine. **Never run `testlog:update` from the
    routine**: with nobody to decide, the review stops at the proposed
    verdict, and the Sunday session with Davide finishes it.
-2. Instead of printing the summary to a conversation, write it to a temp
-   file and send it by email:
+2. Send Davide a **short "ready" email** (Davide, 2026-09-19): the top 1-3
+   actions and the link to https://www.casdey.com/admin, nothing else. No
+   numbers, since they would only duplicate `/admin` and go stale:
    `node scripts/send-email.mjs davide@casdey.com "casdey check-up — <date>" <path>`
    (`web/scripts/send-email.mjs`, the same Zoho OAuth account
-   `src/lib/zoho-mail.ts` already sends from). Put the artifact link at the
-   top of the email body, then the recommended actions, then the same
-   headline-numbers summary.
+   `src/lib/zoho-mail.ts` already sends from).
 
 Set up once via `/schedule`, weekly, Sunday. **All three casdey routines now
 fire at the same `02:00` UTC slot (2026-09-13, Davide's call: 4am Italian
@@ -371,10 +374,11 @@ populate with real data and the email sends cleanly.
   `scripts/test-log-update.mjs`, in an interactive session, after Davide has
   made that call. Nothing else in the outreach sheet, and never from the
   unattended routine.
-- It does not edit `CLAUDE.md`, the plan docs, or `casdey-hq.md` — it reads
-  them. Use `/update-project` for that, separately, if a check-up surfaces
+- It does not edit `CLAUDE.md` or the plan docs — it reads them. Use `/update-project` for that, separately, if a check-up surfaces
   something worth recording.
-- It does not write to Stripe or Supabase, and it does not change the live
+- **In Supabase it writes only casdey HQ's own tables** (`hq_notes`,
+  `hq_todos`, and in an interactive review `hq_goals`), through `npm run hq`.
+  Never gym or member data, never Stripe, and it does not change the live
   outreach routines (setting up the next test is its own step, 1b.6).
 - **Section 5 recommends, it does not execute.** Naming an overdue review or
   a stuck plan item is not the same as doing it — that still needs an

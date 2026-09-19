@@ -7,8 +7,12 @@ state of casdey lives in one place, `CLAUDE.md`, and every agent reads it
 there, so all agents work from the same knowledge. `CLAUDE.md` is long (over
 100 KB) and is not loaded automatically, so before any substantive task:
 
-1. Read `casdey-hq.md` at the repo root: a one-page summary of the offer,
-   prices, costs and current status.
+1. Run `npm run hq -- summary` from `web/`. It prints everything written in
+   casdey HQ (`/admin`, the one place for the business since 2026-09-19):
+   the goals, open to-dos, who does what, costs, the offer, the marketing
+   plan and the latest Sunday check-up. `casdey-hq.md` is retired; do not
+   read it as current. Live numbers are on `/admin` itself, or from
+   `npm run checkup:marketing` and `npm run checkup:numbers`.
 2. Read the parts of `CLAUDE.md` your task touches. For "where do things
    stand", the most current sections are "Marketing plan", "Stage 1
    progress" and the latest "Stage 2 progress" bullets. Newer information

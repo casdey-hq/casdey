@@ -139,7 +139,14 @@ function asCustom(period: AdminPeriod): { count: number; unit: Unit } {
  * render. Mirrors the per-gym dashboard's own period nav, plus a free
  * "last N days / weeks / months" box.
  */
-export function PeriodNav({ current }: { current: AdminPeriod }) {
+export function PeriodNav({
+  current,
+  tab,
+}: {
+  current: AdminPeriod;
+  /** The tab the period belongs to, kept when the period changes. */
+  tab: string;
+}) {
   const activeParam =
     PRESETS.find((p) => p.days === current.days)?.param ??
     (current.days === 84 ? DEFAULT_PARAM : null);
@@ -156,8 +163,8 @@ export function PeriodNav({ current }: { current: AdminPeriod }) {
               key={option.param}
               href={
                 option.param === DEFAULT_PARAM
-                  ? "/admin"
-                  : `/admin?range=${option.param}`
+                  ? `/admin?tab=${tab}`
+                  : `/admin?tab=${tab}&range=${option.param}`
               }
               aria-current={active ? "page" : undefined}
               className={`rounded-md border px-3 py-1.5 text-[0.8125rem] font-medium transition-colors duration-150 ${
@@ -173,6 +180,7 @@ export function PeriodNav({ current }: { current: AdminPeriod }) {
       </nav>
 
       <form action="/admin" method="get" className="flex items-center gap-1">
+        <input type="hidden" name="tab" value={tab} />
         <label htmlFor="admin-count" className="text-[0.8125rem] text-stone">
           or last
         </label>
