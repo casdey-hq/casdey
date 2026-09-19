@@ -38,7 +38,8 @@ export function BookingSettingsForm({
         <p className="mb-5 text-[0.875rem] text-stone">
           When this is on, casdey adds a booking link to your messages. A member
           picks a time from your open hours and it is booked straight away: into
-          casdey, and into your Google Calendar if you have connected one above.
+          casdey, and into the separate <span className="literal">casdey bookings</span>{" "}
+          Google Calendar if you have connected one above.
         </p>
 
         <label className="flex items-start gap-3">

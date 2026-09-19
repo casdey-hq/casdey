@@ -3,7 +3,14 @@ import Link from "next/link";
 import { requireGym } from "@/lib/dal";
 import { calendarFor } from "@/lib/calendar/provider";
 import { formatMoney, gymCurrency } from "@/lib/money";
-import { Card, CardTitle, Notice, PageHeader, memberName } from "@/components/app/ui";
+import {
+  ButtonLink,
+  Card,
+  CardTitle,
+  Notice,
+  PageHeader,
+  memberName,
+} from "@/components/app/ui";
 import { GoogleEmbed } from "./embed";
 
 export const metadata = { title: "Calendar" };
@@ -176,11 +183,14 @@ export default async function CalendarPage(props: PageProps<"/app/calendar">) {
   return (
     <>
       <PageHeader
-        eyebrow="Calendar"
+        eyebrow="Bookings"
         title={MONTH_LABEL.format(monthStart)}
-        lede="Everything casdey has booked for you, on the days it falls. Times your own diary already has taken show as busy."
+        lede="Your booked members appear here by name. Times already taken in your own connected diary show as busy."
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <ButtonLink href="/app/settings/booking" variant="quiet">
+              Booking setup
+            </ButtonLink>
             <Link
               href={`/app/calendar?month=${monthParam(previous)}`}
               aria-label="Previous month"
@@ -220,6 +230,18 @@ export default async function CalendarPage(props: PageProps<"/app/calendar">) {
           </Notice>
         </div>
       ) : null}
+
+      <Card className="mb-6">
+        <CardTitle>Where to see booked members</CardTitle>
+        <p className="mt-1 text-[0.875rem] leading-relaxed text-stone">
+          A named entry is a booking made through casdey. Select its day to see
+          the member, service and offer code. If you connected Google Calendar,
+          the same appointment also appears in its separate{" "}
+          <span className="literal text-graphite">casdey bookings</span>{" "}
+          calendar. Grey busy blocks come from your existing diary, so casdey
+          keeps their details private.
+        </p>
+      </Card>
 
       <Card className="!p-0 overflow-hidden">
         <div className="grid grid-cols-7 border-b border-ash">

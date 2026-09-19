@@ -38,12 +38,36 @@ export default async function BookingSettingsPage(
       ) : null}
 
       <Card>
+        <CardTitle>How booking works</CardTitle>
+        <ol className="mt-4 list-decimal space-y-2 pl-5 text-[0.9375rem] text-graphite">
+          <li>Set your open hours and turn on self-serve booking below.</li>
+          <li>
+            Each campaign message then includes a personal link where a member
+            chooses one of those times.
+          </li>
+          <li>
+            They see their time confirmed straight away, then receive a
+            confirmation email with a calendar invite and a link to cancel.
+          </li>
+          <li>
+            You see every booking, with the member&apos;s name, in{" "}
+            <ButtonLink href="/app/calendar" variant="ghost" className="!px-0 !py-0 !text-[0.9375rem] underline underline-offset-4">
+              Bookings
+            </ButtonLink>
+            .
+          </li>
+        </ol>
+      </Card>
+
+      <Card>
         <CardTitle>Google Calendar</CardTitle>
         <p className="mb-5 text-[0.875rem] text-stone">
           Connect a Google Calendar and casdey reads your free/busy so it never
-          offers a slot you are already in, and writes each booking straight into
-          that calendar. Booking still works without one; it just cannot see
-          bookings made outside casdey.
+          offers a slot you are already in. casdey creates a separate Google
+          calendar called <span className="literal">casdey bookings</span> for
+          the appointments it makes, leaving your own diary untouched. Booking
+          still works without one; it just cannot see bookings made outside
+          casdey.
         </p>
 
         {connection.needsReauth ? (

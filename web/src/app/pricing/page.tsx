@@ -50,7 +50,7 @@ function faq(paidTrial: boolean) {
   },
   {
     q: "Do I need to change my gym software?",
-    a: "No. casdey reads an export from whatever you already use, or a CSV, and writes bookings into your Google Calendar. It does not sit between you and your members' records, and it never writes back to them.",
+    a: "No. casdey reads an export from whatever you already use, or a CSV, and can add bookings to a separate casdey bookings calendar in Google. It does not sit between you and your members' records, and it never writes back to them.",
   },
   {
     q: "Can I change or cancel my plan?",

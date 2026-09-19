@@ -62,7 +62,7 @@ export const SUPPORT_TOPICS: SupportTopic[] = [
     question: "How does booking work, and do I need to connect a calendar?",
     answer: [
       "When booking is on, each member gets a link in their message to pick a time themselves, and casdey books it in. Turn it on in Settings then Booking.",
-      "Connecting a Google Calendar is optional but worth it: casdey reads your free and busy times so it never offers a slot you are already in, and writes each booking into that calendar. Without one, booking still works, it just cannot see appointments made outside casdey.",
+      "Connecting a Google Calendar is optional but worth it: casdey reads your free and busy times so it never offers a slot you are already in, then writes its bookings into a separate Google Calendar called casdey bookings. Without one, booking still works, it just cannot see appointments made outside casdey.",
       "If a connected calendar ever disconnects, casdey stops offering times until you reconnect, so it can never book over something already in your diary.",
     ],
     keywords: ["booking", "calendar", "google", "slots", "book", "diary", "availability", "connect", "appointment"],

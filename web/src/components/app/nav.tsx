@@ -13,7 +13,7 @@ const LINKS = [
   { href: "/app/import", label: "Import", Icon: IconUpload, exact: false },
   { href: "/app/offer", label: "Offer", Icon: IconOffer, exact: false },
   { href: "/app/campaigns", label: "Campaigns", Icon: IconMessage, exact: false },
-  { href: "/app/calendar", label: "Calendar", Icon: IconCalendar, exact: false },
+  { href: "/app/calendar", label: "Bookings", Icon: IconCalendar, exact: false },
   { href: "/app/settings", label: "Settings", Icon: IconSettings, exact: false },
 ] as const;
 
