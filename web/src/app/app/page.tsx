@@ -16,6 +16,7 @@ import { buildSetupState } from "@/lib/setup";
 import { paidTrialEnabled } from "@/lib/plan";
 import { activationFor } from "@/lib/trial";
 import { activityWithComparison, change } from "@/lib/dashboard";
+import { importRefreshReminder } from "@/lib/import-reminder";
 import { Funnel, LineChart, MetricChart, Split } from "@/components/app/chart";
 import { calendarConnectionView } from "@/lib/calendar/provider";
 import { isGoogleCalendarConfigured } from "@/lib/calendar/google";
@@ -92,6 +93,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
     { weeks, total: totals, previous, previousWeeks },
     [{ count: approvedCampaigns }, calendar],
     { data: returnedRows },
+    { data: latestImportRows },
   ] = await Promise.all([
     Promise.all([
       recoveredRevenue(session.supabase, gym.id),
@@ -115,6 +117,13 @@ export default async function DashboardPage(props: PageProps<"/app">) {
       .eq("status", "returned")
       .order("returned_at", { ascending: false })
       .limit(1),
+    session.supabase
+      .from("imports")
+      .select("created_at")
+      .eq("gym_id", gym.id)
+      .eq("status", "completed")
+      .order("created_at", { ascending: false })
+      .limit(1),
   ]);
 
   // The first-run checklist. Derived from state the gym already has, so it
@@ -137,6 +146,10 @@ export default async function DashboardPage(props: PageProps<"/app">) {
   });
 
   const returned = (returnedRows?.[0] ?? null) as Member | null;
+  const latestImport = latestImportRows?.[0] as
+    | { created_at: string }
+    | undefined;
+  const refreshReminder = importRefreshReminder(latestImport?.created_at);
 
   // Forward-looking: roughly what the lapsed members are worth per month, taken
   // from the gym's own membership prices. Needs the lapsed count from the batch
@@ -227,6 +240,23 @@ export default async function DashboardPage(props: PageProps<"/app">) {
               Reconnect it
             </Link>{" "}
             to switch booking back on.
+          </Notice>
+        </div>
+      ) : null}
+
+      {refreshReminder && latestImport ? (
+        <div className="mb-6">
+          <Notice>
+            Your member list was last updated {formatDate(latestImport.created_at)}{" "}
+            ({refreshReminder.daysSinceImport} days ago). Import a fresh CSV to
+            spot members who have come back and keep your campaign audience
+            current. {" "}
+            <Link
+              href="/app/import"
+              className="text-teal underline underline-offset-4"
+            >
+              Import updated CSV
+            </Link>
           </Notice>
         </div>
       ) : null}
