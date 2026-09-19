@@ -25,8 +25,14 @@ Davide works with more than one AI agent (Claude Code, Codex, and possibly
 others later), and all of them must stay equally informed. When your work
 changes the project:
 
+- Before finishing any session that changes code, a fix, a decision, status,
+  a service, or a setting, update the project's own docs so the next agent
+  starts from the current state. Correct stale claims in place. Commit the
+  doc changes, but do not push without fresh, explicit confirmation.
 - Durable business facts, decisions and status go into `CLAUDE.md` (or the
   more specific doc it names), never into this file, where they would drift.
+- Business data stored in `/admin` (costs, to-dos, goals, notes) is updated
+  with `npm run hq` from `web/` and needs no duplicate doc edit.
 - A new or renamed skill in `.claude/skills/` needs a matching pointer file
   in `.agents/skills/<name>/SKILL.md`.
 - A new authoritative doc, a moved file, or a new standing rule from Davide
@@ -38,7 +44,8 @@ changes the project:
 - casdey has one founder, Davide. Never write copy implying a team.
 - Never use em dashes as punctuation in casdey copy. Hyphens in compound
   words are fine.
-- Prices and money lead in EUR; the market is Europe, not UK-first.
+- Prices and money lead in EUR. Read `CLAUDE.md` for current markets and
+  local-currency prices.
 - Business calls (offer, pricing, outreach, lead generation) are judged
   through Alex Hormozi's frameworks, Davide's chosen mentor:
   `.claude/skills/hormozi/`.

@@ -80,8 +80,10 @@ practice / patient / appointment / dormant — was renamed throughout in the
   the same day in verified transactions over `SUPABASE_DB_URL`; `0017` applied
   2026-09-04, also in a verified transaction.**
 - **Vercel plan confirmed Hobby (2026-09-03, plan item B5 done).** The
-  campaign-send cron in `vercel.json` runs once daily (`0 3 * * *`) to stay
-  within the Hobby once-a-day cron cap; revert to hourly only if upgraded to Pro.
+  campaign-send route has five once-a-day schedules in `vercel.json` (03, 08,
+  13, 16 and 19 UTC, since 2026-09-19), each within Hobby's once-a-day-per-job
+  cap, and a gym only sends between 8am and 8pm in its own timezone
+  (`src/lib/send-window.ts`). The trial job runs on the 03:00 schedule only.
 
 ## The offer model (implemented) — see `src/lib/plan.ts`, and `SAAS_V1_PLAN.md` §F0
 

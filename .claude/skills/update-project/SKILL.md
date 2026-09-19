@@ -17,7 +17,7 @@ This is a **repo-durability pass**, not a status report and not a handoff. The a
 
 ## When to invoke
 
-User says: "update project files", "update the project folder", "update-project", "update CLAUDE.md", "sync the docs", "persist this into the project", or a clear equivalent. Do not invoke proactively — this makes a real, visible edit to project files and should be a deliberate ask, not a background action after every change.
+Run this procedure before finishing any session that changes something real in casdey: code, a fix, a decision, status, a service, or a setting. Also run it when the user explicitly asks to update project files. Business data stored in `/admin` (costs, to-dos, goals, notes) is updated with `npm run hq` from `web/` and needs no duplicate doc edit.
 
 ## How to do it
 
@@ -48,7 +48,7 @@ User says: "update project files", "update the project folder", "update-project"
 
 ## Hard rules
 
-1. **Never commit or push as part of this skill.** Editing project docs is a file change like any other — respect whatever standing rules the project or user has about commits and pushes (check memory and `CLAUDE.md` itself for something like a no-push-until-complete rule). Default to leaving changes uncommitted unless the user's own conventions say otherwise or they explicitly ask you to commit.
+1. **Commit the doc changes, but do not push without fresh, explicit user confirmation.** `main` auto-deploys production through Vercel. A commit is not approval to deploy.
 2. **Never invent or infer facts not established this session.** If something is unclear or you're not confident it happened, ask rather than writing a guess into a document other people will treat as ground truth.
 3. **Never write credentials, secrets, or API keys into project docs**, even ones already in `.env` files. Reference that a credential was set and where (`RESEND_API_KEY` in `.env.local`), never the value.
 4. **Don't touch files outside the project's own documentation.** This skill edits docs (`.md` files, doc comments in config), not application code, even if fixing a stale claim would technically also mean changing a code comment — flag those separately rather than folding them in silently.
@@ -59,6 +59,6 @@ User says: "update project files", "update the project folder", "update-project"
 - Turning `CLAUDE.md` into a running session log ("2026-08-15: did X. 2026-08-14: did Y.") when it was written as current-state narrative.
 - Copying this session's `session-handoff` output into a project doc verbatim — handoffs are for the next agent's working memory, not for the repo.
 - Updating one file's claim and leaving the same stale fact elsewhere in the repo uncorrected.
-- Committing or pushing the doc changes without being asked.
+- Pushing doc changes without fresh, explicit user confirmation.
 - Writing implementation-level detail into `CLAUDE.md` when the project has a more specific doc for it.
 - Padding out a one-line status change into a paragraph because it feels more thorough — match the existing density of the section.
