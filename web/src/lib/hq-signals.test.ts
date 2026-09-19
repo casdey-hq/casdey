@@ -59,6 +59,7 @@ describe("liveSignals", () => {
     expect(early).toEqual([]);
     const due = liveSignals({ marketing: test("2026-09-19"), trialsEnding: [], goals: [], now: SATURDAY });
     expect(due[0].key).toBe("test-review:T2:2026-09-19");
+    expect(due[0].due).toBe("2026-09-19");
   });
 
   it("names unapproved Instagram days and unsent DMs, and says nothing when there are none", () => {
@@ -76,6 +77,7 @@ describe("liveSignals", () => {
     });
     expect(busy.map((s) => s.key)).toEqual(["ig-approve:2026-09-19", "ig-dms:2026-09-19"]);
     expect(busy[1].title).toBe("Send 17 Instagram DMs");
+    expect(busy.map((s) => s.due)).toEqual(["2026-09-19", "2026-09-19"]);
 
     const quiet = liveSignals({
       marketing: marketing({

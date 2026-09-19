@@ -76,6 +76,6 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 - Migration `0041_hq.sql` (applied live): `hq_notes`, `hq_todos`, `hq_goals`, `hq_inputs`, `hq_costs`, readable and writable by the server only.
 - `npm run hq` (`web/scripts/hq.mjs`) writes all of it from a session or the Sunday routine; `npm run hq -- summary` prints it for any agent starting a session.
 - Seeded from the old sources: Davide's inputs verbatim, the two current goals, the marketing plan verbatim, the offer (updated for the US and the VAT line), the cost lines, and the HQ doc's open items as to-dos.
-- The Sunday check-up now writes the `checkup` note and proposed to-dos, and sends a short "ready" email (`.claude/skills/check-up/SKILL.md`).
+- The Sunday check-up now writes its analysis (one note per week, shown on a fifth tab, **Check-up**, with earlier weeks kept) and proposed to-dos, and sends a short "ready" email (`.claude/skills/check-up/SKILL.md`). Added the same day at Davide's request, along with an **Added** and a **Due** date on every to-do (an automatic to-do's Added date is when `/admin` first saw it).
 - `casdey-hq.md` carries a retirement line. The two Google Docs and the check-up artifact get a pointer to `/admin` once this is live.
 - Tested: 490 tests (new: `marketing-summary`, `hq-signals`, `unit-economics`), and every tab checked in the browser against live data, including phone width and adding and ticking off a to-do.

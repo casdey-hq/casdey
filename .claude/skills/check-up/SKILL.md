@@ -48,7 +48,7 @@ of the business that any casdey session (interactive or a cloud routine)
 should treat as live context for deciding what to work on next, the same way
 `CLAUDE.md` is treated as the decision record. When a session opens and
 Davide wants to continue casdey work without saying exactly what,
-`npm run hq -- summary` (the latest `checkup` note and the open to-dos) is
+`npm run hq -- summary` (the latest check-up and the open to-dos) is
 the way to ground that. Write section 5
 accordingly: concrete and specific enough (file paths, track names, tab
 names) that a fresh Claude session with no other context could pick one of
@@ -209,7 +209,7 @@ its actions up and start, not just a headline a human would nod at.
 
 5. **Recommended signals & this week's actions — synthesized, not sourced.**
    **Recommendations, not the plan (Davide, 2026-09-13).** Title it exactly
-   "Recommended signals & this week's actions" in the `checkup` note, with a line
+   "Recommended signals & this week's actions" in the week's check-up, with a line
    saying the real plan is decided in the review. This section is what Claude
    proposes going into the review; what actually gets done that week is
    decided by Davide, together with Claude and the `/hormozi` lens, in the
@@ -257,8 +257,8 @@ its actions up and start, not just a headline a human would nod at.
      Davide should actually do (e.g. the offer note still describes a price
      that has changed), which is worth an `npm run hq -- note set offer`, not
      just a footnote.
-   - **Items stuck across multiple runs**: before overwriting the `checkup`
-     note, read the current one (`npm run hq -- note get checkup`) and the
+   - **Items stuck across multiple runs**: before writing this week's check-up
+     note, read last week's (`npm run hq -- checkup get`) and the
      open to-dos (`npm run hq -- todo list`), and compare them against what
      this run just found in `SAAS_V1_PLAN.md`/`SAAS_V1_1_PLAN.md`. An
      item that reads "still open"/"todo" two check-ups running is itself a
@@ -287,13 +287,14 @@ exactly this kind of thing). End with a link to https://www.casdey.com/admin.
 
 **Into `/admin`** (every run, on-demand or weekly), all from `web/`:
 
-1. **This week's analysis** as the `checkup` note, shown on `/admin`'s
-   Overview tab. Write it in the small Markdown `/admin` renders (## headings,
+1. **This week's analysis**, shown on `/admin`'s **Check-up** tab. Each
+   Sunday gets its own note, so earlier weeks stay readable there. Write it in the small Markdown `/admin` renders (## headings,
    - lists, **bold**): the ranked actions first, then one or two lines per
    section, then the proposed test verdict. Keep it short; the numbers
    themselves are live on `/admin` and must not be copied into it, or they go
    stale the moment the page reloads.
-   `npm run hq -- note set checkup "This week, from the Sunday check-up" <file.md>`
+   `npm run hq -- checkup set <file.md>` (it keys the note by the latest
+   Sunday; pass `--week YYYY-MM-DD` for another week)
 2. **The recommended actions as proposed to-dos**, one each, so Davide can
    accept or dismiss them on `/admin`:
    `npm run hq -- todo add "<imperative title>" --detail "<why, one line>" --source checkup --proposed`
@@ -326,7 +327,7 @@ step is different from an on-demand run:
    already have it installed, so this is a no-op there.
 1. Do everything above (all sections including the prepared test review and
    the recommended actions), and write them into `/admin` as "Composing the
-   output" describes: the `checkup` note, and each recommended action as a
+   output" describes: the week's check-up, and each recommended action as a
    *proposed* to-do. Goals are never set from the routine. **Never run `testlog:update` from the
    routine**: with nobody to decide, the review stops at the proposed
    verdict, and the Sunday session with Davide finishes it.

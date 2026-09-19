@@ -8,6 +8,7 @@ import { NumbersTab } from "./numbers-tab";
 import { TodayTab } from "./today-tab";
 import { MarketingTab } from "./marketing-tab";
 import { BusinessTab } from "./business-tab";
+import { CheckupTab } from "./checkup-tab";
 
 export const metadata = { title: "casdey HQ" };
 
@@ -27,6 +28,7 @@ export const metadata = { title: "casdey HQ" };
  *   Numbers    money, signups, activation, traffic, product output
  *   Marketing  outreach, the weekly test review, Instagram, the plan
  *   Business   the offer, prices, costs, per-gym economics, break-even
+ *   Check-up   each Sunday's analysis, its proposals, and earlier weeks
  *
  * Each tab streams in on its own, so a slow Google or PostHog read holds only
  * the tab that needs it.
@@ -37,6 +39,7 @@ const TABS = [
   { id: "numbers", label: "Numbers" },
   { id: "marketing", label: "Marketing" },
   { id: "business", label: "Business" },
+  { id: "checkup", label: "Check-up" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -102,6 +105,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
         {tab === "numbers" ? <NumbersTab period={period} /> : null}
         {tab === "marketing" ? <MarketingTab period={period} /> : null}
         {tab === "business" ? <BusinessTab /> : null}
+        {tab === "checkup" ? <CheckupTab /> : null}
       </Suspense>
     </>
   );

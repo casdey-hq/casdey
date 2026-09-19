@@ -24,6 +24,12 @@ export type Signal = {
   title: string;
   detail: string | null;
   link: string | null;
+  /**
+   * When it needs doing, as YYYY-MM-DD, where the situation has a natural
+   * date: a review's due day, a first week's last day, the first day with no
+   * Instagram post approved. Null where it simply needs doing (a reply).
+   */
+  due: string | null;
   /** Lower sorts first. */
   priority: number;
 };
@@ -68,6 +74,7 @@ export function liveSignals(input: {
         title: `Follow up with ${lead.gym || `lead #${lead.lead}`}`,
         detail: `${lead.status} gym, lead #${lead.lead}${lead.contacted ? `, first contacted ${shortDate(lead.contacted)}` : ""}. Tick this off once you have replied or they have moved on.`,
         link: LEADS_SHEET,
+        due: null,
         priority: 0,
       });
     }
@@ -78,6 +85,7 @@ export function liveSignals(input: {
         title: `Send the video to ${dm.handle}${dm.gym ? ` (${dm.gym})` : ""}`,
         detail: "They asked for it on Instagram. Log the date in Inbound DMs once it is sent.",
         link: LEADS_SHEET,
+        due: null,
         priority: 0,
       });
     }
@@ -89,6 +97,7 @@ export function liveSignals(input: {
         title: `Weekly review of test ${test.id}`,
         detail: `${test.verdict}. Due ${shortDate(test.reviewDueOn)}${test.reviewOverdueDays ? `, ${test.reviewOverdueDays} day${test.reviewOverdueDays === 1 ? "" : "s"} overdue` : ""}. Part of the Sunday check-up.`,
         link: "/admin?tab=marketing",
+        due: test.reviewDueOn,
         priority: 1,
       });
     }
@@ -100,6 +109,7 @@ export function liveSignals(input: {
         title: "Approve Instagram posts",
         detail: `Nothing approved yet for ${uncovered.map(shortDate).join(", ")}. Set Status to Approved in IG Content, or ask Claude for the next batch.`,
         link: LEADS_SHEET,
+        due: uncovered[0],
         priority: 1,
       });
     }
@@ -111,6 +121,7 @@ export function liveSignals(input: {
         title: `Send ${drafts} Instagram DM${drafts === 1 ? "" : "s"}`,
         detail: "Drafted in IG Outreach. Log the date in Date Sent as each goes out.",
         link: LEADS_SHEET,
+        due: today,
         priority: 2,
       });
     }
@@ -122,6 +133,7 @@ export function liveSignals(input: {
       title: `${trial.gymName}'s first week ends ${shortDate(trial.endsAt)}`,
       detail: "Check they have imported and launched a campaign before it ends.",
       link: null,
+      due: trial.endsAt.slice(0, 10),
       priority: 1,
     });
   }
@@ -133,6 +145,7 @@ export function liveSignals(input: {
       title: `Close out the goal "${goal.label}" and set the next one`,
       detail: `Its deadline was ${shortDate(goal.deadline)}. Decide in the Sunday review whether it was hit.`,
       link: null,
+      due: goal.deadline,
       priority: 1,
     });
   }
@@ -146,7 +159,8 @@ export function liveSignals(input: {
       key: `checkup:${sunday}`,
       title: "Sunday check-up with Claude",
       detail: "Run /check-up: the weekly test review, this week's goals, and next week's actions.",
-      link: null,
+      link: "/admin?tab=checkup",
+      due: sunday,
       priority: 1,
     });
   }

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { supabaseAdmin } from "./supabase";
-import type { GoalRef, TrialEnding } from "./hq-signals";
+import type { GoalRef, Signal, TrialEnding } from "./hq-signals";
 
 /**
  * Reads casdey's own business view (migration 0041) for /admin. Everything
@@ -51,6 +51,8 @@ export type HqCost = {
 
 export type HqData = {
   notes: Record<string, HqNote>;
+  /** Sunday check-ups, newest first. Stored as notes keyed checkup_<sunday>. */
+  checkups: HqNote[];
   inputs: HqInput[];
   goals: HqGoal[];
   todos: HqTodo[];
@@ -75,7 +77,7 @@ export async function readHq(now: Date = new Date()): Promise<HqData> {
     db
       .from("hq_todos")
       .select("*")
-      .or(`status.in.(proposed,open),closed_at.gte.${recent},signal_key.not.is.null`)
+      .or(`status.in.(proposed,open),closed_at.gte.${recent}`)
       .order("created_at", { ascending: false }),
     db.from("hq_costs").select("*").order("position"),
     // Real gyms only: a first week ending on a test gym is not a to-do.
@@ -97,6 +99,9 @@ export async function readHq(now: Date = new Date()): Promise<HqData> {
     notes: Object.fromEntries(
       ((notes.data ?? []) as HqNote[]).map((note) => [note.key, note]),
     ),
+    checkups: ((notes.data ?? []) as HqNote[])
+      .filter((note) => note.key.startsWith("checkup_"))
+      .sort((a, b) => b.key.localeCompare(a.key)),
     inputs: (inputs.data ?? []) as HqInput[],
     goals: ((goals.data ?? []) as HqGoal[]).map((goal) => ({
       ...goal,
@@ -111,4 +116,46 @@ export async function readHq(now: Date = new Date()): Promise<HqData> {
       (gym) => ({ gymId: gym.id, gymName: gym.name, endsAt: gym.trial_ends_at }),
     ),
   };
+}
+
+export type SignalState = { status: HqTodo["status"]; firstSeen: string };
+
+/**
+ * Records each live signal the first time it is seen, and reads back what is
+ * known about the ones on screen now: when it first appeared (the "added"
+ * date Davide sees) and whether he has ticked or dismissed it.
+ *
+ * Insert-if-missing, so a signal's first-seen date never moves and a tick is
+ * never undone by a later load. Looked up by the keys on screen rather than
+ * by date, so a signal ticked months ago stays ticked.
+ */
+export async function syncSignals(
+  signals: Pick<Signal, "key" | "title" | "due">[],
+): Promise<Map<string, SignalState>> {
+  const states = new Map<string, SignalState>();
+  if (signals.length === 0) return states;
+  const db = supabaseAdmin();
+
+  const { error: insertError } = await db.from("hq_todos").upsert(
+    signals.map((signal) => ({
+      signal_key: signal.key,
+      title: signal.title.slice(0, 300),
+      due: signal.due,
+      source: "signal",
+      status: "open",
+    })),
+    { onConflict: "signal_key", ignoreDuplicates: true },
+  );
+  if (insertError) console.error("[hq] signal record failed", insertError.message);
+
+  const { data, error } = await db
+    .from("hq_todos")
+    .select("signal_key, status, created_at")
+    .in("signal_key", signals.map((signal) => signal.key));
+  if (error) console.error("[hq] signal read failed", error.message);
+
+  for (const row of (data ?? []) as { signal_key: string; status: HqTodo["status"]; created_at: string }[]) {
+    states.set(row.signal_key, { status: row.status, firstSeen: row.created_at });
+  }
+  return states;
 }

@@ -26,6 +26,9 @@ export type TodoItem = {
   link: string | null;
   /** Where it came from, shown small: "Live", "Check-up", "Claude", "You". */
   origin: string;
+  /** When it first appeared, already formatted ("19 Sept"). */
+  added: string | null;
+  /** When it needs doing by, already formatted; null when it has no date. */
   due: string | null;
   proposed: boolean;
 };
@@ -99,9 +102,12 @@ export function TodoList({ items, empty }: { items: TodoItem[]; empty: string })
                     {item.detail}
                   </p>
                 ) : null}
-                <p className="label mt-1.5 text-stone">
-                  {item.origin}
-                  {item.due ? ` · due ${item.due}` : ""}
+                <p className="label mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-stone">
+                  <span>{item.origin}</span>
+                  {item.added ? <span>Added {item.added}</span> : null}
+                  <span className={item.due ? "text-ink" : undefined}>
+                    {item.due ? `Due ${item.due}` : "No due date"}
+                  </span>
                 </p>
               </div>
               <div className="flex shrink-0 gap-2">

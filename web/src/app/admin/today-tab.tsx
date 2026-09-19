@@ -1,11 +1,12 @@
 import { Card, CardTitle } from "@/components/app/ui";
 import { mrr } from "@/lib/admin-stats";
-import { readHq, type HqGoal, type HqTodo } from "@/lib/hq";
+import { readHq, syncSignals, type HqGoal, type HqTodo } from "@/lib/hq";
 import { liveSignals } from "@/lib/hq-signals";
 import { marketingSummary } from "@/lib/marketing-stats";
 import type { MarketingSummary } from "@/lib/marketing-summary";
-import { AddTodoForm, NoteEditor, TodoList, type TodoItem } from "./hq-client";
-import { MarkdownLite } from "./markdown-lite";
+import Link from "next/link";
+
+import { AddTodoForm, TodoList, type TodoItem } from "./hq-client";
 import { Section } from "./parts";
 
 /**
@@ -45,17 +46,17 @@ export async function TodayTab() {
     mrr(),
   ]);
 
-  const closedKeys = new Set(
-    hq.todos
-      .filter((todo) => todo.signal_key && todo.status !== "open")
-      .map((todo) => todo.signal_key as string),
-  );
-  const signals = liveSignals({
+  const computed = liveSignals({
     marketing,
     trialsEnding: hq.trialsEnding,
     goals: hq.goals,
     now,
-  }).filter((signal) => !closedKeys.has(signal.key));
+  });
+  // Records first sightings (the "added" date) and reads back ticks.
+  const states = await syncSignals(computed);
+  const signals = computed.filter(
+    (signal) => (states.get(signal.key)?.status ?? "open") === "open",
+  );
 
   const open = hq.todos.filter((todo) => todo.status === "open" && !todo.signal_key);
   const proposed = hq.todos.filter((todo) => todo.status === "proposed");
@@ -71,6 +72,7 @@ export async function TodayTab() {
     detail: todo.detail,
     link: todo.link,
     origin: ORIGIN[todo.source],
+    added: shortDate(todo.created_at),
     due: todo.due ? shortDate(todo.due) : null,
     proposed: todo.status === "proposed",
   });
@@ -85,7 +87,8 @@ export async function TodayTab() {
       detail: signal.detail,
       link: signal.link,
       origin: "Live",
-      due: null,
+      added: states.get(signal.key) ? shortDate(states.get(signal.key)!.firstSeen) : null,
+      due: signal.due ? shortDate(signal.due) : null,
       proposed: false,
     })),
     ...open
@@ -93,7 +96,7 @@ export async function TodayTab() {
       .map(toItem),
   ];
 
-  const plan = hq.notes.checkup;
+  const latest = hq.checkups[0] ?? null;
 
   return (
     <>
@@ -105,14 +108,22 @@ export async function TodayTab() {
         <AddTodoForm />
       </Section>
 
-      {proposed.length > 0 ? (
-        <Section
-          title="Proposed by the Sunday check-up"
-          sub="Accept what you agree with, dismiss the rest. Accepted ones join the list above."
-        >
-          <TodoList items={proposed.map(toItem)} empty="" />
-        </Section>
-      ) : null}
+      <Link
+        href="/admin?tab=checkup"
+        className="card mt-8 flex flex-wrap items-center justify-between gap-3 p-5 transition-colors duration-150 hover:border-teal"
+      >
+        <span>
+          <span className="label block text-stone">Sunday check-up</span>
+          <span className="mt-1 block text-[0.9375rem] font-semibold text-ink">
+            {latest ? latest.title : "The first one arrives on Sunday morning"}
+          </span>
+        </span>
+        <span className="text-[0.875rem] font-semibold text-teal">
+          {proposed.length > 0
+            ? `${proposed.length} proposal${proposed.length === 1 ? "" : "s"} to review →`
+            : "Open →"}
+        </span>
+      </Link>
 
       <Section title="Goals" sub="Set in the Sunday review. Progress is live where casdey can measure it.">
         {hq.goals.filter((goal) => goal.status === "active").length === 0 ? (
@@ -133,19 +144,6 @@ export async function TodayTab() {
           </div>
         )}
       </Section>
-
-      {plan ? (
-        <Section
-          title={plan.title}
-          sub={`From the Sunday check-up, ${new Date(plan.updated_at).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.`}
-        >
-          <Card>
-            <NoteEditor noteKey={plan.key} body={plan.body}>
-              <MarkdownLite source={plan.body} />
-            </NoteEditor>
-          </Card>
-        </Section>
-      ) : null}
 
       <Section title="Who does what" sub="Update these whenever the split changes.">
         <div className="grid gap-4 md:grid-cols-3">

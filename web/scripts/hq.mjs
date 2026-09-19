@@ -18,6 +18,8 @@
  *   inputs list
  *   inputs set <file.json>       [{ "owner": "davide|ai|together", "label": "..." }, ...]
  *   costs set <file.json>        [{ "service", "purpose", "monthly_eur", "basis", "when_it_matters" }, ...]
+ *   checkup set <file.md> [--week YYYY-MM-DD]   this week's Sunday analysis (default: latest Sunday)
+ *   checkup get                  the latest one
  *   summary                      everything written, for an agent starting a session
  *
  * Reads SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from the environment first
@@ -203,6 +205,36 @@ switch (`${thing} ${action}`) {
     console.log(`${items.length} cost lines saved`);
     break;
   }
+  case "checkup set": {
+    // One note per week, keyed by that week's Sunday, so /admin's Check-up
+    // tab keeps the history. The Sunday defaults to the most recent one
+    // (today, on a Sunday).
+    const week = flags.week ?? (() => {
+      const now = new Date();
+      return new Date(now.getTime() - now.getUTCDay() * 86_400_000).toISOString().slice(0, 10);
+    })();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(week)) fail("--week must be YYYY-MM-DD");
+    const title = `Week of ${new Date(`${week}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}`;
+    const noteKey = `checkup_${week.replaceAll("-", "_")}`;
+    await run(
+      db.from("hq_notes").upsert({
+        key: noteKey,
+        title,
+        body: readInput(positional[0]),
+        updated_at: new Date().toISOString(),
+        updated_by: who,
+      }),
+    );
+    console.log(`check-up for ${week} saved (${noteKey})`);
+    break;
+  }
+  case "checkup get": {
+    const rows = await run(
+      db.from("hq_notes").select("*").like("key", "checkup\\_%").order("key", { ascending: false }).limit(1),
+    );
+    console.log(rows[0] ? `# ${rows[0].title}\n\n${rows[0].body}` : "(no check-up yet)");
+    break;
+  }
   case "summary undefined":
   case "summary all": {
     // The written half of /admin in one read, for an agent starting a session
@@ -227,7 +259,10 @@ switch (`${thing} ${action}`) {
     }
     const fixed = costs.reduce((sum, c) => sum + Number(c.monthly_eur), 0);
     out.push(`\n## Fixed monthly cost: EUR ${fixed.toFixed(2)} (${costs.filter((c) => Number(c.monthly_eur) > 0).map((c) => `${c.service} ${c.monthly_eur}`).join(", ")})`);
-    for (const n of notes) out.push(`\n## ${n.title} [note: ${n.key}, updated ${n.updated_at.slice(0, 10)} by ${n.updated_by}]\n\n${n.body}`);
+    // Only the latest check-up: earlier weeks are history, on /admin.
+    const checkups = notes.filter((n) => n.key.startsWith("checkup_")).sort((a, b) => b.key.localeCompare(a.key));
+    const shown = notes.filter((n) => !n.key.startsWith("checkup_")).concat(checkups.slice(0, 1));
+    for (const n of shown) out.push(`\n## ${n.title} [note: ${n.key}, updated ${n.updated_at.slice(0, 10)} by ${n.updated_by}]\n\n${n.body}`);
     console.log(out.join("\n"));
     break;
   }
