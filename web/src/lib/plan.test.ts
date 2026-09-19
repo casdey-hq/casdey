@@ -25,6 +25,7 @@ function gym(overrides: Partial<Gym> = {}): Gym {
     stripe_subscription_id: null,
     subscription_status: "none",
     plan_tier: null,
+    internal_plan_tier: null,
     plan_currency: null,
     plan_interval: null,
     trial_ends_at: null,
@@ -78,6 +79,20 @@ function gym(overrides: Partial<Gym> = {}): Gym {
 }
 
 describe("effectivePlan", () => {
+  it("keeps an internal account on its assigned tier regardless of Stripe", () => {
+    expect(
+      effectivePlan(
+        gym({
+          subscription_status: "canceled",
+          plan_tier: "pro",
+          internal_plan_tier: "standard",
+          trial_ends_at: "2026-01-01T00:00:00Z",
+        }),
+        NOW,
+      ),
+    ).toBe("standard");
+  });
+
   it("is trial while the free week is still running", () => {
     const p = gym({ trial_ends_at: "2026-08-18T00:00:00Z" });
     expect(effectivePlan(p, NOW)).toBe("trial");

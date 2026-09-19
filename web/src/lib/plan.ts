@@ -123,10 +123,15 @@ export function earlyAdopterProgramActive(): boolean {
 
 type PlanInput = Pick<
   Gym,
-  "subscription_status" | "trial_ends_at" | "plan_tier"
+  "subscription_status" | "trial_ends_at" | "plan_tier" | "internal_plan_tier"
 >;
 
 export function effectivePlan(gym: PlanInput, now: Date = new Date()): Plan {
+  // An operator grant is the only plan source that outranks Stripe. It exists
+  // for casdey's own accounts and must continue to work if Stripe sends an
+  // event for an old, cancelled or test subscription.
+  if (gym.internal_plan_tier) return gym.internal_plan_tier;
+
   // A live (or lapsed-but-in-grace) Stripe subscription: whichever tier it is
   // paying for. plan_tier is written by the webhook; default to the safer
   // (fuller) tier if a subscription somehow exists without one recorded yet.

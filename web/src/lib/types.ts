@@ -123,6 +123,9 @@ export type Gym = {
   /** Which paid tier a subscribed gym is on (Track F). Null for Free / trial.
    *  Written by the Stripe webhook from the subscription price. */
   plan_tier: PlanTier | null;
+  /** Manual tier for a casdey-owned account. This takes precedence over the
+   *  Stripe-derived plan_tier and survives subscription updates. */
+  internal_plan_tier: PlanTier | null;
   plan_currency: "gbp" | "eur" | "usd" | null;
   plan_interval: "month" | "year" | null;
   trial_ends_at: string | null;

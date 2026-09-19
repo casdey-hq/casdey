@@ -33,6 +33,7 @@ function gym(overrides: Partial<Gym> = {}): Gym {
     stripe_subscription_id: null,
     subscription_status: "none",
     plan_tier: null,
+    internal_plan_tier: null,
     plan_currency: null,
     plan_interval: null,
     trial_ends_at: null,

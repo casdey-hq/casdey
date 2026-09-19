@@ -160,7 +160,7 @@ export async function planBreakdown(
 ): Promise<{ counts: PlanCounts; total: number }> {
   const { data, error } = await supabaseAdmin()
     .from("gyms")
-    .select("subscription_status, trial_ends_at, plan_tier")
+    .select("subscription_status, trial_ends_at, plan_tier, internal_plan_tier")
     .eq("is_internal", false);
 
   const counts: PlanCounts = { trial: 0, free: 0, standard: 0, pro: 0 };
@@ -172,7 +172,10 @@ export async function planBreakdown(
 
   for (const row of data ?? []) {
     const plan = effectivePlan(
-      row as Pick<Gym, "subscription_status" | "trial_ends_at" | "plan_tier">,
+      row as Pick<
+        Gym,
+        "subscription_status" | "trial_ends_at" | "plan_tier" | "internal_plan_tier"
+      >,
       now,
     );
     counts[plan] += 1;
@@ -422,7 +425,7 @@ export async function subscriptionHealth(
   const { data, error } = await supabaseAdmin()
     .from("gyms")
     .select(
-      "subscription_status, plan_tier, plan_currency, trial_ends_at, cancels_at",
+      "subscription_status, plan_tier, internal_plan_tier, plan_currency, trial_ends_at, cancels_at",
     )
     .eq("is_internal", false);
 
@@ -447,7 +450,10 @@ export async function subscriptionHealth(
   for (const row of data ?? []) {
     const status = row.subscription_status as Gym["subscription_status"];
     const plan = effectivePlan(
-      row as Pick<Gym, "subscription_status" | "trial_ends_at" | "plan_tier">,
+      row as Pick<
+        Gym,
+        "subscription_status" | "trial_ends_at" | "plan_tier" | "internal_plan_tier"
+      >,
       now,
     );
     // `incomplete` is a subscription whose payment is waiting on the gym's bank
