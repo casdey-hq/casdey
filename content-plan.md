@@ -12,7 +12,7 @@ send volume.
 | | |
 | --- | --- |
 | Platform | Instagram only, on casdey's existing account (the one the cold DMs come from) |
-| Format | Faceless for now: no face, no voice. **Reels first** (changed 2026-09-13, see "Formats" below): POV reels over stock gym clips, and demo reels of casdey's own UI. Carousels only if reels flop |
+| Format | Faceless for now: no face, no voice. **Reels first** (changed 2026-09-13, see "Formats" below): relatable reels over stock footage with people for the give posts, and a demo reel of casdey's own UI for the weekly ask. Carousels only if reels flop |
 | Cadence | 1 post a day for 100 days. First post Wednesday 2026-09-16, day 100 is 2026-12-24 |
 | Language | English |
 | Audience | Owners of independent gyms, CrossFit and community boxes, and studios in Ireland, the UK and Europe |
@@ -53,8 +53,11 @@ Each maps to one of Hormozi's topic types (pg 117-119).
 | 3 | **The cost of doing nothing.** Simple maths the owner runs on their own numbers | Reveal the problem | 1 | "Count the members who cancelled this year. Multiply by your monthly price. That's the number." |
 | 4 | **casdey at work.** Screen recordings: the lapsed list, the message it writes, the booking step | Sample of the service | 1 | "What casdey sends a member who left 3 months ago, in the gym's own name." |
 | 5 | **Proof.** A real gym's result, only with their permission | Recent past, case study | when it exists | BodyActive, once there is a result. Takes pillar 3's slot |
+| 6 | **Relatable.** A moment every gym owner recognises, no pitch (added 2026-09-13, see "Formats") | Not one of Hormozi's types: modelled on the posts that beat the gym-software accounts' averages | batch 1: 3 | "gym owners at 11pm checking who hasn't been in this month" |
 
-That is 7 a week. Pillar 2 is the backbone, and it follows the lead-magnet rule
+That is 7 a week. Batch 1 (2026-09-16 to 2026-09-18) went out as three relatable reels and one
+demo reel; how the relatable pillar shares the six give slots with pillars 1 to 3 is not settled
+yet. Pillar 2 is the backbone, and it follows the lead-magnet rule
 "give away the secrets, sell the implementation" (*$100M Leads*, lead magnets step 6): a gym
 owner who learns the whole method still has no time to do it for 200 members, and that is what
 casdey sells.
@@ -62,7 +65,10 @@ casdey sells.
 **Hard rules for every post:**
 - Never an invented statistic. Cite a real source on the slide, or use the owner's own numbers.
 - Never a fake customer, fake gym or fake result.
-- "casdey" always lowercase. No em dashes. Brand v4 (Chalk ground, Leaf gold, Outfit titles, IBM Plex body), per `brand assets/casdey-brand-guide.html`.
+- "casdey" always lowercase. No em dashes.
+- Branded posts (the demo reel, any carousel) follow brand v4 (Chalk ground, Leaf gold, Outfit
+  titles, IBM Plex body), per `brand assets/casdey-brand-guide.html`. Relatable give posts carry
+  no brand at all (Davide, 2026-09-13: a logo and gold made them read as ads).
 
 ---
 
@@ -143,16 +149,18 @@ Judged on casdey's own numbers after 2 to 3 weeks (`IG Weekly`), not on these ac
 ### Week 0, 2026-09-14 to 2026-09-15: set up
 - [ ] **Profile.** Mark as the avatar. Bio in three lines: who it is for, the result, the
       action ("DM VIDEO"). Link to casdey.com.
-- [ ] **Review batch 1.** Claude drafts the posts (see "How posts get made, reviewed and
-      tracked" below); Davide reviews them. Nothing is published before Wednesday.
-- [ ] **On Wednesday 2026-09-16, publish three posts and pin them:** the promo film (posted
-      as it is, a reel), founder log 01 and playbook 01. A stranger opening the profile from
-      a DM should understand casdey in ten seconds. From Thursday 2026-09-17, one post a day.
+- [x] **Review batch 1.** Approved 2026-09-13, as four reels, on the third version. Nothing is
+      published before Wednesday.
+- [ ] **On Wednesday 2026-09-16:** reel 001 and the demo reel 002 publish automatically. The
+      original plan here (pin the promo film, founder log 01 and playbook 01) lost its last two
+      posts when the carousels were rejected; whether to pin 001 and 002, and whether to post the
+      promo film by hand, is Davide's call. A stranger opening the profile from a DM should
+      understand casdey in ten seconds. From Thursday 2026-09-17, one post a day.
 
 ### Days 1 to 30, 2026-09-16 to 2026-10-15: hold the inputs
-- **Post by hand every day**, not pre-scheduled. Hormozi finds hand-posted content performs
-  better because the instant feedback makes you try harder (pg 144, lesson 7). About 10
-  minutes, including replying to comments, next to the daily DMs.
+- **One post a day, published automatically** from the approved batch (superseded the original
+  "post by hand every day" on 2026-09-13, see Hormozi's note under "How posts get made"). About
+  10 minutes a day still goes on replying to comments, next to the daily DMs.
 - **Batch twice a month**, which is Hormozi's own routine (pg 140): a batch around
   2026-09-15 and 2026-09-30.
 - **Test formats, never topics:** POV reel against demo reel against tip-list reel, inside the
@@ -207,11 +215,13 @@ go through Instagram's official API instead.
 1. **Claude writes the week's batch** in `content/instagram/<batch>.json` (a `reel` or `slides`,
    caption, planned date, pillar) and renders it with `npm run ig:render -- <batch>` from `web/`
    into `content/instagram/out/<post #>/` (gitignored, rebuilt from the JSON). A reel becomes
-   `reel.mp4` (1080x1920, H.264 and AAC, synthesised music) plus `cover.jpg`, drawn by
-   `web/scripts/instagram-reel.html` and encoded in headless Chrome, so no ffmpeg is needed. A
-   carousel becomes one 1080x1350 PNG per slide. Stock clips live in
-   `content/instagram/footage/` (gitignored, named after their Pexels id, each post's `source`
-   links the clip's page). Every new clip is asked for before it is downloaded.
+   `reel.mp4` (1080x1920, H.264, with the post's licensed track mixed in as AAC, or silent if it
+   names none) plus `cover.jpg`, drawn by `web/scripts/instagram-reel.html` and encoded in
+   headless Chrome, so no ffmpeg is needed. A carousel becomes one 1080x1350 PNG per slide. Stock
+   clips live in `content/instagram/footage/` and tracks in `content/instagram/music/` (both
+   gitignored, named after their Pexels or Pixabay id; each post's `source` and `musicSource`
+   link the page they came from, so either can be downloaded again). Every new clip is asked for
+   before it is downloaded.
 2. **`npm run ig:drive -- <batch>`** uploads the files to Google Drive, as info@casdey.com:
    `casdey Instagram / <batch> / <post # and title> / reel.mp4, cover.jpg` (or `1.png, 2.png ...`)
    and `caption.txt`. Files are never sent in chat.
@@ -252,12 +262,13 @@ Three tabs, created 2026-09-13, all read by the Sunday check-up:
 
 ## Open
 
-- The first review of batch 1's look and voice decides whether the rest of the batch follows the
-  samples. The carousel samples were rejected on 2026-09-13; the three reel samples (two POV, one
-  demo) are what is under review now.
-- Instagram cannot attach its own trending audio through the API, so API-published reels carry
-  casdey's synthesised music. If reach suffers for that, posting a reel by hand with trending
-  audio is the fallback to test.
+- Batch 1 was approved on 2026-09-13, with Davide's note that there is still a lot to improve.
+  The next batch should push the look and the ideas further, still inside the "Formats" rules.
+- Instagram cannot attach its own audio through the API, so API-published reels carry a licensed
+  track built into the video. If reach suffers for that, posting a relatable reel by hand with a
+  sound picked in the app (what PushPress did once) is the fallback to test.
+- The first real publish is 2026-09-16. Instagram has already accepted unpublished Reels
+  containers for two of the reels; a post actually going out has not been seen yet.
 
 ## Sources
 

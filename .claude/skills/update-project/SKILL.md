@@ -40,9 +40,11 @@ User says: "update project files", "update the project folder", "update-project"
 
 6. **Use absolute dates, never relative ones.** "2026-08-15", not "today" or "this session" — these files get read long after the session ends.
 
-7. **Verify internal consistency before finishing.** Re-read the sections you touched end to end. A common failure mode is editing one bullet to reflect a new status while an earlier bullet in the same doc still asserts the old one — check for that specifically, not just that your own edit reads correctly in isolation.
+7. **Keep every agent's entrypoint in sync.** casdey is worked on by more than one AI agent (Claude Code, Codex, possibly others), and Davide wants all of them equally informed. Facts go in `CLAUDE.md` only, which every agent reads. Then check the pointers: every skill in `.claude/skills/` has a matching `.agents/skills/<name>/SKILL.md` pointing at it (add, rename or remove to match); root `AGENTS.md` names every authoritative doc and every standing rule Davide stated this session; and nothing in `AGENTS.md` duplicates a business fact that could drift. Never hand-edit `web/AGENTS.md`, which `next dev` generates.
 
-8. **Report what you changed, in chat, after editing.** A short list of file paths and the one-line gist of what moved in each — not a re-print of the diffs. Do not silently edit without saying so.
+8. **Verify internal consistency before finishing.** Re-read the sections you touched end to end. A common failure mode is editing one bullet to reflect a new status while an earlier bullet in the same doc still asserts the old one — check for that specifically, not just that your own edit reads correctly in isolation.
+
+9. **Report what you changed, in chat, after editing.** A short list of file paths and the one-line gist of what moved in each — not a re-print of the diffs. Do not silently edit without saying so.
 
 ## Hard rules
 
