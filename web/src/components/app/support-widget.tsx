@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
@@ -336,6 +337,12 @@ export function SupportWidget() {
                 >
                   Tell us what you think
                 </button>
+                <Link
+                  href="/app/support"
+                  className="mt-2 block text-center text-[0.875rem] font-semibold text-teal underline underline-offset-4 hover:no-underline"
+                >
+                  Get help from Davide
+                </Link>
                 <p className="mt-3 text-[0.8125rem] text-graphite">
                   Or email{" "}
                   <a

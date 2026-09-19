@@ -52,6 +52,7 @@ export async function sendFeedbackAction(
   // gym to tell us would be asking them to do our work for us.
   const rawPath = String(formData.get("path") ?? "").trim();
   const path = rawPath.startsWith("/app") ? rawPath.slice(0, 200) : null;
+  const isSupportRequest = formData.get("kind") === "support";
 
   const { error } = await supabaseAdmin().from("feedback").insert({
     gym_id: gym.id,
@@ -69,11 +70,13 @@ export async function sendFeedbackAction(
   try {
     await sendMail({
       to: FEEDBACK_TO,
-      subject: `Feedback: ${gym.name}`,
+      subject:
+        (isSupportRequest ? "Support request" : "Feedback") + ": " + gym.name,
       text: [
         message,
         "",
         "---",
+        isSupportRequest ? "Type: Support request" : "Type: Feedback",
         `Gym: ${gym.name}`,
         `From: ${session.email}`,
         `Page: ${path ?? "not recorded"}`,
