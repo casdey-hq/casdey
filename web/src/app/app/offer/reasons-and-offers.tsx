@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 
 import { Button, Card, CardTitle, Notice, Pill } from "@/components/app/ui";
 import { ConfirmButton } from "@/components/app/confirm-button";
@@ -73,6 +74,7 @@ export function ReasonsAndOffers({
     reasonState.message ?? assignState.message ?? variantState.message;
 
   return (
+    <section id="reasons">
     <Card>
       <CardTitle>Different reasons, different offers</CardTitle>
       <p className="mb-5 text-[0.9375rem] leading-relaxed text-stone">
@@ -81,6 +83,27 @@ export function ReasonsAndOffers({
         member left, casdey sends the offer written for that. Anyone without a
         reason on file gets your general offer.
       </p>
+
+      <div className="mb-5 rounded-xl border border-ash bg-mist/40 p-4">
+        <h3 className="text-[0.9375rem] font-semibold text-ink">
+          Set this up in three steps
+        </h3>
+        <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-[0.875rem] text-graphite">
+          <li>Keep the reasons below that your gym actually hears.</li>
+          <li>
+            When someone cancels, open them from{" "}
+            <Link href="/app/members" className="text-teal underline underline-offset-4">
+              Members
+            </Link>{" "}
+            and select their reason under “Why did they leave?”. A CSV cannot
+            reliably guess it.
+          </li>
+          <li>
+            Open a reason below and choose the offer it should receive. Members
+            with no reason recorded receive your general offer.
+          </li>
+        </ol>
+      </div>
 
       {!hasDefault ? (
         <div className="mb-5">
@@ -409,5 +432,6 @@ export function ReasonsAndOffers({
         </form>
       )}
     </Card>
+    </section>
   );
 }

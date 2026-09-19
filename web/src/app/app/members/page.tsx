@@ -149,7 +149,7 @@ export default async function MembersPage(props: PageProps<"/app/members">) {
       <PageHeader
         eyebrow="Members"
         title="Your list"
-        lede="Sorted by how long they have been away. The longest gaps are at the top."
+        lede="Sorted by how long they have been away. Open a member to record why they left or that they have returned."
         actions={
           filter === "lapsed" && total > 0 ? (
             <ButtonLink href="/app/campaigns/new">Build a campaign</ButtonLink>

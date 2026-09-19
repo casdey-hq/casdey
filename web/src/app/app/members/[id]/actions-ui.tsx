@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 
 import { Button, Card, CardTitle } from "@/components/app/ui";
 import type { ResolvedReason } from "@/lib/cancellation";
@@ -95,6 +96,16 @@ export function MemberActions({
           Optional, but it makes a formal cancellation an immediate win-back
           match instead of waiting for the lapse window, and lets a campaign
           reference it with {"{{reason}}"}.
+        </p>
+        <p className="-mt-2 mb-4 text-[0.8125rem] text-stone">
+          Add or rename the reasons your gym uses in{" "}
+          <Link
+            href="/app/offer#reasons"
+            className="text-teal underline underline-offset-4"
+          >
+            Offer
+          </Link>
+          .
         </p>
 
         {cancellationReason && !editingReason ? (
