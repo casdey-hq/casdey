@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Container } from "@/components/ui";
 import { TRIAL_DAYS, earlyAdopterProgramActive, paidTrialEnabled } from "@/lib/plan";
 import { trialPriceDisplay } from "@/lib/offer-copy";
+import { visitorCurrency } from "@/lib/visitor";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -62,13 +63,15 @@ function faq(paidTrial: boolean) {
   ];
 }
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const currency = await visitorCurrency();
   const paidTrial = paidTrialEnabled();
   const FAQ = faq(paidTrial);
 
   return (
     <>
       <SiteHeader
+        currency={currency}
         sections={false}
         paidTrial={paidTrialEnabled()}
         discountActive={earlyAdopterProgramActive()}
@@ -87,13 +90,13 @@ export default function PricingPage() {
               </h1>
               <p className="mx-auto mt-5 max-w-[46ch] text-[1.0625rem] leading-relaxed text-graphite text-pretty">
                 {paidTrial
-                  ? `Every account starts with ${TRIAL_DAYS} days of everything casdey does, for ${trialPriceDisplay()}. Cancel inside the week and that is all you pay.`
+                  ? `Every account starts with ${TRIAL_DAYS} days of everything casdey does, for ${trialPriceDisplay(currency)}. Cancel inside the week and that is all you pay.`
                   : `Every plan starts with ${TRIAL_DAYS} days of everything casdey does, with no card. After that you decide, and the free plan is a real one.`}
               </p>
             </div>
 
             <div className="mt-12">
-              <PricingTable paidTrial={paidTrial} />
+              <PricingTable paidTrial={paidTrial} initialCurrency={currency} />
             </div>
 
             <p className="mt-5 text-center text-[0.8125rem] text-stone">

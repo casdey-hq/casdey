@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getGymContext, requireSession } from "@/lib/dal";
+import { visitorSignupCountry } from "@/lib/visitor";
 import { OnboardingForm } from "./form";
 
 export const metadata = { title: "Set up your gym" };
@@ -21,7 +22,10 @@ export default async function OnboardingPage() {
         later.
       </p>
 
-      <OnboardingForm defaultEmail={session.email} />
+      <OnboardingForm
+        defaultEmail={session.email}
+        defaultCountry={await visitorSignupCountry()}
+      />
     </div>
   );
 }

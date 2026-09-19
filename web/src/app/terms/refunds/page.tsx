@@ -7,6 +7,7 @@ import { Container } from "@/components/ui";
 import { formatMoney } from "@/lib/money";
 import { earlyAdopterProgramActive, paidTrialEnabled } from "@/lib/plan";
 import { TRIAL_PRICE_MINOR } from "@/lib/trial";
+import { visitorCurrency } from "@/lib/visitor";
 
 /*
  * The refund policy. One exception, everything else non-refundable.
@@ -63,10 +64,12 @@ function List({ items }: { items: React.ReactNode[] }) {
   );
 }
 
-export default function RefundPolicyPage() {
+export default async function RefundPolicyPage() {
+  const currency = await visitorCurrency();
   return (
     <>
       <SiteHeader
+        currency={currency}
         sections={false}
         paidTrial={paidTrialEnabled()}
         discountActive={earlyAdopterProgramActive()}

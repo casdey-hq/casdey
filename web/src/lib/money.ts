@@ -22,8 +22,13 @@ export function gymCurrency(
   return gym.plan_currency ?? currencyFor(gym.country);
 }
 
-const LOCALE: Record<Currency, string> = { gbp: "en-GB", eur: "en-IE" };
-const CODE: Record<Currency, string> = { gbp: "GBP", eur: "EUR" };
+const LOCALE: Record<Currency, string> = {
+  gbp: "en-GB",
+  eur: "en-IE",
+  usd: "en-US",
+};
+const CODE: Record<Currency, string> = { gbp: "GBP", eur: "EUR", usd: "USD" };
+const SYMBOL: Record<Currency, string> = { gbp: "£", eur: "€", usd: "$" };
 
 /**
  * Minor units to a display string: 125000 gbp -> "£1,250". A round amount is
@@ -42,6 +47,6 @@ export function formatMoney(minor: number, currency: Currency): string {
 }
 
 export function currencySymbol(currency: Currency): string {
-  return currency === "gbp" ? "£" : "€";
+  return SYMBOL[currency];
 }
 

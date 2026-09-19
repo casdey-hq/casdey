@@ -1,4 +1,5 @@
 import { requireGym } from "@/lib/dal";
+import { dateOrderFor } from "@/lib/countries";
 import { ImportWizard } from "@/components/app/import-wizard";
 import { ProcessingAgreement } from "./agreement";
 import { Card, PageHeader } from "@/components/app/ui";
@@ -141,7 +142,7 @@ export default async function ImportPage() {
           canAgree={role === "owner"}
         />
       ) : (
-        <ImportWizard />
+        <ImportWizard defaultDateOrder={dateOrderFor(gym.country)} />
       )}
 
       <PastImports runs={runs} canUndo={role === "owner"} />

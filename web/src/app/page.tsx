@@ -7,11 +7,14 @@ import { WhyCasdey } from "@/components/sections/why-casdey";
 import { MemberData } from "@/components/sections/member-data";
 import { Offer } from "@/components/sections/offer";
 import { CtaBand } from "@/components/sections/cta-band";
+import { visitorCurrency } from "@/lib/visitor";
 
-export default function Home() {
+export default async function Home() {
+  const currency = await visitorCurrency();
   return (
     <>
       <SiteHeader
+        currency={currency}
         paidTrial={paidTrialEnabled()}
         discountActive={earlyAdopterProgramActive()}
       />

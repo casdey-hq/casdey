@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { ButtonLink, Container } from "@/components/ui";
 import { startCta } from "@/lib/offer-copy";
 import { earlyAdopterProgramActive, paidTrialEnabled } from "@/lib/plan";
+import { visitorCurrency } from "@/lib/visitor";
 
 /**
  * A hidden page: the one the T2 cold email links to once a gym owner has
@@ -22,12 +23,14 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function SeePage() {
+export default async function SeePage() {
+  const currency = await visitorCurrency();
   const paidTrial = paidTrialEnabled();
 
   return (
     <>
       <SiteHeader
+        currency={currency}
         sections={false}
         paidTrial={paidTrial}
         discountActive={earlyAdopterProgramActive()}
@@ -71,7 +74,7 @@ export default function SeePage() {
                 they were worth, in about ten minutes.
               </p>
               <div className="mt-7 flex justify-center">
-                <ButtonLink href="/login?mode=signup">{startCta(paidTrial)}</ButtonLink>
+                <ButtonLink href="/login?mode=signup">{startCta(paidTrial, currency)}</ButtonLink>
               </div>
               <p className="mt-6 text-[0.9375rem] text-graphite">
                 Or just reply to my email with a question. I read every one.

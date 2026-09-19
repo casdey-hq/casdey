@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Container } from "@/components/ui";
+import { visitorCurrency } from "@/lib/visitor";
 
 /*
  * The member-data counterpart to /privacy, which covers the waitlist only and
@@ -64,10 +65,12 @@ function List({ items }: { items: React.ReactNode[] }) {
   );
 }
 
-export default function ProcessingTermsPage() {
+export default async function ProcessingTermsPage() {
+  const currency = await visitorCurrency();
   return (
     <>
       <SiteHeader
+        currency={currency}
         sections={false}
         paidTrial={paidTrialEnabled()}
         discountActive={earlyAdopterProgramActive()}

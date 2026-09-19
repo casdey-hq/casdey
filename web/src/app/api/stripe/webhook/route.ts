@@ -7,6 +7,7 @@ import { supabaseAdmin, UNIQUE_VIOLATION } from "@/lib/supabase";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { recordTrialCard } from "@/lib/trial-start";
 import { sendTrialAuthNeeded } from "@/lib/email/trial-auth";
+import { currencyFromStripe } from "@/lib/countries";
 import type { PlanTier, SubscriptionStatus } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -325,7 +326,7 @@ async function recordInvoicePayment(invoice: Stripe.Invoice): Promise<void> {
       : invoice.customer?.id;
   if (!customerId) return;
 
-  const currency = invoice.currency === "gbp" ? "gbp" : "eur";
+  const currency = currencyFromStripe(invoice.currency);
   const paidAt = toIso(invoice.status_transitions?.paid_at) ?? toIso(invoice.created);
 
   // Whichever of these Stripe actually settled the invoice with. See the
@@ -489,7 +490,7 @@ async function syncSubscription(
     // cancelled that it will be billed again. Written on every sync, so
     // resuming a cancelled subscription clears it.
     cancels_at: toIso(subscription.cancel_at),
-    plan_currency: price?.currency === "gbp" ? "gbp" : "eur",
+    plan_currency: currencyFromStripe(price?.currency),
     plan_interval: price?.recurring?.interval === "year" ? "year" : "month",
     // Only write plan_tier when a tier actually resolves, so a not-yet-
     // configured price never nulls out a tier set by a later, configured event.

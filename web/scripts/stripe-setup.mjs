@@ -1,5 +1,5 @@
 /**
- * Creates the two casdey products (Standard, Pro) and their eight prices in
+ * Creates the two casdey products (Standard, Pro) and their twelve prices in
  * Stripe test mode, plus the lifetime early-adopter coupon, then prints the
  * environment lines to paste into web/.env.local.
  *

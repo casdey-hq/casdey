@@ -8,12 +8,41 @@ import { createGymAction, type OnboardingState } from "./actions";
 
 const INITIAL: OnboardingState = { error: null };
 
-export function OnboardingForm({ defaultEmail }: { defaultEmail: string }) {
+/**
+ * The browser's own timezone, when it is one of the choices offered for the
+ * country. A gym owner signing up from their desk is almost always sitting in
+ * the zone their gym runs on, so this is a better first guess than the
+ * country's biggest city.
+ */
+function guessTimezone(country: string): string {
+  const entry = COUNTRIES.find((c) => c.code === country);
+  if (!entry?.timezones) return entry?.timezone ?? "";
+  try {
+    const local = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (entry.timezones.some((t) => t.value === local)) return local;
+  } catch {
+    // Some privacy modes refuse. The country default is fine.
+  }
+  return entry.timezone;
+}
+
+export function OnboardingForm({
+  defaultEmail,
+  defaultCountry,
+}: {
+  defaultEmail: string;
+  /** Where the visitor is, when casdey sells there. See src/lib/visitor.ts. */
+  defaultCountry: string;
+}) {
   const id = useId();
   const [state, action, pending] = useActionState(
     createGymAction,
     INITIAL,
   );
+
+  const [country, setCountry] = useState(defaultCountry);
+  const [timezone, setTimezone] = useState(() => guessTimezone(defaultCountry));
+  const zones = COUNTRIES.find((c) => c.code === country)?.timezones;
 
   // The reply-to defaults to the account email but is genuinely a different
   // thing: it is where a member's "yes, book me in" lands, so it needs to be
@@ -50,13 +79,17 @@ export function OnboardingForm({ defaultEmail }: { defaultEmail: string }) {
           id={`${id}-country`}
           name="country"
           required
-          defaultValue="GB"
+          value={country}
+          onChange={(event) => {
+            setCountry(event.target.value);
+            setTimezone(guessTimezone(event.target.value));
+          }}
           disabled={pending}
           className="field"
         >
-          {COUNTRIES.map((country) => (
-            <option key={country.code} value={country.code}>
-              {country.name}
+          {COUNTRIES.map((entry) => (
+            <option key={entry.code} value={entry.code}>
+              {entry.name}
             </option>
           ))}
         </select>
@@ -64,6 +97,33 @@ export function OnboardingForm({ defaultEmail }: { defaultEmail: string }) {
           Sets your billing currency and the time messages go out.
         </p>
       </div>
+
+      {zones ? (
+        <div className="mb-5">
+          <label htmlFor={`${id}-timezone`} className="field-label">
+            Time zone
+          </label>
+          <select
+            id={`${id}-timezone`}
+            name="timezone"
+            required
+            value={timezone}
+            onChange={(event) => setTimezone(event.target.value)}
+            disabled={pending}
+            className="field"
+          >
+            {zones.map((zone) => (
+              <option key={zone.value} value={zone.value}>
+                {zone.label}
+              </option>
+            ))}
+          </select>
+          <p className="field-hint">
+            The booking times your members are offered, and when messages go
+            out, follow this.
+          </p>
+        </div>
+      ) : null}
 
       <div className="mb-5">
         <label htmlFor={`${id}-contact`} className="field-label">

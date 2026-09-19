@@ -44,6 +44,11 @@ export const AMOUNTS = [
   { productId: "casdey_pro", tier: "pro", lookupKey: "casdey_pro_eur_year",  currency: "eur", interval: "year",  amount: 289_000, envVar: "STRIPE_PRICE_PRO_EUR_YEAR",  label: "Pro €2,890 / year" },
   { productId: "casdey_pro", tier: "pro", lookupKey: "casdey_pro_gbp_month", currency: "gbp", interval: "month", amount: 24_900,  envVar: "STRIPE_PRICE_PRO_GBP_MONTH", label: "Pro £249 / month" },
   { productId: "casdey_pro", tier: "pro", lookupKey: "casdey_pro_gbp_year",  currency: "gbp", interval: "year",  amount: 249_000, envVar: "STRIPE_PRICE_PRO_GBP_YEAR",  label: "Pro £2,490 / year" },
+  // USD, for the US market (2026-09-19): round US numbers, not a conversion.
+  { productId: "casdey_standard", tier: "standard", lookupKey: "casdey_standard_usd_month", currency: "usd", interval: "month", amount: 9_900,   envVar: "STRIPE_PRICE_STANDARD_USD_MONTH", label: "Standard $99 / month" },
+  { productId: "casdey_standard", tier: "standard", lookupKey: "casdey_standard_usd_year",  currency: "usd", interval: "year",  amount: 99_000,  envVar: "STRIPE_PRICE_STANDARD_USD_YEAR",  label: "Standard $990 / year" },
+  { productId: "casdey_pro", tier: "pro", lookupKey: "casdey_pro_usd_month", currency: "usd", interval: "month", amount: 29_900,  envVar: "STRIPE_PRICE_PRO_USD_MONTH", label: "Pro $299 / month" },
+  { productId: "casdey_pro", tier: "pro", lookupKey: "casdey_pro_usd_year",  currency: "usd", interval: "year",  amount: 299_000, envVar: "STRIPE_PRICE_PRO_USD_YEAR",  label: "Pro $2,990 / year" },
 ];
 
 /**

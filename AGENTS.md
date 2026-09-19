@@ -50,6 +50,8 @@ changes the project:
   - product and deployment state: `web/SAAS_HANDOFF.md`
   - V1 work: `web/SAAS_V1_PLAN.md`
   - trial, signup, activation, or paid-week work: `web/SAAS_V1_1_PLAN.md`
+  - the current improvements list Davide is working through, recorded
+    verbatim, with a status board: `IMPROVEMENTS.md`
   - visual work: `brand assets/casdey-brand-guide.html` and
     `brand assets/CLAUDE_DESIGN.md`
   - business context, historical decisions, and infrastructure details:

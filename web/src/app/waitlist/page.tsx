@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { MemberTimeline } from "@/components/marks/member-timeline";
 import { Container, Eyebrow } from "@/components/ui";
+import { visitorCurrency } from "@/lib/visitor";
 
 // Without its own openGraph/twitter blocks, this page inherits the root
 // layout's, so a shared /waitlist link would preview with the homepage's URL
@@ -85,6 +86,7 @@ const QUESTIONS = [
 export default async function WaitlistPage({
   searchParams,
 }: PageProps<"/waitlist">) {
+  const currency = await visitorCurrency();
   // Carried over from the single field in the landing page hero.
   const params = await searchParams;
   const raw = params?.email;
@@ -93,6 +95,7 @@ export default async function WaitlistPage({
   return (
     <>
       <SiteHeader
+        currency={currency}
         sections={false}
         paidTrial={paidTrialEnabled()}
         discountActive={earlyAdopterProgramActive()}

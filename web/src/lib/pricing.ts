@@ -17,6 +17,8 @@ import type { PlanTier } from "./types";
  *   Standard  €99/mo   (£89)    €990/yr    (£890)    — email win-back + at-risk
  *   Pro       €289/mo  (£249)   €2,890/yr  (£2,490)  — + WhatsApp + guarantee
  *
+ * US gyms pay $99 and $299 a month ($990 and $2,990 a year).
+ *
  * Annual is "two months free": ten times the monthly rate, billed once.
  *
  * The free week that precedes a paid tier is casdey's to give and never
@@ -117,6 +119,44 @@ export const PRICE_PLANS: PricePlan[] = [
     chargeDisplay: "£2,490 a year",
     amountMinor: 249000,
     envVar: "STRIPE_PRICE_PRO_GBP_YEAR",
+  },
+  // USD (added 2026-09-19 for the US market, Davide's call: round US numbers,
+  // roughly at parity with EUR rather than a live conversion).
+  {
+    tier: "standard",
+    currency: "usd",
+    interval: "month",
+    monthlyDisplay: "$99",
+    chargeDisplay: "$99 a month",
+    amountMinor: 9900,
+    envVar: "STRIPE_PRICE_STANDARD_USD_MONTH",
+  },
+  {
+    tier: "standard",
+    currency: "usd",
+    interval: "year",
+    monthlyDisplay: "$83",
+    chargeDisplay: "$990 a year",
+    amountMinor: 99000,
+    envVar: "STRIPE_PRICE_STANDARD_USD_YEAR",
+  },
+  {
+    tier: "pro",
+    currency: "usd",
+    interval: "month",
+    monthlyDisplay: "$299",
+    chargeDisplay: "$299 a month",
+    amountMinor: 29900,
+    envVar: "STRIPE_PRICE_PRO_USD_MONTH",
+  },
+  {
+    tier: "pro",
+    currency: "usd",
+    interval: "year",
+    monthlyDisplay: "$249",
+    chargeDisplay: "$2,990 a year",
+    amountMinor: 299000,
+    envVar: "STRIPE_PRICE_PRO_USD_YEAR",
   },
 ];
 

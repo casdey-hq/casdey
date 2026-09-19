@@ -5,6 +5,7 @@ import { stripeClient } from "./stripe";
 import { effectivePlan, type Plan } from "./plan";
 import { change } from "./dashboard";
 import { bucketKeyFor, periodBuckets, type PeriodPoint } from "./admin-period";
+import { isCurrency, type Currency } from "./countries";
 import { gymCurrency } from "./money";
 import type { Gym } from "./types";
 
@@ -42,11 +43,11 @@ import type { Gym } from "./types";
  * price list.
  */
 
-export type MoneyByCurrency = { eur: number; gbp: number };
+export type MoneyByCurrency = Record<Currency, number>;
 /** @deprecated older name, kept so callers do not all churn at once. */
 export type MrrByCurrency = MoneyByCurrency;
 
-const ZERO_MONEY: MoneyByCurrency = { eur: 0, gbp: 0 };
+const ZERO_MONEY: MoneyByCurrency = { eur: 0, gbp: 0, usd: 0 };
 
 /** Whole days back from now, with the trend charts grouping by day or week.
  *  The URL → these values mapping lives in src/app/admin/parts.tsx. */
@@ -266,7 +267,7 @@ export async function mrr(): Promise<Mrr> {
     for (const item of subscription.items.data) {
       const price = item.price;
       const currency = price.currency;
-      if (currency !== "eur" && currency !== "gbp") continue;
+      if (!isCurrency(currency)) continue;
       const interval = price.recurring?.interval;
       const divisor = interval === "year" ? 12 : interval === "month" ? 1 : null;
       if (!divisor || price.unit_amount == null) continue;
@@ -284,6 +285,7 @@ export async function mrr(): Promise<Mrr> {
     byCurrency: {
       eur: Math.round(byCurrency.eur),
       gbp: Math.round(byCurrency.gbp),
+      usd: Math.round(byCurrency.usd),
     },
     gymsByCurrency,
     payingGyms,
@@ -301,7 +303,7 @@ export type RevenueCollected = {
   previousNet: MoneyByCurrency;
   allTimeGross: MoneyByCurrency;
   allTimeNet: MoneyByCurrency;
-  changeNet: { eur: number | null; gbp: number | null };
+  changeNet: Record<Currency, number | null>;
 };
 
 /**
@@ -323,7 +325,7 @@ export async function revenueCollected(
     previousNet: { ...ZERO_MONEY },
     allTimeGross: { ...ZERO_MONEY },
     allTimeNet: { ...ZERO_MONEY },
-    changeNet: { eur: null, gbp: null },
+    changeNet: { eur: null, gbp: null, usd: null },
   };
   if (gymIds.length === 0) return empty;
 
@@ -349,12 +351,12 @@ export async function revenueCollected(
     previousNet: { ...ZERO_MONEY },
     allTimeGross: { ...ZERO_MONEY },
     allTimeNet: { ...ZERO_MONEY },
-    changeNet: { eur: null, gbp: null },
+    changeNet: { eur: null, gbp: null, usd: null },
   };
 
   for (const row of data ?? []) {
-    const currency = row.currency as "eur" | "gbp";
-    if (currency !== "eur" && currency !== "gbp") continue;
+    const currency = row.currency;
+    if (!isCurrency(currency)) continue;
     const gross = (row.amount_minor as number) ?? 0;
     const refunded = (row.refunded_minor as number) ?? 0;
     const net = gross - refunded;
@@ -375,6 +377,7 @@ export async function revenueCollected(
   result.changeNet = {
     eur: change(result.windowNet.eur, result.previousNet.eur),
     gbp: change(result.windowNet.gbp, result.previousNet.gbp),
+    usd: change(result.windowNet.usd, result.previousNet.usd),
   };
   return result;
 }
@@ -463,8 +466,8 @@ export async function subscriptionHealth(
     else result.statusCounts.free += 1;
 
     if (paying) {
-      const currency = row.plan_currency as "eur" | "gbp" | null;
-      if (currency === "eur" || currency === "gbp") {
+      const currency = row.plan_currency;
+      if (isCurrency(currency)) {
         result.activeByCurrency[currency] += 1;
       }
     }
@@ -838,8 +841,8 @@ export async function guaranteeSummary(): Promise<GuaranteeSummary> {
   let pendingClaims = 0;
   for (const row of data ?? []) {
     const gymRow = Array.isArray(row.gyms) ? row.gyms[0] : row.gyms;
-    const currency = gymRow?.plan_currency as "eur" | "gbp" | null | undefined;
-    if (currency) refundedByCurrency[currency] += (row.refunded_minor as number) ?? 0;
+    const currency = gymRow?.plan_currency;
+    if (isCurrency(currency)) refundedByCurrency[currency] += (row.refunded_minor as number) ?? 0;
     if (row.status === "processing") pendingClaims += 1;
   }
 

@@ -13,6 +13,7 @@ import {
 } from "@/lib/pricing";
 import type { Currency } from "@/lib/countries";
 import { startCta } from "@/lib/offer-copy";
+import { formatMoney } from "@/lib/money";
 import { ButtonLink } from "./ui";
 
 /**
@@ -103,14 +104,21 @@ function Cell({ value }: { value: boolean | string }) {
  * switch below is local state, so the price named in the button follows
  * whichever currency the visitor is looking at.
  */
-export function PricingTable({ paidTrial }: { paidTrial: boolean }) {
-  const [currency, setCurrency] = useState<Currency>("eur");
+export function PricingTable({
+  paidTrial,
+  initialCurrency,
+}: {
+  paidTrial: boolean;
+  /** The visitor's own currency, so a US visitor lands on dollars. */
+  initialCurrency: Currency;
+}) {
+  const [currency, setCurrency] = useState<Currency>(initialCurrency);
   const [interval, setInterval] = useState<PlanInterval>("month");
 
   const priceFor = (tier: PublicTier) => {
     if (tier === "free") {
       return {
-        headline: currency === "eur" ? "€0" : "£0",
+        headline: formatMoney(0, currency),
         sub: "Free forever",
       };
     }
@@ -143,6 +151,7 @@ export function PricingTable({ paidTrial }: { paidTrial: boolean }) {
           onChange={setCurrency}
           options={[
             { value: "eur", label: "EUR" },
+            { value: "usd", label: "USD" },
             { value: "gbp", label: "GBP" },
           ]}
         />

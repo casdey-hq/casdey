@@ -22,6 +22,9 @@ const Schema = z.object({
   country: z.enum(COUNTRIES.map((c) => c.code) as [string, ...string[]], {
     message: "Choose the country your gym is in.",
   }),
+  // Only offered where a country spans several zones. timezoneFor() checks it
+  // belongs to the country, so a hand-posted value cannot mismatch the two.
+  timezone: z.string().max(64).nullable(),
   contactEmail: z
     .email("That email address does not look right.")
     .max(320),
@@ -51,6 +54,7 @@ export async function createGymAction(
   const parsed = Schema.safeParse({
     name: formData.get("name"),
     country: formData.get("country"),
+    timezone: formData.get("timezone") ?? null,
     contactEmail: formData.get("contactEmail"),
     replyToEmail: formData.get("replyToEmail"),
   });
@@ -59,13 +63,13 @@ export async function createGymAction(
     return { error: parsed.error.issues[0]?.message ?? "Check the form." };
   }
 
-  const { name, country, contactEmail, replyToEmail } = parsed.data;
+  const { name, country, timezone, contactEmail, replyToEmail } = parsed.data;
 
   const { data: gymId, error } = await supabaseAdmin().rpc("create_gym", {
     p_user_id: session.userId,
     p_name: name,
     p_country: country,
-    p_timezone: timezoneFor(country),
+    p_timezone: timezoneFor(country, timezone),
     p_contact_email: contactEmail.toLowerCase(),
     // Members see the gym's own name on the email, not casdey's.
     p_sender_name: name,

@@ -37,10 +37,10 @@ function clearPriceEnv(): void {
 }
 
 describe("PRICE_PLANS", () => {
-  it("covers both paid tiers in both currencies, monthly and annual", () => {
-    expect(PRICE_PLANS).toHaveLength(8);
+  it("covers both paid tiers in every currency, monthly and annual", () => {
+    expect(PRICE_PLANS).toHaveLength(12);
     for (const tier of ["standard", "pro"] as const) {
-      for (const currency of ["eur", "gbp"] as const) {
+      for (const currency of ["eur", "gbp", "usd"] as const) {
         expect(pricePlansFor(tier, currency).map((p) => p.interval).sort()).toEqual([
           "month",
           "year",
@@ -54,9 +54,9 @@ describe("PRICE_PLANS", () => {
     expect(new Set(vars).size).toBe(vars.length);
   });
 
-  it("prices Pro above Standard in both currencies", () => {
+  it("prices Pro above Standard in every currency", () => {
     const amount = (s: string) => Number(s.replace(/[^0-9]/g, ""));
-    for (const currency of ["eur", "gbp"] as const) {
+    for (const currency of ["eur", "gbp", "usd"] as const) {
       const standard = findPricePlan("standard", currency, "month")!;
       const pro = findPricePlan("pro", currency, "month")!;
       expect(amount(pro.monthlyDisplay)).toBeGreaterThan(amount(standard.monthlyDisplay));
@@ -147,7 +147,7 @@ describe("couponIdFor", () => {
  * amount.
  */
 describe("PRICE_PLANS vs the script price spec", () => {
-  it("covers exactly the same eight env vars", async () => {
+  it("covers exactly the same twelve env vars", async () => {
     const { AMOUNTS } = await import("../../scripts/price-spec.mjs");
 
     expect(AMOUNTS.map((a: { envVar: string }) => a.envVar).sort()).toEqual(
@@ -173,6 +173,15 @@ describe("PRICE_PLANS vs the script price spec", () => {
     }
   });
 
+  it("agrees on the amount, so the site never shows a price the card is not charged", async () => {
+    const { AMOUNTS } = await import("../../scripts/price-spec.mjs");
+
+    for (const amount of AMOUNTS) {
+      const plan = PRICE_PLANS.find((p) => p.envVar === amount.envVar);
+      expect(plan!.amountMinor, amount.envVar).toBe(amount.amount);
+    }
+  });
+
   it("shows the customer the amount Stripe actually charges", async () => {
     const { AMOUNTS } = await import("../../scripts/price-spec.mjs");
 
@@ -180,7 +189,7 @@ describe("PRICE_PLANS vs the script price spec", () => {
     // It must contain the real figure, or the page quotes a price we do not take.
     for (const amount of AMOUNTS) {
       const plan = PRICE_PLANS.find((p) => p.envVar === amount.envVar)!;
-      const symbol = amount.currency === "gbp" ? "£" : "€";
+      const symbol = ({ gbp: "£", eur: "€", usd: "$" } as Record<string, string>)[amount.currency];
       const figure = (amount.amount / 100).toLocaleString("en-GB");
 
       expect(

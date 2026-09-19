@@ -93,6 +93,37 @@ export function parseDate(
 }
 
 /**
+ * Reads the date order off the file itself, when the file settles it.
+ *
+ * 03/04/2024 could be either order, and a guess that is wrong on those dates
+ * is silent: the row imports, just with a last visit a month or more out,
+ * which moves members on or off the lapsed list for no reason anyone could
+ * see. But 25/03/2024 can only be day first, and 03/25/2024 only month first.
+ * One such date anywhere in the column decides the whole file, since an export
+ * uses one format throughout.
+ *
+ * Returns null when nothing is decisive (every date has both parts at 12 or
+ * under, or the column is ISO, which parseDate reads whatever is chosen) and
+ * when the file contradicts itself, which is a broken export rather than
+ * something to guess about.
+ */
+export function detectDateOrder(values: string[]): "dmy" | "mdy" | null {
+  let dayFirst = false;
+  let monthFirst = false;
+  for (const value of values) {
+    const datePart = value.trim().split(/[T\s]/)[0];
+    const match = /^(\d{1,2})[/.\-](\d{1,2})[/.\-](\d{2}|\d{4})$/.exec(datePart);
+    if (!match) continue;
+    const first = Number(match[1]);
+    const second = Number(match[2]);
+    if (first > 12 && second <= 12) dayFirst = true;
+    if (second > 12 && first <= 12) monthFirst = true;
+  }
+  if (dayFirst === monthFirst) return null;
+  return dayFirst ? "dmy" : "mdy";
+}
+
+/**
  * A gym's export writes phone numbers the way the front desk dials them: local
  * format ("07700 900123"), not E.164 ("+447700900123"). Numbers are normalised
  * to E.164 at import so storage stays consistent whatever the source file's

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Container } from "@/components/ui";
+import { visitorCurrency } from "@/lib/visitor";
 
 /*
  * Scope note: this notice covers the *waitlist* only, i.e. the details a
@@ -50,10 +51,12 @@ function P({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const currency = await visitorCurrency();
   return (
     <>
       <SiteHeader
+        currency={currency}
         sections={false}
         paidTrial={paidTrialEnabled()}
         discountActive={earlyAdopterProgramActive()}

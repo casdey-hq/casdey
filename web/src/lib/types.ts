@@ -123,7 +123,7 @@ export type Gym = {
   /** Which paid tier a subscribed gym is on (Track F). Null for Free / trial.
    *  Written by the Stripe webhook from the subscription price. */
   plan_tier: PlanTier | null;
-  plan_currency: "gbp" | "eur" | null;
+  plan_currency: "gbp" | "eur" | "usd" | null;
   plan_interval: "month" | "year" | null;
   trial_ends_at: string | null;
   /* Trial With Penalty (Track H, migration 0038). All null for a gym that
@@ -368,7 +368,7 @@ export type SubscriptionPayment = {
   stripe_payment_intent_id: string | null;
   stripe_charge_id: string | null;
   amount_minor: number;
-  currency: "gbp" | "eur";
+  currency: "gbp" | "eur" | "usd";
   paid_at: string;
   refunded_minor: number;
   created_at: string;
@@ -459,7 +459,7 @@ export type TrialPenalty = {
   gym_id: string;
   step: "import" | "prices" | "campaign";
   amount_minor: number;
-  currency: "eur" | "gbp";
+  currency: "eur" | "gbp" | "usd";
   stripe_payment_intent_id: string | null;
   charged_at: string | null;
   failure_reason: string | null;

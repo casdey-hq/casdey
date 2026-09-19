@@ -141,6 +141,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
     const parts: string[] = [];
     if (by.eur > 0) parts.push(formatMoney(by.eur, "eur"));
     if (by.gbp > 0) parts.push(formatMoney(by.gbp, "gbp"));
+    if (by.usd > 0) parts.push(formatMoney(by.usd, "usd"));
     return parts.length > 0 ? parts.join(" + ") : zero;
   };
 
@@ -182,7 +183,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
           value={money(revenue.byCurrency)}
           hint={
             revenue.payingGyms > 0
-              ? `${revenue.payingGyms} paying · ARR ${money({ eur: arrEur, gbp: arrGbp })}`
+              ? `${revenue.payingGyms} paying · ARR ${money({ eur: arrEur, gbp: arrGbp, usd: revenue.byCurrency.usd * 12 })}`
               : "No paying gyms yet"
           }
           tone="teal"

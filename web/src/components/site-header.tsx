@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { ButtonLink, Container } from "./ui";
 import { startCtaShort } from "@/lib/offer-copy";
+import type { Currency } from "@/lib/countries";
 import { AnnouncementBar } from "./announcement-bar";
 import { Logo } from "./wordmark";
 
@@ -45,6 +46,7 @@ export function SiteHeader({
   sections = true,
   paidTrial,
   discountActive,
+  currency,
 }: {
   sections?: boolean;
   /** From the server page: a client component cannot read the flag itself.
@@ -54,6 +56,9 @@ export function SiteHeader({
   /** Whether the launch-window discount is still being handed out. Same
    *  reasoning: read on the server, passed in, required. */
   discountActive: boolean;
+  /** The visitor's currency, from src/lib/visitor.ts. Required for the same
+   *  reason: the header names a price. */
+  currency: Currency;
 }) {
   const [lifted, setLifted] = useState(false);
 
@@ -112,7 +117,7 @@ export function SiteHeader({
                 Sign in
               </Link>
               <ButtonLink href="/login?mode=signup" size="sm">
-                {startCtaShort(paidTrial)}
+                {startCtaShort(paidTrial, currency)}
               </ButtonLink>
             </div>
           </div>

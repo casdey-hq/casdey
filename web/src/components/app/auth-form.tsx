@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { supabaseBrowser } from "@/lib/supabase-browser";
 import { startCta } from "@/lib/offer-copy";
+import type { Currency } from "@/lib/countries";
 import { Button } from "./ui";
 import { IconGoogle } from "./icons";
 
@@ -47,11 +48,14 @@ export function AuthForm({
   initialMode,
   next,
   paidTrial,
+  currency,
 }: {
   initialMode: Mode;
   next: string;
   /** From the server page: a client component cannot read the flag itself. */
   paidTrial: boolean;
+  /** The visitor's currency, for the price named on the signup button. */
+  currency: Currency;
 }) {
   const router = useRouter();
   const id = useId();
@@ -274,7 +278,7 @@ export function AuthForm({
   return (
     <div className="card p-7">
       <h1 className="display text-[1.5rem]">
-        {mode === "signup" ? startCta(paidTrial) : "Sign in"}
+        {mode === "signup" ? startCta(paidTrial, currency) : "Sign in"}
       </h1>
       <p className="mt-2 text-[0.9375rem] text-graphite">
         {mode === "signup"
@@ -377,7 +381,7 @@ export function AuthForm({
           }}
           className="font-semibold text-teal underline underline-offset-4 hover:no-underline"
         >
-          {mode === "signup" ? "Sign in" : startCta(paidTrial)}
+          {mode === "signup" ? "Sign in" : startCta(paidTrial, currency)}
         </button>
       </p>
     </div>

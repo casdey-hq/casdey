@@ -5,7 +5,12 @@ import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Button, Card, CardTitle } from "./ui";
-import { guessMapping, headerOffset, normalizeRow } from "@/lib/ingestion/csv";
+import {
+  detectDateOrder,
+  guessMapping,
+  headerOffset,
+  normalizeRow,
+} from "@/lib/ingestion/csv";
 import type {
   ColumnMapping,
   DateFormat,
@@ -58,7 +63,19 @@ const DATE_FORMATS: { value: DateFormat; label: string; example: string }[] = [
   { value: "mdy", label: "Month first", example: "03/05/2024 is 5 March" },
 ];
 
-export function ImportWizard() {
+/**
+ * Rows read in the browser to learn the file's date order. Enough for a decisive
+ * date (a day past the 12th) to turn up in any real export, small enough to stay
+ * instant. The preview table still shows only the first five.
+ */
+const DETECT_ROWS = 500;
+
+export function ImportWizard({
+  defaultDateOrder,
+}: {
+  /** From the gym's country: month first in the US, day first elsewhere. */
+  defaultDateOrder: "dmy" | "mdy";
+}) {
   const router = useRouter();
   const id = useId();
 
@@ -67,7 +84,10 @@ export function ImportWizard() {
   const [headers, setHeaders] = useState<string[]>([]);
   const [sample, setSample] = useState<Record<string, string>[]>([]);
   const [mapping, setMapping] = useState<Partial<ColumnMapping>>({});
-  const [dateFormat, setDateFormat] = useState<DateFormat>("dmy");
+  // Null until the gym picks one by hand. Until then the file decides when it
+  // can, and the gym's country when it cannot, so a US gym that never looks at
+  // this control still gets its dates read month first.
+  const [chosenFormat, setDateFormat] = useState<DateFormat | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -86,8 +106,9 @@ export function ImportWizard() {
         const skip = headerOffset(chunk);
         return skip ? chunk.split(/\r?\n/).slice(skip).join("\n") : chunk;
       },
-      // Only enough rows to show them what we read. The rest stays on disk.
-      preview: 6,
+      // Only enough rows to show what we read and learn the date order. The
+      // rest stays on disk.
+      preview: DETECT_ROWS,
       transformHeader: (header) => header.trim(),
       complete: (result) => {
         const found = (result.meta.fields ?? []).filter(Boolean);
@@ -143,6 +164,14 @@ export function ImportWizard() {
       setBusy(false);
     }
   }
+
+  const detected = mapping.lastVisitAt
+    ? detectDateOrder(sample.map((row) => row[mapping.lastVisitAt!] ?? ""))
+    : null;
+  const dateFormat: DateFormat = chosenFormat ?? detected ?? defaultDateOrder;
+  // Only worth saying when the gym has overridden what the file itself shows.
+  const contradictsFile =
+    chosenFormat !== null && detected !== null && chosenFormat !== "iso" && chosenFormat !== detected;
 
   /* --- Preview of the mapping, computed with the same code the server uses --- */
   const preview = mapping.lastVisitAt
@@ -300,10 +329,22 @@ export function ImportWizard() {
       <Card>
         <CardTitle>How dates are written in your file</CardTitle>
         <p className="mt-1 mb-4 text-[0.9375rem] text-graphite">
-          03/04/2024 is the 3rd of April in the UK and the 4th of March in the
-          US. We will not guess: the wrong choice moves every member&apos;s
-          last visit by months.
+          03/04/2024 is the 3rd of April in Europe and the 4th of March in the
+          US. The wrong choice moves members&apos; last visits by months, so
+          check this one.
+          {detected && chosenFormat === null
+            ? detected === "mdy"
+              ? " Your file has dates like 03/25, so it is month first, and that is selected."
+              : " Your file has dates like 25/03, so it is day first, and that is selected."
+            : ""}
         </p>
+        {contradictsFile ? (
+          <p role="alert" className="notice notice-error mb-4">
+            {detected === "mdy"
+              ? "Your file has dates like 03/25, which only work month first. With this choice those rows will be skipped."
+              : "Your file has dates like 25/03, which only work day first. With this choice those rows will be skipped."}
+          </p>
+        ) : null}
         <div className="flex flex-wrap gap-2">
           {DATE_FORMATS.map((format) => (
             <button

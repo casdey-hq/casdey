@@ -7,6 +7,7 @@ import { paidTrialEnabled } from "@/lib/plan";
 import { startCta, trialPriceDisplay } from "@/lib/offer-copy";
 import { conversionAmountMinor } from "@/lib/trial";
 import { formatMoney } from "@/lib/money";
+import { visitorCurrency } from "@/lib/visitor";
 
 /**
  * One surface, three facts.
@@ -18,18 +19,19 @@ import { formatMoney } from "@/lib/money";
  * colour break left on the page is the closing band, which is the point of
  * having it.
  */
-export function Offer() {
+export async function Offer() {
   const paidTrial = paidTrialEnabled();
-  const price = trialPriceDisplay();
+  const currency = await visitorCurrency();
+  const price = trialPriceDisplay(currency);
   // The LIST price, deliberately. An earlier pass showed the discounted figure
   // here on the reasoning that every signup today holds the launch discount.
   // Davide's call, and it is the right one: the list price is what the plan
   // costs, and a site that quietly quotes the discounted number has nothing
   // left to say when it wants to point out that there is a discount. The
   // announcement bar carries that, once, where it applies to every plan.
-  const proMonthlyMinor = conversionAmountMinor("eur", false);
+  const proMonthlyMinor = conversionAmountMinor(currency, false);
   const proMonthly =
-    proMonthlyMinor == null ? null : formatMoney(proMonthlyMinor, "eur");
+    proMonthlyMinor == null ? null : formatMoney(proMonthlyMinor, currency);
 
   return (
     <section id="pricing" className="scroll-mt-24 pb-24 sm:pb-32">
@@ -101,7 +103,7 @@ export function Offer() {
 
           <div className="mt-8 flex flex-wrap items-center gap-5">
             <ButtonLink href="/login?mode=signup" size="sm">
-              {startCta(paidTrial)}
+              {startCta(paidTrial, currency)}
             </ButtonLink>
             <Link
               href="/pricing"

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Container, Eyebrow } from "@/components/ui";
+import { visitorCurrency } from "@/lib/visitor";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -43,10 +44,12 @@ const CHANNELS = [
 ];
 
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const currency = await visitorCurrency();
   return (
     <>
       <SiteHeader
+        currency={currency}
         sections={false}
         paidTrial={paidTrialEnabled()}
         discountActive={earlyAdopterProgramActive()}
@@ -93,7 +96,8 @@ export default function ContactPage() {
             </div>
 
             <p className="mt-8 max-w-[54ch] text-[0.8125rem] leading-relaxed text-stone">
-              casdey is run from Italy and serves gyms across the UK and the EU.
+              casdey is run from Italy and serves gyms in the US, the UK and
+              Europe.
               For anything about your members&apos; data specifically, including
               a request to delete it, the{" "}
               <a

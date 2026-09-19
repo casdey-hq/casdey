@@ -1,5 +1,6 @@
 import "server-only";
 
+import { currencyFromStripe } from "./countries";
 import { stripeClient } from "./stripe";
 import type { Gym } from "./types";
 
@@ -32,7 +33,7 @@ export type PaymentAction = {
    *  3-D Secure challenge for us. */
   url: string;
   amountMinor: number;
-  currency: "eur" | "gbp";
+  currency: "eur" | "gbp" | "usd";
 };
 
 /** Statuses where an unpaid invoice is plausible. Anything else skips the
@@ -56,7 +57,7 @@ export async function pendingPaymentAction(
     const invoice = invoices.data[0];
     if (!invoice?.hosted_invoice_url || invoice.amount_due <= 0) return null;
 
-    const currency = invoice.currency === "gbp" ? "gbp" : "eur";
+    const currency = currencyFromStripe(invoice.currency);
     return {
       url: invoice.hosted_invoice_url,
       amountMinor: invoice.amount_due,

@@ -4,6 +4,7 @@ import { AuthForm } from "@/components/app/auth-form";
 import { Logo } from "@/components/wordmark";
 import { safeNextPath } from "@/lib/safe-redirect";
 import { paidTrialEnabled } from "@/lib/plan";
+import { visitorCurrency } from "@/lib/visitor";
 
 import "@/styles/product.css";
 
@@ -39,6 +40,7 @@ export default async function LoginPage(props: PageProps<"/login">) {
           initialMode={mode}
           next={next}
           paidTrial={paidTrialEnabled()}
+          currency={await visitorCurrency()}
         />
 
         <p className="mt-6 text-center text-[0.8125rem] text-stone">

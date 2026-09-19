@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { guessMapping, normalizePhoneForCountry, normalizeRow, parseDate } from "./csv";
+import {
+  detectDateOrder,
+  guessMapping,
+  normalizePhoneForCountry,
+  normalizeRow,
+  parseDate,
+} from "./csv";
 import type { ColumnMapping } from "./types";
 
 describe("parseDate", () => {
@@ -382,5 +388,31 @@ describe("normalizeRow phone handling", () => {
     );
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.member.phone).toBe("07700 900123");
+  });
+});
+
+describe("detectDateOrder", () => {
+  it("reads month first off a US export with a day past the 12th", () => {
+    expect(detectDateOrder(["03/04/2024", "03/25/2024", "11/02/2023"])).toBe("mdy");
+  });
+
+  it("reads day first off a European export with a day past the 12th", () => {
+    expect(detectDateOrder(["03/04/2024", "25/03/2024 18:30"])).toBe("dmy");
+  });
+
+  it("stays silent when every date could be either order", () => {
+    expect(detectDateOrder(["03/04/2024", "01/12/2023", "12/11/2024"])).toBeNull();
+  });
+
+  it("stays silent on ISO dates, which parse whatever is chosen", () => {
+    expect(detectDateOrder(["2024-03-25", "2024-11-02"])).toBeNull();
+  });
+
+  it("refuses to guess when the file contradicts itself", () => {
+    expect(detectDateOrder(["25/03/2024", "03/25/2024"])).toBeNull();
+  });
+
+  it("ignores blanks and junk", () => {
+    expect(detectDateOrder(["", "n/a", "13.05.2024"])).toBe("dmy");
   });
 });

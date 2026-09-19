@@ -1,5 +1,5 @@
 import { requireGym } from "@/lib/dal";
-import { currencyFor } from "@/lib/countries";
+import { currencyFor, type Currency } from "@/lib/countries";
 import {
   capabilities,
   earlyAdopterProgramActive,
@@ -341,7 +341,7 @@ export default async function BillingPage(
             <p className="text-[0.9375rem] text-graphite">
               A paid plan is where casdey sends: it works the quiet half of your
               list for you, start to finish. Billed in{" "}
-              {currency === "gbp" ? "pounds" : "euros"}.
+              {currency === "gbp" ? "pounds" : currency === "usd" ? "dollars" : "euros"}.
             </p>
           </div>
 
@@ -387,7 +387,7 @@ function TierBlock({
   discounted,
 }: {
   tier: PlanTier;
-  currency: "gbp" | "eur";
+  currency: Currency;
   discounted: boolean;
 }) {
   const plans = pricePlansFor(tier, currency);
