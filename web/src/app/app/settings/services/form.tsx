@@ -44,6 +44,8 @@ type Row = {
   capacity: string;
   /** How many periods between charges. "5" with monthly is every 5 months. */
   billingInterval: string;
+  /** Current members on this recurring membership. Blank means unknown. */
+  activeMemberCount: string;
 };
 
 function toRow(service: Service): Row {
@@ -55,6 +57,10 @@ function toRow(service: Service): Row {
     price: String(service.price_minor / 100),
     billingPeriod: service.billing_period,
     billingInterval: String(service.billing_interval ?? 1),
+    activeMemberCount:
+      service.active_member_count == null
+        ? ""
+        : String(service.active_member_count),
     active: service.active,
     bookable: service.bookable,
     duration: service.duration_minutes == null ? "" : String(service.duration_minutes),
@@ -77,6 +83,7 @@ function blankRow(): Row {
     buffer: "",
     capacity: "1",
     billingInterval: "1",
+    activeMemberCount: "",
   };
 }
 
@@ -150,6 +157,10 @@ export function ServicesForm({
       bufferMinutes: row.buffer.trim() === "" ? null : Number(row.buffer),
       capacity: Number(row.capacity || 1),
       billingInterval: Number(row.billingInterval || 1),
+      activeMemberCount:
+        row.activeMemberCount.trim() === ""
+          ? null
+          : Number(row.activeMemberCount),
     }));
 
     startTransition(async () => {
@@ -419,6 +430,37 @@ export function ServicesForm({
                 </p>
               </div>
             </div>
+
+            {recurring ? (
+              <div className="mt-4 max-w-[16rem]">
+                <label
+                  className="field-label"
+                  htmlFor={`${row.key}-member-count`}
+                >
+                  Members on this membership <span className="text-stone">(optional)</span>
+                </label>
+                <input
+                  id={`${row.key}-member-count`}
+                  type="number"
+                  min={0}
+                  max={100000}
+                  step={1}
+                  value={row.activeMemberCount}
+                  onChange={(e) =>
+                    update(row.key, { activeMemberCount: e.target.value })
+                  }
+                  placeholder="120"
+                  disabled={disabled}
+                  className="field literal"
+                />
+                <p className="field-hint">
+                  Current members on this membership. Add a count for every
+                  recurring membership and casdey will weight the lapsed-revenue
+                  estimate by the mix you actually sell. Leave it blank if you
+                  do not know it.
+                </p>
+              </div>
+            ) : null}
 
             <div className="mt-5 border-t border-ash pt-5">
               <label className="flex items-center gap-2.5 text-[0.9375rem] text-ink">

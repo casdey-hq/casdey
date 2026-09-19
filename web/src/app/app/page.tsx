@@ -279,10 +279,10 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           <p className="mt-3 max-w-xl text-[0.8125rem] text-stone">
             Your {opportunity.lapsedMembers} lapsed{" "}
             {opportunity.lapsedMembers === 1 ? "member" : "members"} represent
-            about this much a month between them, at your typical membership of{" "}
-            {formatMoney(opportunity.typicalMonthlyMinor, currency)}. A rough
-            measure of the opportunity, not a promise, and some may already have
-            cancelled with you.
+            about this much a month between them, at a typical membership of{" "}
+            {formatMoney(opportunity.typicalMonthlyMinor, currency)}. {opportunity.basis === "member_counts"
+              ? `That figure is weighted by the ${opportunity.weightedMembers} current members you recorded across your memberships.`
+              : "Add current-member counts to every recurring membership to weight this figure by your actual membership mix."} A rough measure of the opportunity, not a promise, and some may already have cancelled with you.
           </p>
         </Card>
       ) : null}

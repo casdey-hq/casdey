@@ -14,8 +14,9 @@ import { annualisedMinor, isRecurring, type BillingPeriod } from "./services";
  *
  * Where the per-member number comes from, without inventing it: the gym's own
  * priced recurring memberships. Each active recurring service is reduced to a
- * monthly figure, and the MEDIAN of those is taken as "a typical membership".
- * That number is then multiplied by the count of lapsed members.
+ * monthly figure. When the gym has recorded a current-member count for every
+ * one, those counts produce a weighted average. Otherwise the MEDIAN is used
+ * as the conservative fallback. That number is multiplied by the lapsed count.
  *
  *   - It is not a value the gym typed into a box. D1 #12/#13 removed that field
  *     because an unverifiable input made casdey look useless or miraculous
@@ -25,8 +26,9 @@ import { annualisedMinor, isRecurring, type BillingPeriod } from "./services";
  *     free.
  *   - It never touches the guarantee or "Revenue recovered". It is a display
  *     figure and nothing reads it back.
- *   - The median, not the mean: one €400 corporate plan among €40 memberships
- *     should not drag the typical figure upward.
+ *   - The weighted average reflects a gym's real membership mix. The median
+ *     fallback stops one €400 corporate plan among €40 memberships dragging an
+ *     unknown mix upward.
  *
  * A gym with no recurring membership priced gets `priced: false` and the
  * Overview shows a prompt to add one rather than a fabricated number.
@@ -35,8 +37,12 @@ import { annualisedMinor, isRecurring, type BillingPeriod } from "./services";
 export type LapsedOpportunity = {
   /** The gym has at least one active, recurring, priced membership. */
   priced: boolean;
-  /** Median monthly value of those memberships, in minor units. */
+  /** Weighted or median monthly value of those memberships, in minor units. */
   typicalMonthlyMinor: number;
+  /** How the typical membership value was calculated. */
+  basis: "member_counts" | "median";
+  /** Sum of current-member counts when the weighted calculation is used. */
+  weightedMembers: number | null;
   /** How many lapsed members the figure is spread across. */
   lapsedMembers: number;
   /** typicalMonthlyMinor × lapsedMembers. The headline. */
@@ -46,6 +52,8 @@ export type LapsedOpportunity = {
 export const NO_OPPORTUNITY: LapsedOpportunity = {
   priced: false,
   typicalMonthlyMinor: 0,
+  basis: "median",
+  weightedMembers: null,
   lapsedMembers: 0,
   monthlyMinor: 0,
 };
@@ -64,6 +72,7 @@ type ServiceRow = {
   price_minor: number | null;
   billing_period: BillingPeriod;
   billing_interval: number | null;
+  active_member_count: number | null;
 };
 
 export async function lapsedOpportunity(
@@ -73,7 +82,7 @@ export async function lapsedOpportunity(
 ): Promise<LapsedOpportunity> {
   const { data, error } = await supabase
     .from("services")
-    .select("price_minor, billing_period, billing_interval")
+    .select("price_minor, billing_period, billing_interval, active_member_count")
     .eq("gym_id", gymId)
     .eq("active", true)
     .gt("price_minor", 0);
@@ -83,26 +92,50 @@ export async function lapsedOpportunity(
     return { ...NO_OPPORTUNITY };
   }
 
-  const monthlyValues = ((data ?? []) as ServiceRow[])
+  const recurringServices = ((data ?? []) as ServiceRow[])
     .filter((service) => isRecurring(service.billing_period))
-    .map((service) =>
-      Math.round(
+    .map((service) => ({
+      monthlyMinor: Math.round(
         annualisedMinor({
           price_minor: service.price_minor ?? 0,
           billing_period: service.billing_period,
           billing_interval: service.billing_interval,
         }) / 12,
       ),
-    )
-    .filter((value) => value > 0);
+      // A pre-migration row can omit this key entirely. Normalise that shape
+      // to null so only a real count enables the weighted calculation.
+      activeMemberCount: service.active_member_count ?? null,
+    }))
+    .filter((service) => service.monthlyMinor > 0);
 
-  if (monthlyValues.length === 0) return { ...NO_OPPORTUNITY };
+  if (recurringServices.length === 0) return { ...NO_OPPORTUNITY };
 
-  const typicalMonthlyMinor = median(monthlyValues);
+  const monthlyValues = recurringServices.map((service) => service.monthlyMinor);
+  const hasEveryMemberCount = recurringServices.every(
+    (service) => service.activeMemberCount !== null,
+  );
+  const weightedMembers = hasEveryMemberCount
+    ? recurringServices.reduce(
+        (total, service) => total + (service.activeMemberCount ?? 0),
+        0,
+      )
+    : 0;
+  const useMemberCounts = hasEveryMemberCount && weightedMembers > 0;
+  const typicalMonthlyMinor = useMemberCounts
+    ? Math.round(
+        recurringServices.reduce(
+          (total, service) =>
+            total + service.monthlyMinor * (service.activeMemberCount ?? 0),
+          0,
+        ) / weightedMembers,
+      )
+    : median(monthlyValues);
 
   return {
     priced: true,
     typicalMonthlyMinor,
+    basis: useMemberCounts ? "member_counts" : "median",
+    weightedMembers: useMemberCounts ? weightedMembers : null,
     lapsedMembers,
     monthlyMinor: typicalMonthlyMinor * lapsedMembers,
   };

@@ -325,6 +325,8 @@ export type Service = {
   /** How many billing_periods between charges. 1 unless the gym charges on an
    *  unusual rhythm, e.g. monthly with interval 5 for every five months. */
   billing_interval: number;
+  /** Current members on this recurring membership. Null means unknown. */
+  active_member_count: number | null;
   /** Retired without deleting it, so past bookings keep their history. */
   active: boolean;
   /** Members can pick this when booking. */

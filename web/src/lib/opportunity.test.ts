@@ -53,9 +53,40 @@ describe("lapsedOpportunity", () => {
       30,
     );
     expect(result.priced).toBe(true);
+    expect(result.basis).toBe("median");
+    expect(result.weightedMembers).toBeNull();
     expect(result.typicalMonthlyMinor).toBe(50_00);
     expect(result.lapsedMembers).toBe(30);
     expect(result.monthlyMinor).toBe(50_00 * 30);
+  });
+
+  it("weights the typical membership by the current members on each plan", async () => {
+    const result = await lapsedOpportunity(
+      fakeClient([
+        { ...svc(40_00, "monthly"), active_member_count: 90 },
+        { ...svc(100_00, "monthly"), active_member_count: 10 },
+      ]),
+      "gym-1",
+      30,
+    );
+    expect(result.basis).toBe("member_counts");
+    expect(result.weightedMembers).toBe(100);
+    expect(result.typicalMonthlyMinor).toBe(46_00);
+    expect(result.monthlyMinor).toBe(46_00 * 30);
+  });
+
+  it("keeps the median when any recurring membership has no member count", async () => {
+    const result = await lapsedOpportunity(
+      fakeClient([
+        { ...svc(40_00, "monthly"), active_member_count: 90 },
+        svc(100_00, "monthly"),
+      ]),
+      "gym-1",
+      1,
+    );
+    expect(result.basis).toBe("median");
+    expect(result.weightedMembers).toBeNull();
+    expect(result.typicalMonthlyMinor).toBe(70_00);
   });
 
   it("reduces every billing period to a monthly figure", async () => {

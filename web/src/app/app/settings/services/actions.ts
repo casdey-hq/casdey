@@ -53,6 +53,12 @@ const Row = z.object({
     .min(1, "Charge at least once per period.")
     .max(52, "Fifty two periods is the longest gap casdey will hold.")
     .default(1),
+  activeMemberCount: z
+    .number()
+    .int()
+    .min(0, "Member count cannot be negative.")
+    .max(100_000, "casdey will not store more than 100,000 members on one service.")
+    .nullable(),
 });
 
 const Schema = z
@@ -103,6 +109,11 @@ export async function saveServices(
     // A one-off is charged once, so an interval on it would be meaningless
     // and is normalised away rather than stored to confuse a later reader.
     billing_interval: row.billingPeriod === "one_off" ? 1 : row.billingInterval,
+    // A one-off session has no membership population to weight, so any stale
+    // count disappears with the recurring billing period rather than affecting
+    // a future estimate if this service changes shape later.
+    active_member_count:
+      row.billingPeriod === "one_off" ? null : row.activeMemberCount,
     active: row.active,
     bookable: row.bookable,
     // Only meaningful on a bookable service. Clearing them when the switch is
