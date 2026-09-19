@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { requireGym } from "@/lib/dal";
 import { supabaseAdmin } from "@/lib/supabase";
 import { recordAudit } from "@/lib/audit";
+import { saveError } from "@/lib/save-error";
 import { isKnownReason } from "@/lib/cancellation";
 import { gymReasons } from "@/lib/reasons";
 
@@ -49,7 +50,7 @@ export async function markCancelledAction(
 
   if (error || !data) {
     console.error("[member] cancel failed", error?.message);
-    return { error: "We could not save that. Try again." };
+    return { error: saveError(error, "this member's status") };
   }
 
   await client.from("member_events").insert({
@@ -103,7 +104,7 @@ export async function markReturnedAction(
 
   if (error || !data) {
     console.error("[member] return failed", error?.message);
-    return { error: "We could not save that. Try again." };
+    return { error: saveError(error, "this member's status") };
   }
 
   await client.from("member_events").insert({
@@ -164,7 +165,7 @@ export async function unmarkReturnedAction(
 
   if (error || !data) {
     console.error("[member] undo return failed", error?.message);
-    return { error: "We could not save that. Try again." };
+    return { error: saveError(error, "this member's status") };
   }
 
   await client.from("member_events").insert({

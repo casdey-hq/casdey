@@ -17,6 +17,7 @@ import {
   toStatus,
   verifySendingDomain,
 } from "@/lib/email/domains";
+import { saveError } from "@/lib/save-error";
 
 export type SendingState = { error: string | null; message: string | null };
 
@@ -107,7 +108,7 @@ export async function connectDomainAction(
 
   if (error) {
     console.error("[sending] save failed", error.message);
-    return { error: "We could not save that. Try again.", message: null };
+    return { error: saveError(error, "your sending domain"), message: null };
   }
 
   await recordAudit({
@@ -210,7 +211,10 @@ export async function disconnectDomainAction(): Promise<SendingState> {
     .eq("id", gym.id);
 
   if (error) {
-    return { error: "We could not disconnect that. Try again.", message: null };
+    return {
+      error: saveError(error, "your sending domain connection"),
+      message: null,
+    };
   }
 
   await recordAudit({

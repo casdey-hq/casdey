@@ -9,6 +9,7 @@ import { recordAudit } from "@/lib/audit";
 import { hasPricedServices } from "@/lib/revenue";
 import { stampActivation } from "@/lib/trial-activation";
 import { BILLING_PERIODS } from "@/lib/services";
+import { saveError } from "@/lib/save-error";
 
 export type ServicesState = { error: string | null; saved: boolean };
 
@@ -86,7 +87,7 @@ export async function saveServices(
 
   if (readError) {
     console.error("[services] read failed", readError.message);
-    return { error: "We could not save that. Try again.", saved: false };
+    return { error: saveError(readError, "your services"), saved: false };
   }
 
   const existingIds = new Set((existingRows ?? []).map((r) => r.id as string));
@@ -136,7 +137,7 @@ export async function saveServices(
       .upsert(toUpsert, { defaultToNull: false });
     if (error) {
       console.error("[services] upsert failed", error.message);
-      return { error: "We could not save that. Try again.", saved: false };
+      return { error: saveError(error, "your services"), saved: false };
     }
   }
 
@@ -148,7 +149,10 @@ export async function saveServices(
       .in("id", toDelete);
     if (error) {
       console.error("[services] delete failed", error.message);
-      return { error: "We saved your changes but could not remove a row. Reload and try again.", saved: false };
+      return {
+        error: `Your service changes were saved, but one removed row could not be deleted. ${saveError(error, "your services")}`,
+        saved: false,
+      };
     }
   }
 

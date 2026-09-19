@@ -7,6 +7,7 @@ import { z } from "zod";
 import { requireActiveGym } from "@/lib/dal";
 import { supabaseAdmin } from "@/lib/supabase";
 import { recordAudit } from "@/lib/audit";
+import { saveError } from "@/lib/save-error";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { stampActivation } from "@/lib/trial-activation";
 import { atRiskRuleFor, ruleFor } from "@/lib/lapse";
@@ -170,7 +171,7 @@ export async function createCampaignAction(
 
   if (error || !data) {
     console.error("[campaign] create failed", error?.message);
-    return { error: "We could not save that campaign. Try again." };
+    return { error: saveError(error, "your campaign") };
   }
 
   await recordAudit({
@@ -253,7 +254,7 @@ async function createWhatsAppCampaign(
 
   if (error || !data) {
     console.error("[campaign] whatsapp create failed", error?.message);
-    return { error: "We could not save that campaign. Try again." };
+    return { error: saveError(error, "your campaign") };
   }
 
   await recordAudit({
@@ -973,7 +974,7 @@ export async function updateCampaignAction(
 
   if (error) {
     console.error("[campaign] update failed", error.message);
-    return { error: "We could not save that. Try again." };
+    return { error: saveError(error, "your campaign") };
   }
 
   if (!data || data.length === 0) {

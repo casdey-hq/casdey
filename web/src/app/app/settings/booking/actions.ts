@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireOwner } from "@/lib/dal";
 import { supabaseAdmin } from "@/lib/supabase";
 import { recordAudit } from "@/lib/audit";
+import { saveError } from "@/lib/save-error";
 import type { BookingHours, Weekday } from "@/lib/types";
 
 export type BookingSettingsState = { error: string | null; saved: boolean };
@@ -87,7 +88,7 @@ export async function saveBookingSettingsAction(
 
   if (error) {
     console.error("[booking settings] update failed", error.message);
-    return { error: "We could not save that. Try again.", saved: false };
+    return { error: saveError(error, "your booking settings"), saved: false };
   }
 
   await recordAudit({

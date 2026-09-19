@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireOwner } from "@/lib/dal";
 import { supabaseAdmin } from "@/lib/supabase";
 import { recordAudit } from "@/lib/audit";
+import { saveError } from "@/lib/save-error";
 
 export type WhatsAppSettingsState = { error: string | null; saved: boolean };
 
@@ -77,7 +78,7 @@ export async function saveWhatsAppSettingsAction(
 
   if (error) {
     console.error("[whatsapp settings] update failed", error.message);
-    return { error: "We could not save that. Try again.", saved: false };
+    return { error: saveError(error, "your WhatsApp settings"), saved: false };
   }
 
   await recordAudit({

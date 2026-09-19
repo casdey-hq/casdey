@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireOwner } from "@/lib/dal";
 import { supabaseAdmin } from "@/lib/supabase";
 import { recordAudit } from "@/lib/audit";
+import { saveError } from "@/lib/save-error";
 import { OFFERS } from "@/lib/offers/library";
 import { deadlineFrom, renderOffer } from "@/lib/offers/select";
 import { parseVariants, type OfferVariants } from "@/lib/offers/variants";
@@ -76,7 +77,7 @@ export async function chooseOfferAction(
 
   if (error) {
     console.error("[offer] save failed", error.message);
-    return { error: "We could not save that. Try again.", message: null };
+    return { error: saveError(error, "your offer"), message: null };
   }
 
   await rememberOffer(gym.id, {
@@ -179,7 +180,7 @@ export async function writeOwnOfferAction(
 
   if (error) {
     console.error("[offer] custom save failed", error.message);
-    return { error: "We could not save that. Try again.", message: null };
+    return { error: saveError(error, "your offer"), message: null };
   }
 
   await rememberOffer(gym.id, {
@@ -256,7 +257,7 @@ export async function saveOfferVariantsAction(
 
   if (error) {
     console.error("[offer] variants save failed", error.message);
-    return { error: "We could not save those. Try again.", message: null };
+    return { error: saveError(error, "your offer variants"), message: null };
   }
 
   await recordAudit({
@@ -514,7 +515,7 @@ export async function saveReasonsAction(
 
     if (error) {
       console.error("[reasons] save failed", error.message);
-      return { error: "We could not save those. Try again.", message: null };
+      return { error: saveError(error, "your cancellation reasons"), message: null };
     }
   }
 
@@ -597,7 +598,7 @@ export async function assignOfferToReasonAction(
 
   if (error) {
     console.error("[offer] assign failed", error.message);
-    return { error: "We could not save that. Try again.", message: null };
+    return { error: saveError(error, "your reason-specific offer"), message: null };
   }
 
   await recordAudit({
@@ -674,7 +675,7 @@ export async function editSavedOfferAction(
 
   if (error) {
     console.error("[offer] edit failed", error.message);
-    return { error: "We could not save that. Try again.", message: null };
+    return { error: saveError(error, "your offer"), message: null };
   }
 
   if (wasInUse) {

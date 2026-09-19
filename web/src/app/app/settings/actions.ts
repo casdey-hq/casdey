@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireOwner } from "@/lib/dal";
 import { supabaseAdmin } from "@/lib/supabase";
 import { recordAudit } from "@/lib/audit";
+import { saveError } from "@/lib/save-error";
 
 export type SettingsState = { error: string | null; saved: boolean };
 
@@ -135,7 +136,7 @@ export async function saveSettingsAction(
 
   if (error) {
     console.error("[settings] update failed", error.message);
-    return { error: "We could not save that. Try again.", saved: false };
+    return { error: saveError(error, "your settings"), saved: false };
   }
 
   await recordAudit({
