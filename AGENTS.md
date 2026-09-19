@@ -25,10 +25,11 @@ Davide works with more than one AI agent (Claude Code, Codex, and possibly
 others later), and all of them must stay equally informed. When your work
 changes the project:
 
-- Before finishing any session that changes code, a fix, a decision, status,
-  a service, or a setting, update the project's own docs so the next agent
-  starts from the current state. Correct stale claims in place. Commit the
-  doc changes, but do not push without fresh, explicit confirmation.
+- When Davide asks to update the project docs (he does this at the end of
+  any session that changed something real, since an agent cannot tell when
+  a session ends), update them so the next agent starts from the current
+  state. Correct stale claims in place. Commit the doc changes, but do not
+  push without fresh, explicit confirmation.
 - Durable business facts, decisions and status go into `CLAUDE.md` (or the
   more specific doc it names), never into this file, where they would drift.
 - Business data stored in `/admin` (costs, to-dos, goals, notes) is updated

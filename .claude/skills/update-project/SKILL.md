@@ -17,7 +17,7 @@ This is a **repo-durability pass**, not a status report and not a handoff. The a
 
 ## When to invoke
 
-Run this procedure before finishing any session that changes something real in casdey: code, a fix, a decision, status, a service, or a setting. Also run it when the user explicitly asks to update project files. Business data stored in `/admin` (costs, to-dos, goals, notes) is updated with `npm run hq` from `web/` and needs no duplicate doc edit.
+Run it when Davide asks: "update project files", "update-project", "update the project docs", or together with a session handoff. Do not run it on your own guess that the session is ending: an agent cannot see when a session ends, and Davide asks at the end of every session that changed something real. Business data stored in `/admin` (costs, to-dos, goals, notes) is updated with `npm run hq` from `web/` and needs no duplicate doc edit.
 
 ## How to do it
 

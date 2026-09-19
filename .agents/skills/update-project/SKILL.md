@@ -1,6 +1,6 @@
 ---
 name: update-project
-description: Keep casdey's project documentation current after real changes or when the user asks for a documentation update.
+description: Keep casdey's project documentation current when the user asks for a documentation update, usually at the end of a session.
 ---
 
 # casdey documentation update
