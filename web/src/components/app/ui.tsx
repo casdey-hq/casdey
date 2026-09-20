@@ -19,7 +19,7 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-ash pb-6">
+    <header className="page-enter mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-ash pb-6">
       <div className="min-w-0 w-full sm:min-w-[20rem] sm:flex-1">
         {eyebrow ? <p className="label mb-2 text-teal">{eyebrow}</p> : null}
         <h1 className="display max-w-[30ch] text-[1.875rem] sm:text-[2.125rem]">

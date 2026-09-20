@@ -295,6 +295,7 @@ export default async function MembersPage(props: PageProps<"/app/members">) {
               </tbody>
             </table>
           </Card>
+          <p className="mt-2 text-[0.75rem] text-stone sm:hidden">Swipe the table to see dates and status.</p>
 
           {hiddenCount > 0 ? (
             <div className="mt-4 flex flex-col items-start gap-3 rounded-[12px] border border-dashed border-ash bg-shallow px-5 py-4 sm:flex-row sm:items-center sm:justify-between">

@@ -261,7 +261,89 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         </div>
       ) : null}
 
-      <section aria-label="Member journey" className="metric-rail grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
+      {/* The outcome is the visual anchor. Its progress line uses the same
+          denominator as the funnel below: returned members among those who
+          went quiet. Opportunity stays visible but subordinate. */}
+      <section aria-label="Recovery results" className="recovery-overview overview-enter overview-enter-1 grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
+        {priced ? (
+          <Card className="revenue-hero on-deep relative flex min-h-[17rem] flex-col justify-between overflow-hidden p-7 sm:p-8">
+            <div>
+              <p className="label text-stone">Revenue recovered</p>
+              <p className="literal mt-3 text-[3.25rem] leading-none font-semibold tracking-[-0.055em] text-teal sm:text-[4rem]">
+                {formatMoney(recovered.totalMinor, currency)}
+              </p>
+              <p className="mt-3 max-w-[52ch] text-[0.875rem] leading-relaxed text-graphite">
+                {recovered.bookings - recovered.unpriced}{" "}
+                {recovered.bookings - recovered.unpriced === 1 ? "booking" : "bookings"} won back, valued at the price of each service. This is recovered value, not an amount casdey has billed.
+              </p>
+            </div>
+            <div className="mt-8 border-t border-ash pt-4">
+              <div className="flex items-center justify-between gap-4 text-[0.8125rem]">
+                <span className="text-graphite">Members who came back</span>
+                <span className="literal font-semibold text-ink">{stats.returned} of {stats.lapsed}</span>
+              </div>
+              <div className="mt-2 h-[3px] overflow-hidden rounded-full bg-ash">
+                <div className="recovery-fill h-full rounded-full bg-teal-bright" style={{ width: `${Math.min(100, stats.returned / Math.max(stats.lapsed, 1) * 100)}%` }} />
+              </div>
+              {recovered.recurringMinor > 0 || recovered.oneOffMinor > 0 ? (
+                <p className="mt-3 text-[0.8125rem] text-stone">
+                  {formatMoney(recovered.recurringMinor, currency)} recurring · {formatMoney(recovered.oneOffMinor, currency)} one off
+                  {recovered.annualisedRecurringMinor > recovered.recurringMinor
+                    ? ` · roughly ${formatMoney(recovered.annualisedRecurringMinor, currency)} over a year if recurring members stay`
+                    : ""}
+                </p>
+              ) : null}
+              {recovered.unpriced > 0 ? (
+                <p className="mt-3 text-[0.8125rem] text-stone">
+                  {recovered.unpriced} {recovered.unpriced === 1 ? "booking has" : "bookings have"} no service, so {recovered.unpriced === 1 ? "its value is" : "their value is"} left out.
+                </p>
+              ) : null}
+            </div>
+          </Card>
+        ) : (
+          <Card className="flex flex-col justify-between gap-5 p-7 sm:p-8">
+            <div>
+              <CardTitle>See the money, not just the count</CardTitle>
+              <p className="mt-2 max-w-[52ch] text-[0.9375rem] text-graphite">
+                Add what you sell and what it costs. casdey then values each booking it wins back at the price of that service.
+              </p>
+            </div>
+            <ButtonLink href="/app/settings/services" variant="quiet" className="self-start">Add your services</ButtonLink>
+          </Card>
+        )}
+
+        <Card className="opportunity-panel flex flex-col justify-between p-7 sm:p-8">
+          <div>
+            <p className="label text-stone">Recurring revenue lapsed</p>
+            {opportunity.priced && opportunity.lapsedMembers > 0 ? (
+              <>
+                <p className="literal mt-3 text-[2rem] leading-none font-semibold text-ink">
+                  {formatMoney(opportunity.monthlyMinor, currency)}<span className="ml-1 text-[0.875rem] font-normal text-stone">/month</span>
+                </p>
+                <p className="mt-3 text-[0.875rem] leading-relaxed text-graphite">
+                  Estimated value of {opportunity.lapsedMembers} members who have gone quiet. A rough measure of opportunity, not a promise.
+                </p>
+              </>
+            ) : (
+              <p className="mt-3 text-[0.875rem] leading-relaxed text-graphite">
+                Add an active recurring membership in <Link href="/app/settings/services" className="text-teal underline underline-offset-4">Services</Link> to estimate the monthly value of members who have gone quiet. One-off services are left out.
+              </p>
+            )}
+          </div>
+          {opportunity.priced && opportunity.lapsedMembers > 0 ? (
+            <details className="opportunity-detail mt-5 border-t border-ash pt-4 text-[0.8125rem] text-stone">
+              <summary className="cursor-pointer font-medium text-graphite">How this is estimated</summary>
+              <p className="mt-2 leading-relaxed">
+                Based on a typical membership of {formatMoney(opportunity.typicalMonthlyMinor, currency)}. {opportunity.basis === "member_counts"
+                  ? `Weighted by the ${opportunity.weightedMembers} current members recorded across your memberships.`
+                  : "Add current-member counts to every recurring membership to weight this by your actual membership mix."} Some of these members may already have cancelled with you.
+              </p>
+            </details>
+          ) : null}
+        </Card>
+      </section>
+
+      <section aria-label="Member journey" className="metric-rail overview-enter overview-enter-2 mt-5 grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
         <Stat label="Members" value={stats.members} />
         <Stat
           label="At risk"
@@ -291,125 +373,11 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         />
       </section>
 
-      {/* The forward figure, paired with Recovered beside it: what the quiet
-          half of the list is worth per month, against what casdey has pulled
-          back so far. An estimate from the gym's own membership prices, shown
-          on every tier (the size of the opportunity is never hidden) and
-          deliberately set smaller than Recovered so it does not compete with
-          the number the product is actually judged on. */}
-      <div className="mt-4 grid items-start gap-4 xl:grid-cols-2">
-      <Card>
-        <p className="label text-stone">Recurring revenue lapsed</p>
-        {opportunity.priced && opportunity.lapsedMembers > 0 ? (
-          <>
-          <p className="literal mt-2 text-[1.75rem] leading-none font-medium text-ink">
-            {formatMoney(opportunity.monthlyMinor, currency)}
-            <span className="text-[0.9375rem] font-normal text-stone">
-              /month
-            </span>
-          </p>
-          <p className="mt-3 max-w-xl text-[0.8125rem] text-stone">
-            Your {opportunity.lapsedMembers} lapsed{" "}
-            {opportunity.lapsedMembers === 1 ? "member" : "members"} represent
-            about this much a month between them, at a typical membership of{" "}
-            {formatMoney(opportunity.typicalMonthlyMinor, currency)}. {opportunity.basis === "member_counts"
-              ? `That figure is weighted by the ${opportunity.weightedMembers} current members you recorded across your memberships.`
-              : "Add current-member counts to every recurring membership to weight this figure by your actual membership mix."} A rough measure of the opportunity, not a promise, and some may already have cancelled with you.
-          </p>
-          </>
-        ) : (
-          <p className="mt-3 max-w-xl text-[0.8125rem] text-stone">
-            Add an active recurring membership, such as one charged weekly or
-            monthly, in{" "}
-            <Link href="/app/settings/services" className="text-teal underline underline-offset-4">
-              Services
-            </Link>{" "}
-            to estimate the recurring value of members who have gone quiet.
-            One-off classes and sessions are deliberately left out.
-          </p>
-        )}
-      </Card>
-
-      {/* Recovered revenue belongs with the counts above it, not at the bottom
-          of the page: it is the one number the whole product is judged on and
-          the first thing anybody opens this page to see. */}
-      {priced ? (
-        <Card>
-          <p className="label text-stone">Revenue recovered</p>
-          <p className="literal mt-2 text-[2.5rem] leading-none font-medium text-[color-mix(in_srgb,var(--amber)_62%,var(--ink))]">
-            {formatMoney(recovered.totalMinor, currency)}
-          </p>
-          <p className="mt-3 max-w-xl text-[0.8125rem] text-stone">
-            {recovered.bookings - recovered.unpriced}{" "}
-            {recovered.bookings - recovered.unpriced === 1
-              ? "booking"
-              : "bookings"}{" "}
-            casdey won back, each one at the price of the service it was for.
-            Not an average, and not a number casdey has billed.
-          </p>
-
-          {/* What the money is made of. Thirty monthly memberships and thirty
-              single sessions are the same total and completely different
-              businesses. */}
-          {recovered.recurringMinor > 0 || recovered.oneOffMinor > 0 ? (
-            <div className="mt-4 border-t border-ash pt-4">
-              <p className="text-[0.875rem] text-graphite">
-                <span className="literal text-ink">
-                  {formatMoney(recovered.recurringMinor, currency)}
-                </span>{" "}
-                of it is recurring and{" "}
-                <span className="literal text-ink">
-                  {formatMoney(recovered.oneOffMinor, currency)}
-                </span>{" "}
-                is one off.
-              </p>
-              {recovered.annualisedRecurringMinor > recovered.recurringMinor ? (
-                <p className="mt-1 text-[0.8125rem] text-stone">
-                  The recurring part is worth about{" "}
-                  {formatMoney(recovered.annualisedRecurringMinor, currency)} over
-                  a year if those members stay, which is the figure worth
-                  holding against what casdey costs.
-                </p>
-              ) : null}
-            </div>
-          ) : null}
-
-          {/* Said out loud rather than quietly depressing the total. A gym
-              seeing a number lower than it expected deserves to know why. */}
-          {recovered.unpriced > 0 ? (
-            <p className="mt-3 text-[0.8125rem] text-stone">
-              {recovered.unpriced}{" "}
-              {recovered.unpriced === 1 ? "booking has" : "bookings have"} no
-              service on{" "}
-              {recovered.unpriced === 1 ? "it" : "them"}, so casdey cannot say
-              what {recovered.unpriced === 1 ? "it was" : "they were"} worth and
-              {recovered.unpriced === 1 ? " it is" : " they are"} left out of
-              this total.
-            </p>
-          ) : null}
-        </Card>
-      ) : (
-        <Card className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <CardTitle>See the money, not just the count</CardTitle>
-            <p className="text-[0.9375rem] text-graphite">
-              Add what you sell and what it costs. casdey then values every
-              booking it wins back at the price of the service it was for, and
-              those are the same prices your members read when they book.
-            </p>
-          </div>
-          <ButtonLink href="/app/settings/services" variant="quiet">
-            Add your services
-          </ButtonLink>
-        </Card>
-      )}
-      </div>
-
       {/* Analytics. Each measure gets its own panel against its own scale:
           messages sent and members returned differ by an order of magnitude,
           and one chart with two y-axes would let the picture imply a
           relationship the data has not earned. */}
-      <section className="mt-8">
+      <section className="overview-enter overview-enter-3 mt-8">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="display text-[1.25rem]">{range.heading}</h2>

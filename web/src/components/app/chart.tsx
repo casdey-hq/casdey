@@ -100,6 +100,7 @@ export function MetricChart({
           return (
             <rect
               key={point.label}
+              className="chart-bar"
               x={index * (barWidth + gap)}
               y={height - drawn}
               width={barWidth}

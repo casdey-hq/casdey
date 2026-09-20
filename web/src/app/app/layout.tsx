@@ -4,7 +4,7 @@ import { AppNav } from "@/components/app/nav";
 import { IconSignOut } from "@/components/app/icons";
 import { Logo } from "@/components/wordmark";
 import { cookies } from "next/headers";
-import { DM_Sans, Source_Sans_3 } from "next/font/google";
+import { Geist } from "next/font/google";
 
 import { getGymContext } from "@/lib/dal";
 import { BillingBanner } from "@/components/app/billing-banner";
@@ -15,16 +15,10 @@ import { supportThreadForGym } from "@/lib/support";
 
 import "@/styles/product.css";
 
-// The signed-in workspace uses a softer pair. Marketing and the wordmark keep
-// their established faces, and these files load only for the product.
-const productDisplay = DM_Sans({
-  variable: "--font-product-display",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const productBody = Source_Sans_3({
-  variable: "--font-product-body",
+// A crisp, high-contrast product face. Marketing and the Outfit wordmark keep
+// their own typography; this file loads only in the signed-in workspace.
+const productFont = Geist({
+  variable: "--font-product",
   subsets: ["latin"],
   display: "swap",
 });
@@ -71,7 +65,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
       // it kept the light theme's near-black and rendered black on black in
       // dark mode. Re-stating it here resolves the token inside the themed
       // scope, so every descendant inherits the right one.
-      className={`${productDisplay.variable} ${productBody.variable} product-workspace flex min-h-full flex-1 flex-col bg-paper text-ink md:flex-row`}
+      className={`${productFont.variable} product-workspace flex min-h-full flex-1 flex-col bg-white text-ink md:flex-row`}
     >
       {/* Sticky and exactly one viewport tall on desktop, with its own scroll.
           As a plain flex child it stretched to the height of whatever page it
@@ -79,7 +73,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
           the foot of a long document instead of the foot of the screen: on
           Settings you had to scroll the page to reach the controls that are
           supposed to be always there. */}
-      <aside className="app-sidebar on-deep flex shrink-0 flex-col gap-6 px-4 py-4 md:sticky md:top-0 md:h-[100dvh] md:w-60 md:overflow-y-auto md:px-5 md:py-7">
+      <aside className="app-sidebar flex shrink-0 flex-col gap-5 px-4 py-4 md:sticky md:top-0 md:h-[100dvh] md:w-60 md:overflow-y-auto md:px-4 md:py-6">
         <div className="flex items-center justify-between md:block">
           <Link href="/app" className="inline-block text-ink">
             <Logo className="text-[1.5rem]" />
@@ -91,16 +85,20 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
           </div>
         </div>
 
+        {context ? (
+          <div className="workspace-identity hidden md:block">
+            <span className="text-[0.6875rem] font-semibold text-stone">Workspace</span>
+            <span className="mt-1 block truncate text-[0.875rem] font-semibold text-ink">{context.gym.name}</span>
+          </div>
+        ) : null}
+
         <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:flex-1 md:overflow-visible md:px-0">
           <AppNav />
         </div>
 
         {context ? (
-          <div className="hidden border-t border-deep-line pt-4 md:block">
-            <p className="truncate text-[0.9375rem] text-ink">
-              {context.gym.name}
-            </p>
-            <p className="literal truncate text-[0.75rem] text-sea/80">
+          <div className="hidden border-t border-ash pt-4 md:block">
+            <p className="literal truncate text-[0.75rem] text-stone">
               {context.session.email}
             </p>
             <div className="mt-3 -mx-2.5">
@@ -126,7 +124,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
             bottom right and was sitting on top of whatever the page ended
             with: on Members that was the next-page arrow, which could not be
             clicked at all. */}
-        <main className="mx-auto w-full max-w-[72rem] flex-1 px-5 pt-8 pb-24 sm:px-8 sm:pt-10">
+        <main className="mx-auto w-full max-w-[76rem] flex-1 px-5 pt-8 pb-24 sm:px-10 sm:pt-10">
           {children}
         </main>
       </div>

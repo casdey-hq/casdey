@@ -7,8 +7,8 @@
  * from globals.css, which mirrors brand assets/casdey-brand-guide.html.
  *
  * Rules carried over from the guide:
- *   - Three planes. Paper is the ground, white is raised, Deep is inverted and
- *     used once (the sidebar).
+ *   - Three planes. White is the workspace, Chalk is the navigation rail, and
+ *     Deep is reserved for the recovered-revenue result.
  *   - Amber marks a returned member and nothing else. It is never a button and
  *     never a background.
  *   - Transform and opacity only, 200ms, cubic-bezier(.22,1,.36,1).
@@ -19,54 +19,82 @@
 
 @layer components {
   .product-workspace {
-    font-family: var(--font-product-body), system-ui, sans-serif;
-    font-size: 16px;
+    font-family: var(--font-product), system-ui, sans-serif;
+    font-size: 15px;
     line-height: 1.5;
   }
 
   .product-workspace .display {
-    font-family: var(--font-product-display), system-ui, sans-serif;
-    font-weight: 600;
-    letter-spacing: -0.035em;
-    line-height: 1.15;
+    font-family: var(--font-product), system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.12;
   }
 
   .product-workspace .literal {
-    font-family: var(--font-product-body), system-ui, sans-serif;
+    font-family: var(--font-product), system-ui, sans-serif;
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.035em;
   }
 
-  /* --- Sidebar, the one inverted plane ------------------------------------ */
+  /* --- Workspace navigation ----------------------------------------------- */
 
   .app-sidebar {
-    background: var(--deep);
-    color: var(--sea);
+    background: var(--paper);
+    color: var(--ink);
+    border-right: 1px solid var(--ash);
+  }
+
+  .workspace-identity {
+    background: var(--white);
+    border: 1px solid var(--ash);
+    border-radius: 11px;
+    padding: 0.75rem 0.875rem;
   }
 
   .app-nav-link {
     display: flex;
     align-items: center;
     gap: 0.625rem;
-    border-radius: 10px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9375rem;
-    color: var(--sea);
+    border: 1px solid transparent;
+    border-radius: 9px;
+    padding: 0.5625rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--graphite);
     transition:
       background-color 200ms cubic-bezier(0.22, 1, 0.36, 1),
-      color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+      color 200ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .app-nav-link:hover {
-    background: var(--deep-raised);
+    background: var(--white);
     color: var(--ink);
+    transform: translateX(2px);
   }
 
   .app-nav-link[aria-current="page"] {
-    background: var(--deep-raised);
+    background: var(--white);
+    border-color: var(--ash);
     color: var(--ink);
     font-weight: 600;
-    box-shadow: inset 2px 0 0 var(--teal-bright);
+    box-shadow: 0 1px 2px rgba(21, 21, 15, 0.035);
+  }
+
+  .app-nav-link[aria-current="page"] svg {
+    color: var(--teal);
+  }
+
+  @media (max-width: 767px) {
+    .app-sidebar {
+      border-right: 0;
+      border-bottom: 1px solid var(--ash);
+    }
+
+    .app-nav-link:hover {
+      transform: none;
+    }
   }
 
   /* --- Raised plane ------------------------------------------------------- */
@@ -134,6 +162,72 @@
     border-left: 1px solid var(--ash);
   }
 
+  .product-workspace .revenue-hero {
+    border-color: var(--deep-line);
+    background: var(--deep);
+  }
+
+  .revenue-hero::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6rem;
+    height: 6rem;
+    border-top: 1px solid color-mix(in srgb, var(--teal-bright) 45%, transparent);
+    border-right: 1px solid color-mix(in srgb, var(--teal-bright) 45%, transparent);
+    border-radius: 0 0 0 100%;
+    pointer-events: none;
+  }
+
+  .recovery-fill {
+    transform-origin: left center;
+    animation: recovery-grow 750ms cubic-bezier(0.22, 1, 0.36, 1) 250ms both;
+  }
+
+  .chart-bar {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: chart-grow 550ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+  }
+
+  .page-enter,
+  .overview-enter {
+    animation: workspace-enter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .overview-enter-1 { animation-delay: 35ms; }
+  .overview-enter-2 { animation-delay: 70ms; }
+  .overview-enter-3 { animation-delay: 105ms; }
+
+  @keyframes workspace-enter {
+    from { opacity: 0.84; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes chart-grow {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+
+  @keyframes recovery-grow {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-enter,
+    .overview-enter,
+    .chart-bar,
+    .recovery-fill {
+      animation: none;
+    }
+
+    .app-nav-link {
+      transition: none;
+    }
+  }
+
   @media (max-width: 1023px) {
     .chart-rail > .chart-panel:not(:first-child) {
       border-top: 1px solid var(--ash);
@@ -194,7 +288,7 @@
   /* --- Data --------------------------------------------------------------- */
 
   /* Anything literal: counts, dates, addresses, prices. In the signed-in app,
-     tabular Source Sans figures replace this legacy mono treatment. */
+     tabular Geist figures replace this legacy mono treatment. */
   .literal {
     font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
     font-variant-numeric: tabular-nums;
@@ -209,7 +303,7 @@
   .data-table th {
     padding: 0.625rem 1rem;
     text-align: left;
-    font-family: var(--font-product-body), system-ui, sans-serif;
+    font-family: var(--font-product), system-ui, sans-serif;
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: 0;
@@ -245,7 +339,7 @@
     gap: 0.375rem;
     border-radius: 999px;
     padding: 0.1875rem 0.625rem;
-    font-family: var(--font-product-body), system-ui, sans-serif;
+    font-family: var(--font-product), system-ui, sans-serif;
     font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0;
