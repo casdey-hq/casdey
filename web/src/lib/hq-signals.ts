@@ -102,7 +102,18 @@ export function liveSignals(input: {
       });
     }
 
-    const uncovered = marketing.igContent?.uncoveredNextDays ?? [];
+    // The 100-day Instagram cadence is retired since 2026-09-20 (Davide's
+    // call): the posts were weak for reasons tooling cannot fix, and the
+    // research behind the plan had already found Instagram to be a side
+    // channel for every gym-software account profiled. What is left is three
+    // pinned posts, so a gym owner who gets a cold email and checks the
+    // profile finds something real. Nothing is scheduled, so this signal
+    // would otherwise ask for a batch every single day. Set back to false to
+    // restart a cadence.
+    const IG_CADENCE_RETIRED = true;
+    const uncovered = IG_CADENCE_RETIRED
+      ? []
+      : (marketing.igContent?.uncoveredNextDays ?? []);
     if (uncovered.length > 0) {
       signals.push({
         key: `ig-approve:${uncovered[0]}`,

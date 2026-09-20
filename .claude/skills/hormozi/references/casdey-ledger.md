@@ -482,3 +482,65 @@ Reason: numbers pulled live on 2026-09-20 from the `Casdey-Gym-Leads` sheet,
 the production database and Stripe during the Sunday review. Actions agreed:
 work the three live leads to a close, clear the Arlington mailbox blocker on
 the US switch, and resolve Instagram content either way.
+
+## 2026-09-20 — Instagram content retired after 4 posts. Three pinned posts stay, everything else goes to cold email
+Framework: $100M Leads / Core Four ("one channel to a predictable
+leads-per-day before adding another", pg 245), More before New (pg 246-250),
+content lifts cold outreach (pg 114), hold the cadence or do not start it
+(pg 145); $100M Offers / Perceived Likelihood
+Decision: the 100-day Instagram cadence committed on 2026-09-13 is **retired
+after 4 posts**. Instagram is set aside until casdey is bigger. What remains
+is **three pinned posts**, whose only job is that a gym owner who gets a cold
+email and checks the profile finds something real (pg 114). Cold email is the
+single channel. The pipeline is left working and unchanged so a cadence could
+restart without rebuilding anything; `/admin` stops asking for batches behind
+`IG_CADENCE_RETIRED`.
+
+**Why, and this is the part worth keeping.** Davide asked what the real
+roadblock to good content was, and offered three candidates: no footage, no
+access to Instagram's sound library, and Claude being unable to watch video.
+All three are real. Two things outrank them, and neither is a tooling gap:
+
+1. **The format was copied; the line could not be.** The plan's research was
+   sound and did exactly what it should have: it profiled seven gym-software
+   accounts, found their averages mediocre, and said to copy the outliers,
+   naming Glofox's POV reels. What makes that outlier work is the *sentence*,
+   not the container. "POV: you're a fitness instructor watching the IG story
+   of the member who late cancelled at 3am" is a recognition, built from
+   details only someone who has watched gym staff would have. casdey's version,
+   "gym owners at 11pm checking who hasn't been in this month", is a
+   description of a situation, and has no sting. That gap is writing, not
+   production, and closing it needs lived observation of gym owners that
+   neither Claude nor the pipeline has.
+2. **casdey has nothing true to say yet.** The topic is winning back
+   ex-members and casdey has never won one back; no gym has ever imported a
+   member list. So every post is necessarily generic advice. This is the same
+   Perceived Likelihood zero the 2026-09-10 diagnosis named, surfacing in a
+   second place.
+Of Davide's three: the **sound library** is a real and already-documented
+**distribution ceiling** (business accounts get only Meta's Sound Collection,
+the API cannot attach Instagram audio, and a downloaded viral track is muted by
+audio matching), so it caps the channel whatever the quality. **Not being able
+to watch video** matters less as verification than as taste: Claude has never
+seen a reel, only descriptions of reels, so it cannot tell native from
+assembled. **Footage** is real but downstream, and the reframing matters for
+any future tooling decision: the problem is not that clips were missing, it is
+that stock footage can only ever serve a generic line. That is why better or
+AI-generated footage (Higgsfield was raised and deliberately parked) does not
+address either of the top two reasons.
+Follows or diverges: **Follows.** This restores Core Four discipline, one
+channel until it produces predictable leads per day, and reverses the partial
+divergence taken on 2026-09-13. Keeping three pinned posts is pg 114 satisfied
+at its cheapest: the profile exists for the cold email's sake, not for reach.
+Reason: Davide's call. Note that the 2026-09-13 decision rested on him being
+time-rich, and **that premise still holds, he has the hours**; Claude argued
+otherwise during this session and was corrected. The decision was made on the
+content's own merits instead, which is the stronger ground: the research behind
+the plan had already concluded Instagram is a side channel for every account
+profiled, won instead on sales teams, search and ads. Davide's own framing, to
+revisit when there is money: go all in on cold outreach until there are paying
+gyms, then do paid ads properly rather than content badly.
+**Open, and deliberately not answered here:** if the founder hours are not
+going into content, where do they go? Cold outreach is automated and needs
+about an hour a week. That question is the direct successor to the
+2026-09-13 "idle week" entry and should be answered rather than left to drift.

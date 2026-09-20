@@ -62,9 +62,11 @@ describe("liveSignals", () => {
     expect(due[0].due).toBe("2026-09-19");
   });
 
-  // Instagram DMs are paused since 2026-09-20, so the drafts sitting unsent in
-  // the sheet must not become a daily to-do. See IG_DMS_PAUSED in hq-signals.ts.
-  it("names unapproved Instagram days but never the paused DMs", () => {
+  // Both halves of Instagram are switched off: the DMs since 2026-09-20
+  // (IG_DMS_PAUSED) and the posting cadence the same day (IG_CADENCE_RETIRED).
+  // Unsent drafts and unscheduled days must therefore raise nothing at all,
+  // or /admin asks for work nobody intends to do, every day, forever.
+  it("stays quiet on both halves of Instagram while they are switched off", () => {
     const busy = liveSignals({
       marketing: marketing({
         igContent: {
@@ -77,8 +79,7 @@ describe("liveSignals", () => {
       goals: [],
       now: SATURDAY,
     });
-    expect(busy.map((s) => s.key)).toEqual(["ig-approve:2026-09-19"]);
-    expect(busy.map((s) => s.due)).toEqual(["2026-09-19"]);
+    expect(busy.map((s) => s.key)).toEqual([]);
 
     const quiet = liveSignals({
       marketing: marketing({

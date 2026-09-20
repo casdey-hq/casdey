@@ -1,5 +1,25 @@
 # casdey content plan: Instagram, 100 days
 
+> **RETIRED 2026-09-20, after 4 posts. Davide's call.** The cadence is over and
+> Instagram is set aside until casdey is bigger. What remains is **three pinned
+> posts**, so a gym owner who gets a cold email and checks the profile finds
+> something real (*$100M Leads* pg 114). Everything below is kept as the record
+> of how it was built and what was learned, not as instructions to follow.
+>
+> **Why, in one line:** the posts were weak for reasons better tooling cannot
+> fix. The format was copied correctly from the research below; what could not
+> be copied was the insider's line that makes the format work, and casdey has
+> no real result to post about yet (no gym has ever imported a member list).
+> The research in "Formats" had already found Instagram to be a side channel
+> for every gym-software account profiled, won instead on sales, search and
+> ads. Full diagnosis: the ledger entry "2026-09-20, Instagram content
+> retired".
+>
+> The pipeline (`ig:render`, `ig:drive`, `ig:sync`, `ig:stage`, the daily
+> publisher cron) is left working and unchanged, so pinned posts can still be
+> made and a cadence could restart without rebuilding anything. `/admin` stops
+> asking for batches via `IG_CADENCE_RETIRED` in `src/lib/hq-signals.ts`.
+
 Decided 2026-09-13 with Davide, reasoned through `/hormozi`. The ledger entry is
 "2026-09-13, The founder's idle week" in `.claude/skills/hormozi/references/casdey-ledger.md`.
 This plan adds a channel. It does not touch the outreach routines, the T2 test or the
