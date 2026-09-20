@@ -409,7 +409,7 @@
   }
 
   .product-workspace[data-theme="dark"] .revenue-hero {
-    background: #2b2d32;
+    background: var(--white);
   }
 
   .recovery-orbit {
@@ -702,10 +702,18 @@
    equally unlayered or the global dark values win regardless of specificity. */
 .product-workspace[data-theme="dark"] {
   --paper: #09090a;
-  --white: #242529;
-  --mist: #303136;
-  --ash: #404248;
+  --white: #202125;
+  --mist: #292a2e;
+  --ash: #383a40;
   --stone: #a5a5a9;
   --graphite: #d0d0d2;
   --shallow: #393527;
+}
+
+/* Every raised workspace surface shares one card plane. The darker controls
+   inside it provide the hierarchy without reintroducing bright grey boxes. */
+.product-workspace[data-theme="dark"] .workspace-identity,
+.product-workspace[data-theme="dark"] .overview-views,
+.product-workspace[data-theme="dark"] .insights-invite {
+  background: var(--white);
 }
