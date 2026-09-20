@@ -69,11 +69,15 @@ export function Stat({
   value,
   hint,
   tone = "default",
+  href,
+  className = "",
 }: {
   label: string;
   value: string | number;
   hint?: string;
   tone?: "default" | "teal" | "returned";
+  href?: string;
+  className?: string;
 }) {
   const valueTone =
     tone === "returned"
@@ -82,8 +86,8 @@ export function Stat({
         ? "text-teal"
         : "text-ink";
 
-  return (
-    <div className="card p-5">
+  const content = (
+    <>
       <p className="label text-stone">{label}</p>
       <p
         className={`literal mt-2 text-[2rem] leading-none font-medium ${valueTone}`}
@@ -91,8 +95,14 @@ export function Stat({
         {value}
       </p>
       {hint ? <p className="mt-2 text-[0.8125rem] text-stone">{hint}</p> : null}
-    </div>
+      {href ? <span className="journey-arrow" aria-hidden="true">↗</span> : null}
+    </>
   );
+
+  if (href) {
+    return <Link href={href} className={`card journey-link p-5 ${className}`}>{content}</Link>;
+  }
+  return <div className={`card p-5 ${className}`}>{content}</div>;
 }
 
 export function EmptyState({

@@ -73,7 +73,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
           the foot of a long document instead of the foot of the screen: on
           Settings you had to scroll the page to reach the controls that are
           supposed to be always there. */}
-      <aside className="app-sidebar flex shrink-0 flex-col gap-5 px-4 py-4 md:sticky md:top-0 md:h-[100dvh] md:w-60 md:overflow-y-auto md:px-4 md:py-6">
+      <aside className="app-sidebar flex shrink-0 flex-col gap-4 px-4 py-4 md:sticky md:top-0 md:h-[100dvh] md:w-[15.5rem] md:overflow-y-auto md:px-4 md:py-6">
         <div className="flex items-center justify-between md:block">
           <Link href="/app" className="inline-block text-ink">
             <Logo className="text-[1.5rem]" />
@@ -126,7 +126,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
             bottom right and was sitting on top of whatever the page ended
             with: on Members that was the next-page arrow, which could not be
             clicked at all. */}
-        <main className="mx-auto w-full max-w-[76rem] flex-1 px-5 pt-8 pb-24 sm:px-10 sm:pt-10">
+        <main className="workspace-content mx-auto w-full max-w-[82rem] flex-1 px-5 pt-8 pb-24 sm:px-10 sm:pt-10">
           {children}
         </main>
       </div>

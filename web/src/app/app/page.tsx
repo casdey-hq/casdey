@@ -174,6 +174,50 @@ export default async function DashboardPage(props: PageProps<"/app">) {
     <TrialPanel gym={gym} steps={trialSteps} />
   ) : null;
 
+  // One honest next step, chosen from information already on this page. It
+  // never guesses whether a campaign has finished sending.
+  const nextMove = calendar.needsReauth
+    ? {
+        title: "Reconnect your calendar",
+        body: "Booking is paused until Google Calendar is connected again.",
+        href: "/app/settings/booking",
+        action: "Fix booking",
+      }
+    : refreshReminder
+      ? {
+          title: "Refresh your member list",
+          body: `The last import was ${refreshReminder.daysSinceImport} days ago. A fresh file keeps the list and return counts current.`,
+          href: "/app/import",
+          action: "Import a fresh list",
+        }
+      : stats.reachable === 0
+        ? {
+            title: "Add reachable members",
+            body: "No lapsed member has an email address casdey can use. Map the email column on your next import.",
+            href: "/app/import",
+            action: "Update your list",
+          }
+        : !priced
+          ? {
+              title: "Price what you sell",
+              body: "Add service prices so each return has a value alongside the member count.",
+              href: "/app/settings/services",
+              action: "Add services",
+            }
+          : (approvedCampaigns ?? 0) === 0
+            ? {
+                title: "Write to members who went quiet",
+                body: `${stats.reachable} ${stats.reachable === 1 ? "member has" : "members have"} an email address. Review the draft before anything sends.`,
+                href: "/app/campaigns/new",
+                action: "Build a campaign",
+              }
+            : {
+                title: "See who needs attention",
+                body: "Review members who have gone quiet, what was sent, and who came back.",
+                href: "/app/members?filter=lapsed",
+                action: "Open member list",
+              };
+
   if (stats.members === 0) {
     return (
       <>
@@ -199,9 +243,6 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         eyebrow="Overview"
         title={gym.name}
         lede={`Lapsed means ${describeRule(ruleFor(gym))}. Change that in settings.`}
-        actions={
-          <ButtonLink href="/app/campaigns/new">Build a campaign</ButtonLink>
-        }
       />
 
       {/* Nothing links here any more (signup lands on ?welcome=1), so this is
@@ -260,6 +301,20 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           </Notice>
         </div>
       ) : null}
+
+      <section aria-label="Next move" className="focus-panel overview-enter mb-5 flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex min-w-0 gap-4">
+          <span className="focus-symbol" aria-hidden="true">↗</span>
+          <div>
+            <p className="label text-teal">Next move</p>
+            <h2 className="display mt-1 text-[1.25rem] text-ink sm:text-[1.375rem]">{nextMove.title}</h2>
+            <p className="mt-1 max-w-[65ch] text-[0.875rem] leading-relaxed text-graphite">{nextMove.body}</p>
+          </div>
+        </div>
+        <ButtonLink href={nextMove.href} variant="quiet" className="focus-action shrink-0 self-start lg:self-auto">
+          {nextMove.action}<span aria-hidden="true">↗</span>
+        </ButtonLink>
+      </section>
 
       {/* The outcome is the visual anchor. Its progress line uses the same
           denominator as the funnel below: returned members among those who
@@ -343,17 +398,24 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         </Card>
       </section>
 
-      <section aria-label="Member journey" className="metric-rail overview-enter overview-enter-2 mt-5 grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
-        <Stat label="Members" value={stats.members} />
+      <section aria-label="Member journey" className="overview-enter overview-enter-2 mt-7">
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <h2 className="display text-[1.125rem]">The path back</h2>
+          <p className="hidden text-[0.8125rem] text-stone sm:block">Open a stage to see its members</p>
+        </div>
+        <div className="metric-rail grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
+        <Stat label="Members" value={stats.members} href="/app/members?filter=all" />
         <Stat
           label="At risk"
           value={stats.atRisk}
+          href="/app/members?filter=at_risk"
           hint={`not yet contacted, ${gym.at_risk_after_days}+ days away`}
         />
         <Stat
           label="Gone quiet"
           value={stats.lapsed}
           tone="teal"
+          href="/app/members?filter=lapsed"
           hint={
             stats.reachable < stats.lapsed
               ? `${stats.reachable} have an email address`
@@ -363,14 +425,17 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         <Stat
           label="Contacted"
           value={stats.contacted}
+          href="/app/members?filter=contacted"
           hint="sent at least one message"
         />
         <Stat
           label="Returned"
           value={stats.returned}
           tone="returned"
+          href="/app/members?filter=returned"
           hint="came back after we wrote"
         />
+        </div>
       </section>
 
       {/* Analytics. Each measure gets its own panel against its own scale:
@@ -575,33 +640,6 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           />
         </Card>
       ) : null}
-
-      {stats.reachable > 0 ? (
-        <Card className="mt-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <CardTitle>Ready to work</CardTitle>
-            <p className="text-[0.9375rem] text-graphite">
-              <span className="literal font-medium text-ink">
-                {stats.reachable}
-              </span>{" "}
-              lapsed {stats.reachable === 1 ? "member has" : "members have"}{" "}
-              an email address on file. A campaign writes to them once, and
-              stops.
-            </p>
-          </div>
-          <ButtonLink href="/app/campaigns/new">Build a campaign</ButtonLink>
-        </Card>
-      ) : (
-        <Card className="mt-6">
-          <CardTitle>No email addresses yet</CardTitle>
-          <p className="text-[0.9375rem] text-graphite">
-            {stats.lapsed} lapsed{" "}
-            {stats.lapsed === 1 ? "member" : "members"}, none with an email
-            address casdey can use. Re-import with the email column mapped and
-            they become contactable.
-          </p>
-        </Card>
-      )}
 
       {/* Below the numbers, deliberately. The checklist is scaffolding: it is
           there for the first week and then never again, while the dashboard is

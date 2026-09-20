@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { requireGym } from "@/lib/dal";
 import {
+  atRiskCutoff,
+  atRiskRuleFor,
   describeRule,
   lapseCutoff,
   monthsSince,
@@ -27,10 +29,11 @@ export const metadata = { title: "Members" };
 // members should never be asked to scroll to find one.
 const PAGE_SIZE = 10;
 
-type Filter = "lapsed" | "all" | "contacted" | "returned";
+type Filter = "lapsed" | "at_risk" | "all" | "contacted" | "returned";
 
 const FILTERS: { value: Filter; label: string }[] = [
   { value: "lapsed", label: "Gone quiet" },
+  { value: "at_risk", label: "At risk" },
   { value: "contacted", label: "Contacted" },
   { value: "returned", label: "Returned" },
   { value: "all", label: "Everyone" },
@@ -105,6 +108,10 @@ export default async function MembersPage(props: PageProps<"/app/members">) {
       .neq("status", "opted_out")
       .lte("visit_count", visitCeiling(rule))
       .lte("last_visit_at", cutoff);
+  } else if (filter === "at_risk") {
+    query = query
+      .eq("status", "active")
+      .lte("last_visit_at", atRiskCutoff(atRiskRuleFor(gym)));
   } else if (filter === "contacted") {
     query = query.eq("status", "contacted");
   } else if (filter === "returned") {
@@ -211,11 +218,15 @@ export default async function MembersPage(props: PageProps<"/app/members">) {
           title={
             filter === "lapsed"
               ? "Nobody has gone quiet"
+              : filter === "at_risk"
+                ? "Nobody is at risk"
               : "Nothing here yet"
           }
           body={
             filter === "lapsed"
               ? `No member matches your current rule: ${describeRule(rule)}.`
+              : filter === "at_risk"
+                ? `No uncontacted member has been away for ${gym.at_risk_after_days} days or more.`
               : "Once casdey starts writing to members, they show up here."
           }
           action={<ButtonLink href="/app/import">Import your list</ButtonLink>}

@@ -4,11 +4,11 @@
  * Imported by the signed-in app, the login page and the unsubscribe page. It is
  * never imported by the landing page or the waitlist, so nothing here can shift
  * a pixel on either. It starts from the tokens in globals.css, then adds small
- * product-only dark surface adjustments so cards remain distinct from the page.
+ * product-only surface adjustments so the active work stands clear of the ground.
  *
  * Rules carried over from the guide:
- *   - Three planes. White is the workspace, Chalk is the navigation rail, and
- *     cards are distinguished by a quiet edge and measured depth.
+ *   - Three planes. The navigation rail recedes, the workspace holds the
+ *     content, and cards are the brighter plane in dark mode.
  *   - Amber marks a returned member and nothing else. It is never a button and
  *     never a background.
  *   - Transform and opacity only, 200ms, cubic-bezier(.22,1,.36,1).
@@ -19,17 +19,10 @@
 
 @layer components {
   .product-workspace {
-    background: var(--white);
+    background: var(--paper);
     font-family: var(--font-product), system-ui, sans-serif;
     font-size: 15px;
     line-height: 1.5;
-  }
-
-  .product-workspace[data-theme="dark"] {
-    --white: #1b1b1d;
-    --mist: #242426;
-    --ash: #39393d;
-    background: var(--paper);
   }
 
   .product-workspace .display {
@@ -54,14 +47,27 @@
   }
 
   .product-workspace[data-theme="dark"] .app-sidebar {
-    background: #121214;
+    background: #191a1e;
   }
 
   .workspace-identity {
-    background: var(--white);
+    background: color-mix(in srgb, var(--white) 72%, var(--paper));
     border: 1px solid var(--ash);
-    border-radius: 11px;
-    padding: 0.75rem 0.875rem;
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+  }
+
+  .nav-section-label {
+    margin: 1.25rem 0 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+
+  .nav-section-label:first-child {
+    margin-top: 0;
   }
 
   .command-trigger {
@@ -126,12 +132,13 @@
   }
 
   .app-nav-link {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 0.625rem;
     border: 1px solid transparent;
-    border-radius: 9px;
-    padding: 0.5625rem 0.75rem;
+    border-radius: 10px;
+    padding: 0.625rem 0.75rem;
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--graphite);
@@ -147,16 +154,38 @@
     transform: translateX(2px);
   }
 
+  .app-nav-link:active {
+    transform: translateX(1px) scale(0.99);
+  }
+
   .app-nav-link[aria-current="page"] {
     background: var(--white);
-    border-color: var(--ash);
+    border-color: color-mix(in srgb, var(--teal) 38%, var(--ash));
     color: var(--ink);
     font-weight: 600;
-    box-shadow: 0 1px 2px rgba(21, 21, 15, 0.035);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   }
 
   .app-nav-link[aria-current="page"] svg {
     color: var(--teal);
+  }
+
+  .nav-active-mark {
+    position: absolute;
+    right: 0.65rem;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 14%, transparent);
+  }
+
+  .workspace-content > .page-enter {
+    margin-bottom: 1.5rem;
+  }
+
+  .workspace-content > .page-enter h1 {
+    letter-spacing: -0.05em;
   }
 
   @media (max-width: 767px) {
@@ -181,28 +210,101 @@
 
   .product-workspace .card {
     border-color: var(--ash);
-    border-radius: 16px;
+    border-radius: 14px;
     box-shadow: 0 1px 2px rgba(21, 21, 15, 0.035), 0 8px 24px rgba(21, 21, 15, 0.035);
   }
 
   .product-workspace[data-theme="dark"] .card {
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 8px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 12px 32px rgba(0, 0, 0, 0.11);
+  }
+
+  .focus-panel {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--teal) 38%, var(--ash));
+    border-radius: 14px;
+    background: var(--white);
+  }
+
+  .focus-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--teal-bright);
+  }
+
+  .focus-symbol {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex: none;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--shallow);
+    color: var(--teal);
+    font-size: 1.375rem;
+    line-height: 1;
+  }
+
+  .focus-action span {
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .focus-action:hover span {
+    transform: translate(2px, -2px);
   }
 
   /* One continuous read of the member journey, rather than five equal boxes. */
   .metric-rail {
     overflow: hidden;
     border: 1px solid var(--ash);
-    border-radius: 16px;
+    border-radius: 14px;
     background: var(--white);
   }
 
   .product-workspace .metric-rail > .card {
+    position: relative;
     min-width: 0;
     border: 0;
     border-radius: 0;
     box-shadow: none;
     padding: 1.25rem;
+    animation: path-arrive 440ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  .metric-rail > .card:nth-child(2) { animation-delay: 55ms; }
+  .metric-rail > .card:nth-child(3) { animation-delay: 110ms; }
+  .metric-rail > .card:nth-child(4) { animation-delay: 165ms; }
+  .metric-rail > .card:nth-child(5) { animation-delay: 220ms; }
+
+  .journey-link {
+    transition: background-color 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .journey-link:hover,
+  .journey-link:focus-visible {
+    background: var(--mist);
+  }
+
+  .journey-link:active {
+    transform: scale(0.985);
+  }
+
+  .journey-arrow {
+    position: absolute;
+    top: 1.125rem;
+    right: 1.125rem;
+    color: var(--stone);
+    opacity: 0;
+    transform: translate(-3px, 3px);
+    transition: opacity 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .journey-link:hover .journey-arrow,
+  .journey-link:focus-visible .journey-arrow {
+    opacity: 1;
+    transform: translate(0, 0);
   }
 
   .product-workspace .metric-rail > .card:not(:first-child) {
@@ -232,7 +334,7 @@
   .chart-rail {
     overflow: hidden;
     border: 1px solid var(--ash);
-    border-radius: 16px;
+    border-radius: 14px;
     background: var(--white);
     box-shadow: 0 1px 2px rgba(21, 21, 15, 0.035), 0 8px 24px rgba(21, 21, 15, 0.035);
   }
@@ -243,6 +345,10 @@
 
   .product-workspace .revenue-hero {
     background: var(--white);
+  }
+
+  .product-workspace[data-theme="dark"] .revenue-hero {
+    background: #303238;
   }
 
   .revenue-hero::after {
@@ -293,6 +399,11 @@
     to { transform: scaleX(1); }
   }
 
+  @keyframes path-arrive {
+    from { opacity: 0.65; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .page-enter,
     .overview-enter,
@@ -301,8 +412,12 @@
       animation: none;
     }
 
-    .app-nav-link {
-      transition: none;
+    .product-workspace *,
+    .product-workspace *::before,
+    .product-workspace *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 
@@ -467,4 +582,16 @@
     border-color: color-mix(in srgb, var(--danger-soft) 38%, transparent);
     color: var(--danger);
   }
+}
+
+/* globals.css declares theme tokens outside a layer. Product tokens must be
+   equally unlayered or the global dark values win regardless of specificity. */
+.product-workspace[data-theme="dark"] {
+  --paper: #121317;
+  --white: #292b30;
+  --mist: #34363c;
+  --ash: #45474e;
+  --stone: #a5a5a9;
+  --graphite: #d0d0d2;
+  --shallow: #393527;
 }

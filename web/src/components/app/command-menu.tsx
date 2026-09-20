@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
-import { IconMessage } from "@/components/marks/icons";
+import { IconFind, IconMessage } from "@/components/marks/icons";
 import { APP_LINKS } from "./nav";
 
 const ITEMS = [
@@ -19,9 +19,15 @@ export function CommandMenu() {
   const titleId = useId();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
-  const matches = ITEMS.filter((item) =>
-    item.label.toLowerCase().includes(query.trim().toLowerCase()),
-  );
+  const search = query.trim();
+  const matches = [
+    ...ITEMS.filter((item) =>
+      item.label.toLowerCase().includes(search.toLowerCase()),
+    ),
+    ...(search.length >= 2
+      ? [{ href: `/app/members?filter=all&q=${encodeURIComponent(search)}`, label: `Find member: “${search}”`, Icon: IconFind }]
+      : []),
+  ];
 
   function toggle() {
     const dialog = dialogRef.current;
@@ -109,15 +115,15 @@ export function CommandMenu() {
                 dialogRef.current?.querySelectorAll<HTMLAnchorElement>("[data-command-item]")[active]?.click();
               }
             }}
-            placeholder="Where do you want to go?"
-            aria-label="Search pages"
+            placeholder="Go to a page or find a member"
+            aria-label="Search pages and members"
             className="w-full border-0 bg-transparent py-4 text-[0.9375rem] text-ink outline-none placeholder:text-stone"
           />
           <button type="button" onClick={() => dialogRef.current?.close()} aria-label="Close quick navigation" className="rounded-md px-2 py-1 text-[0.75rem] text-stone hover:bg-mist hover:text-ink">Esc</button>
         </div>
         <div className="max-h-[min(60vh,25rem)] overflow-y-auto p-2">
           {matches.length === 0 ? (
-            <p className="px-3 py-8 text-center text-[0.875rem] text-stone">No matching page.</p>
+            <p className="px-3 py-8 text-center text-[0.875rem] text-stone">No matching page. Type a name to search members.</p>
           ) : (
             matches.map((item, index) => (
               <Link
