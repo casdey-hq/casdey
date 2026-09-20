@@ -53,6 +53,14 @@ export type HqData = {
   notes: Record<string, HqNote>;
   /** Sunday check-ups, newest first. Stored as notes keyed checkup_<sunday>. */
   checkups: HqNote[];
+  /**
+   * What each Sunday review with Davide DECIDED, newest first, keyed
+   * review_<sunday>. Kept apart from the check-up on purpose (Davide,
+   * 2026-09-20): the check-up is the analysis, written unattended before he
+   * is awake, and writing the decisions over it destroys what they were
+   * decided from.
+   */
+  reviews: HqNote[];
   inputs: HqInput[];
   goals: HqGoal[];
   todos: HqTodo[];
@@ -101,6 +109,9 @@ export async function readHq(now: Date = new Date()): Promise<HqData> {
     ),
     checkups: ((notes.data ?? []) as HqNote[])
       .filter((note) => note.key.startsWith("checkup_"))
+      .sort((a, b) => b.key.localeCompare(a.key)),
+    reviews: ((notes.data ?? []) as HqNote[])
+      .filter((note) => note.key.startsWith("review_"))
       .sort((a, b) => b.key.localeCompare(a.key)),
     inputs: (inputs.data ?? []) as HqInput[],
     goals: ((goals.data ?? []) as HqGoal[]).map((goal) => ({

@@ -295,9 +295,26 @@ exactly this kind of thing). End with a link to https://www.casdey.com/admin.
 
 **Into `/admin`** (every run, on-demand or weekly), all from `web/`:
 
+0. **The check-up and the review are TWO notes, and the review never
+   overwrites the check-up (Davide, 2026-09-20).** The check-up is the
+   analysis, usually written unattended at 02:00 before Davide is awake; the
+   review is what he and Claude then decided. A session wrote the decisions
+   over the analysis, which destroyed the very thing they were decided from,
+   and he asked for the two kept apart: `npm run hq -- checkup set` for the
+   analysis, `npm run hq -- review set` for the decisions, shown above it on
+   `/admin`. In an interactive session leave the routine's check-up alone,
+   even where its numbers have since moved, and say so in the review instead.
+
 1. **This week's analysis**, shown on `/admin`'s **Check-up** tab. Each
-   Sunday gets its own note, so earlier weeks stay readable there. Write it in the small Markdown `/admin` renders (## headings,
-   - lists, **bold**): the ranked actions first, then one or two lines per
+   Sunday gets its own note, so earlier weeks stay readable there. Write it
+   in the small Markdown `/admin` renders: `##` and `###` headings, `-` and
+   `1.` lists, **bold**, *italic*, pipe tables and `>` callouts. Hard wrapping
+   is fine (lazy continuation works since 2026-09-20; before that it shredded
+   every wrapped bullet into stray paragraphs). **Do not write a wall of
+   prose** (Davide, 2026-09-20): a table is the right shape for per-arm
+   numbers or anything comparative, and a `>` callout for the one thing he
+   should not miss. Never use em dashes, per `CLAUDE.md`.
+   The ranked actions come first, then one or two lines per
    section, then the proposed test verdict. Keep it short; the numbers
    themselves are live on `/admin` and must not be copied into it, or they go
    stale the moment the page reloads.
@@ -336,7 +353,7 @@ step is different from an on-demand run:
 1. Do everything above (all sections including the prepared test review and
    the recommended actions), and write them into `/admin` as "Composing the
    output" describes: the week's check-up, and each recommended action as a
-   *proposed* to-do. Goals are never set from the routine. **Never run `testlog:update` from the
+   *proposed* to-do. **Never `review set`**: the review is what Davide decided, and nobody decided anything at 02:00. Goals are never set from the routine. **Never run `testlog:update` from the
    routine**: with nobody to decide, the review stops at the proposed
    verdict, and the Sunday session with Davide finishes it.
 2. Send Davide a **short "ready" email** (Davide, 2026-09-19): the top 1-3

@@ -20,7 +20,15 @@
  *   costs set <file.json>        [{ "service", "purpose", "monthly_eur", "basis", "when_it_matters" }, ...]
  *   checkup set <file.md> [--week YYYY-MM-DD]   this week's Sunday analysis (default: latest Sunday)
  *   checkup get                  the latest one
+ *   review set <file.md> [--week YYYY-MM-DD]    what the Sunday session DECIDED
+ *   review get                   the latest one
  *   summary                      everything written, for an agent starting a session
+ *
+ * The check-up and the review are two notes on purpose (Davide, 2026-09-20).
+ * The check-up is the analysis, usually written unattended at 02:00; the
+ * review is what he and Claude then decided. Writing decisions over the
+ * analysis destroys the thing they were decided from, so `checkup set` must
+ * never be used to record a decision.
  *
  * Reads SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from the environment first
  * (a cloud routine) and web/.env.local otherwise (a local session).
@@ -205,7 +213,8 @@ switch (`${thing} ${action}`) {
     console.log(`${items.length} cost lines saved`);
     break;
   }
-  case "checkup set": {
+  case "checkup set":
+  case "review set": {
     // One note per week, keyed by that week's Sunday, so /admin's Check-up
     // tab keeps the history. The Sunday defaults to the most recent one
     // (today, on a Sunday).
@@ -214,8 +223,10 @@ switch (`${thing} ${action}`) {
       return new Date(now.getTime() - now.getUTCDay() * 86_400_000).toISOString().slice(0, 10);
     })();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(week)) fail("--week must be YYYY-MM-DD");
-    const title = `Week of ${new Date(`${week}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}`;
-    const noteKey = `checkup_${week.replaceAll("-", "_")}`;
+    const kind = thing === "review" ? "review" : "checkup";
+    const when = new Date(`${week}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+    const title = kind === "review" ? `Review of ${when}` : `Week of ${when}`;
+    const noteKey = `${kind}_${week.replaceAll("-", "_")}`;
     await run(
       db.from("hq_notes").upsert({
         key: noteKey,
@@ -225,14 +236,16 @@ switch (`${thing} ${action}`) {
         updated_by: who,
       }),
     );
-    console.log(`check-up for ${week} saved (${noteKey})`);
+    console.log(`${kind} for ${week} saved (${noteKey})`);
     break;
   }
-  case "checkup get": {
+  case "checkup get":
+  case "review get": {
+    const prefix = thing === "review" ? "review" : "checkup";
     const rows = await run(
-      db.from("hq_notes").select("*").like("key", "checkup\\_%").order("key", { ascending: false }).limit(1),
+      db.from("hq_notes").select("*").like("key", `${prefix}\\_%`).order("key", { ascending: false }).limit(1),
     );
-    console.log(rows[0] ? `# ${rows[0].title}\n\n${rows[0].body}` : "(no check-up yet)");
+    console.log(rows[0] ? `# ${rows[0].title}\n\n${rows[0].body}` : `(no ${prefix} yet)`);
     break;
   }
   case "summary undefined":
@@ -259,9 +272,13 @@ switch (`${thing} ${action}`) {
     }
     const fixed = costs.reduce((sum, c) => sum + Number(c.monthly_eur), 0);
     out.push(`\n## Fixed monthly cost: EUR ${fixed.toFixed(2)} (${costs.filter((c) => Number(c.monthly_eur) > 0).map((c) => `${c.service} ${c.monthly_eur}`).join(", ")})`);
-    // Only the latest check-up: earlier weeks are history, on /admin.
-    const checkups = notes.filter((n) => n.key.startsWith("checkup_")).sort((a, b) => b.key.localeCompare(a.key));
-    const shown = notes.filter((n) => !n.key.startsWith("checkup_")).concat(checkups.slice(0, 1));
+    // Only the latest check-up and the latest review: earlier weeks are
+    // history, on /admin. The review goes last because what was decided is
+    // what an agent starting a session most needs to know.
+    const weekly = (prefix) => notes.filter((n) => n.key.startsWith(prefix)).sort((a, b) => b.key.localeCompare(a.key)).slice(0, 1);
+    const shown = notes
+      .filter((n) => !n.key.startsWith("checkup_") && !n.key.startsWith("review_"))
+      .concat(weekly("checkup_"), weekly("review_"));
     for (const n of shown) out.push(`\n## ${n.title} [note: ${n.key}, updated ${n.updated_at.slice(0, 10)} by ${n.updated_by}]\n\n${n.body}`);
     console.log(out.join("\n"));
     break;

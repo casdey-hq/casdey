@@ -2,8 +2,15 @@ import type { ReactNode } from "react";
 
 /**
  * Renders the small slice of Markdown casdey HQ notes are written in: ## and
- * ### headings, - and 1. lists, paragraphs, **bold** and *italic*. Anything
- * else shows as the text it is.
+ * ### headings, - and 1. lists, tables, > callouts, paragraphs, **bold** and
+ * *italic*. Anything else shows as the text it is.
+ *
+ * Wrapped lines work (2026-09-20). A note is written in a file and hard
+ * wrapped like any other Markdown, and until this was fixed every line after
+ * the first of a bullet ended the list and became its own stray paragraph, so
+ * a correctly written note rendered as shrapnel. A non-blank line under an
+ * open list item now continues it, which is what Markdown calls lazy
+ * continuation.
  *
  * Built as React elements, never as HTML, so a note can hold any characters
  * without them being read as markup. A dependency would render more, but the
@@ -51,6 +58,45 @@ export function MarkdownLite({ source }: { source: string }) {
     );
     paragraph = [];
   };
+  const table: string[] = [];
+  const flushTable = () => {
+    if (table.length === 0) return;
+    const cells = (row: string) =>
+      row.replace(/^\||\|$/g, "").split("|").map((cell) => cell.trim());
+    // A separator row (|---|---|) is optional: with one, row 1 is the header.
+    const header = table.length > 1 && /^[\s|:-]+$/.test(table[1]) ? cells(table[0]) : null;
+    const body = table.slice(header ? 2 : 0).map(cells);
+    const key = `t-${blocks.length}`;
+    blocks.push(
+      <div key={key} className="overflow-x-auto">
+        <table className="w-full text-left text-[0.9375rem] leading-relaxed text-graphite">
+          {header ? (
+            <thead>
+              <tr className="border-b border-ash">
+                {header.map((cell, i) => (
+                  <th key={i} className="py-1.5 pr-4 font-semibold text-ink">
+                    {inline(cell, `${key}-h-${i}`)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+          ) : null}
+          <tbody>
+            {body.map((row, r) => (
+              <tr key={r} className="border-b border-ash/60 last:border-0">
+                {row.map((cell, c) => (
+                  <td key={c} className="py-1.5 pr-4 align-top">
+                    {inline(cell, `${key}-${r}-${c}`)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>,
+    );
+    table.length = 0;
+  };
   const flushList = () => {
     if (!list) return;
     const Tag = list.ordered ? "ol" : "ul";
@@ -74,12 +120,33 @@ export function MarkdownLite({ source }: { source: string }) {
     const bullet = /^\s*[-*]\s+(.*)$/.exec(line);
     const numbered = /^\s*\d+\.\s+(.*)$/.exec(line);
 
+    const quote = /^>\s?(.*)$/.exec(line);
+    const isTableRow = /^\s*\|.*\|\s*$/.test(line);
+
     if (!line.trim()) {
       flushParagraph();
       flushList();
+      flushTable();
+    } else if (isTableRow) {
+      flushParagraph();
+      flushList();
+      table.push(line.trim());
+    } else if (quote) {
+      flushParagraph();
+      flushList();
+      flushTable();
+      blocks.push(
+        <p
+          key={`q-${blocks.length}`}
+          className="border-l-2 border-teal pl-3 text-[0.9375rem] leading-relaxed text-graphite"
+        >
+          {inline(quote[1], `q-${blocks.length}`)}
+        </p>,
+      );
     } else if (heading) {
       flushParagraph();
       flushList();
+      flushTable();
       blocks.push(
         heading[1].length === 2 ? (
           <h3 key={`h-${blocks.length}`} className="display pt-2 text-[1.0625rem] text-ink">
@@ -93,17 +160,22 @@ export function MarkdownLite({ source }: { source: string }) {
       );
     } else if (bullet || numbered) {
       flushParagraph();
+      flushTable();
       const ordered = Boolean(numbered);
       if (list && list.ordered !== ordered) flushList();
       if (!list) list = { ordered, items: [] };
       list.items.push((bullet ?? numbered)![1]);
+    } else if (list) {
+      // Lazy continuation: a wrapped line belongs to the item above it.
+      list.items[list.items.length - 1] += ` ${line.trim()}`;
     } else {
-      flushList();
+      flushTable();
       paragraph.push(line.trim());
     }
   }
   flushParagraph();
   flushList();
+  flushTable();
 
   return <div className="space-y-3">{blocks}</div>;
 }

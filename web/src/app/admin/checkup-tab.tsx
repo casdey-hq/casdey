@@ -10,9 +10,13 @@ import { Section } from "./parts";
  * The Sunday check-up, one week at a time (IMPROVEMENTS.md #2, Davide's ask on
  * 2026-09-19 to be able to see it).
  *
- * The routine writes each Sunday's analysis as its own note
- * (checkup_<sunday>, with `npm run hq -- checkup set`) and its recommended
- * actions as proposed to-dos. This tab is where Davide reads the latest,
+ * Two notes a week, deliberately (Davide, 2026-09-20). The routine writes the
+ * analysis as checkup_<sunday> (`npm run hq -- checkup set`) plus its
+ * recommended actions as proposed to-dos, usually unattended at 02:00. The
+ * Sunday session with Claude then writes what was DECIDED as its own note,
+ * review_<sunday> (`npm run hq -- review set`), shown above the check-up and
+ * never written over it: the analysis is the thing the decisions were made
+ * from, so losing it loses the reasoning. This tab is where Davide reads both,
  * decides on the proposals, and can look back at earlier weeks. The numbers
  * behind it stay on the Numbers and Marketing tabs, live, rather than being
  * copied into the analysis where they would go stale.
@@ -28,6 +32,7 @@ const shortDate = (iso: string) =>
 export async function CheckupTab() {
   const hq = await readHq();
   const [latest, ...earlier] = hq.checkups;
+  const [decided, ...earlierReviews] = hq.reviews;
 
   const proposed: TodoItem[] = hq.todos
     .filter((todo) => todo.status === "proposed")
@@ -45,6 +50,19 @@ export async function CheckupTab() {
 
   return (
     <>
+      {decided ? (
+        <Section
+          title={decided.title}
+          sub="What the Sunday session with Claude decided. The check-up it was decided from is below, untouched."
+        >
+          <Card>
+            <NoteEditor noteKey={decided.key} body={decided.body}>
+              <MarkdownLite source={decided.body} />
+            </NoteEditor>
+          </Card>
+        </Section>
+      ) : null}
+
       {latest ? (
         <Section
           title={latest.title}
@@ -96,10 +114,12 @@ export async function CheckupTab() {
         </ul>
       </Section>
 
-      {earlier.length > 0 ? (
+      {earlier.length + earlierReviews.length > 0 ? (
         <Section title="Earlier weeks">
           <div className="space-y-3">
-            {earlier.map((note) => (
+            {[...earlierReviews, ...earlier]
+              .sort((a, b) => b.key.slice(-10).localeCompare(a.key.slice(-10)))
+              .map((note) => (
               <details key={note.key} className="card group p-5">
                 <summary className="cursor-pointer list-none text-[0.9375rem] font-semibold text-ink">
                   {note.title}
@@ -111,7 +131,7 @@ export async function CheckupTab() {
                   <MarkdownLite source={note.body} />
                 </div>
               </details>
-            ))}
+              ))}
           </div>
         </Section>
       ) : null}
