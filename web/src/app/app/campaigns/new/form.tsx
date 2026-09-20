@@ -608,7 +608,7 @@ export function CampaignForm({
               <p className="mb-4 border-b border-ash pb-3 text-[0.9375rem] font-semibold text-ink">
                 {renderTemplate(subject, context)}
               </p>
-              <pre className="font-[family-name:var(--font-inter)] text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-graphite">
+              <pre className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-graphite">
                 {composeBody({
                   body,
                   context,

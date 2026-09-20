@@ -49,7 +49,7 @@ export function MetricChart({
   const fill = TONES[tone];
 
   return (
-    <div className="rounded-[16px] border border-ash bg-white p-5">
+    <div className="chart-panel p-5">
       <div className="flex items-baseline justify-between gap-3">
         <p className="label text-stone">{title}</p>
         {changePercent !== null ? (

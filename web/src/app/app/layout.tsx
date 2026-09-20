@@ -4,6 +4,7 @@ import { AppNav } from "@/components/app/nav";
 import { IconSignOut } from "@/components/app/icons";
 import { Logo } from "@/components/wordmark";
 import { cookies } from "next/headers";
+import { DM_Sans, Source_Sans_3 } from "next/font/google";
 
 import { getGymContext } from "@/lib/dal";
 import { BillingBanner } from "@/components/app/billing-banner";
@@ -13,6 +14,20 @@ import { ThemeToggle, THEME_COOKIE } from "@/components/app/theme-toggle";
 import { supportThreadForGym } from "@/lib/support";
 
 import "@/styles/product.css";
+
+// The signed-in workspace uses a softer pair. Marketing and the wordmark keep
+// their established faces, and these files load only for the product.
+const productDisplay = DM_Sans({
+  variable: "--font-product-display",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const productBody = Source_Sans_3({
+  variable: "--font-product-body",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 /**
  * The app shell.
@@ -56,7 +71,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
       // it kept the light theme's near-black and rendered black on black in
       // dark mode. Re-stating it here resolves the token inside the themed
       // scope, so every descendant inherits the right one.
-      className="flex min-h-full flex-1 flex-col bg-paper text-ink md:flex-row"
+      className={`${productDisplay.variable} ${productBody.variable} product-workspace flex min-h-full flex-1 flex-col bg-paper text-ink md:flex-row`}
     >
       {/* Sticky and exactly one viewport tall on desktop, with its own scroll.
           As a plain flex child it stretched to the height of whatever page it
@@ -111,7 +126,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
             bottom right and was sitting on top of whatever the page ended
             with: on Members that was the next-page arrow, which could not be
             clicked at all. */}
-        <main className="mx-auto w-full max-w-[68rem] flex-1 px-5 pt-8 pb-24 sm:px-8 sm:pt-10">
+        <main className="mx-auto w-full max-w-[72rem] flex-1 px-5 pt-8 pb-24 sm:px-8 sm:pt-10">
           {children}
         </main>
       </div>

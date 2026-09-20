@@ -99,7 +99,7 @@ export function MemberTimeline({
         y={y - 12}
         fill="var(--stone)"
         fontSize="10"
-        fontFamily="var(--font-jetbrains-mono), ui-monospace, monospace"
+        fontFamily="var(--font-product-body), system-ui, sans-serif"
       >
         {visitLabel}
       </text>
@@ -109,7 +109,7 @@ export function MemberTimeline({
         y={y + 21}
         fill="var(--stone)"
         fontSize="10"
-        fontFamily="var(--font-jetbrains-mono), ui-monospace, monospace"
+        fontFamily="var(--font-product-body), system-ui, sans-serif"
       >
         {gapLabel}
       </text>
@@ -122,7 +122,7 @@ export function MemberTimeline({
           fontSize="10"
           fontWeight="500"
           textAnchor="middle"
-          fontFamily="var(--font-jetbrains-mono), ui-monospace, monospace"
+          fontFamily="var(--font-product-body), system-ui, sans-serif"
         >
           returned
         </text>

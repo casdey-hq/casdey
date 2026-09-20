@@ -261,7 +261,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         </div>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <section aria-label="Member journey" className="metric-rail grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
         <Stat label="Members" value={stats.members} />
         <Stat
           label="At risk"
@@ -289,7 +289,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           tone="returned"
           hint="came back after we wrote"
         />
-      </div>
+      </section>
 
       {/* The forward figure, paired with Recovered beside it: what the quiet
           half of the list is worth per month, against what casdey has pulled
@@ -444,7 +444,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           </nav>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="chart-rail grid lg:grid-cols-3">
           <MetricChart
             title="Messages sent"
             hero={String(totals.sent)}

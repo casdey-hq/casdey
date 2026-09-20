@@ -18,6 +18,25 @@
  */
 
 @layer components {
+  .product-workspace {
+    font-family: var(--font-product-body), system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .product-workspace .display {
+    font-family: var(--font-product-display), system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.15;
+  }
+
+  .product-workspace .literal {
+    font-family: var(--font-product-body), system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
   /* --- Sidebar, the one inverted plane ------------------------------------ */
 
   .app-sidebar {
@@ -46,7 +65,8 @@
   .app-nav-link[aria-current="page"] {
     background: var(--deep-raised);
     color: var(--ink);
-    font-weight: 500;
+    font-weight: 600;
+    box-shadow: inset 2px 0 0 var(--teal-bright);
   }
 
   /* --- Raised plane ------------------------------------------------------- */
@@ -56,6 +76,69 @@
     border: 1px solid color-mix(in srgb, var(--ash) 60%, transparent);
     border-radius: 20px;
     box-shadow: var(--shadow-raised);
+  }
+
+  .product-workspace .card {
+    border-color: var(--ash);
+    border-radius: 16px;
+    box-shadow: none;
+  }
+
+  /* One continuous read of the member journey, rather than five equal boxes. */
+  .metric-rail {
+    overflow: hidden;
+    border: 1px solid var(--ash);
+    border-radius: 16px;
+    background: var(--white);
+  }
+
+  .product-workspace .metric-rail > .card {
+    min-width: 0;
+    border: 0;
+    border-radius: 0;
+    padding: 1.25rem;
+  }
+
+  .product-workspace .metric-rail > .card:not(:first-child) {
+    border-left: 1px solid var(--ash);
+  }
+
+  @media (min-width: 640px) and (max-width: 1279px) {
+    .product-workspace .metric-rail > .card:nth-child(3n + 1) {
+      border-left: 0;
+    }
+
+    .product-workspace .metric-rail > .card:nth-child(-n + 3) {
+      border-bottom: 1px solid var(--ash);
+    }
+  }
+
+  @media (max-width: 639px) {
+    .product-workspace .metric-rail > .card:nth-child(odd) {
+      border-left: 0;
+    }
+
+    .product-workspace .metric-rail > .card:nth-child(-n + 4) {
+      border-bottom: 1px solid var(--ash);
+    }
+  }
+
+  .chart-rail {
+    overflow: hidden;
+    border: 1px solid var(--ash);
+    border-radius: 16px;
+    background: var(--white);
+  }
+
+  .chart-rail > .chart-panel:not(:first-child) {
+    border-left: 1px solid var(--ash);
+  }
+
+  @media (max-width: 1023px) {
+    .chart-rail > .chart-panel:not(:first-child) {
+      border-top: 1px solid var(--ash);
+      border-left: 0;
+    }
   }
 
   .card-tight {
@@ -110,10 +193,8 @@
 
   /* --- Data --------------------------------------------------------------- */
 
-  /* Anything literal: counts, dates, addresses, prices.
-     The font var comes from next/font on <html>. Note that --font-mono lives
-     inside globals.css's `@theme inline`, which by design emits no custom
-     property, so referencing it here would resolve to nothing. */
+  /* Anything literal: counts, dates, addresses, prices. In the signed-in app,
+     tabular Source Sans figures replace this legacy mono treatment. */
   .literal {
     font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
     font-variant-numeric: tabular-nums;
@@ -128,11 +209,11 @@
   .data-table th {
     padding: 0.625rem 1rem;
     text-align: left;
-    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font-family: var(--font-product-body), system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--stone);
     border-bottom: 1px solid var(--ash);
     white-space: nowrap;
@@ -164,11 +245,11 @@
     gap: 0.375rem;
     border-radius: 999px;
     padding: 0.1875rem 0.625rem;
-    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-    font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-family: var(--font-product-body), system-ui, sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
     white-space: nowrap;
   }
 
