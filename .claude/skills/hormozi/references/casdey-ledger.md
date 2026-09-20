@@ -389,3 +389,41 @@ attached, from pg 145: pick a cadence that can be held, then do not stop. A burs
 that ends when the week gets busy is worth nothing. Watch item, not acted on: 11
 of 12 replies being a no is a small signal about the market, not only the message,
 and T2 is the test that separates the two.
+
+## 2026-09-20 — Instagram DMs paused, posting kept
+Framework: $100M Leads / Core Four ("one channel to a predictable leads-per-day
+before adding another", pg 245), More before New (pg 246-250), engaged leads as
+the true output of advertising (pg 26)
+Decision: the manual Instagram DM channel is paused. The "casdey gym IG outreach"
+routine (`trig_01La223qWjwxoumG4z8gssL8`) is disabled, the unsent drafts in the
+`IG Outreach` tab are deliberately left unsent, and `/admin`'s "Send N Instagram
+DMs" signal is gated off behind `IG_DMS_PAUSED` in `src/lib/hq-signals.ts`.
+Instagram **posting** is untouched: it is a different mechanism, it is automated,
+it costs no daily founder time, and it is what would make a future DM land.
+The numbers this was decided on (live, 2026-09-20): Instagram 201 first DMs plus
+127 FU1 and 69 FU2, so **397 messages, 1 reply, 0 engaged leads**; email 1,393
+gyms contacted, 19 genuine replies (1.36%), 2 engaged (0.14%).
+Follows or diverges: **Follows.**
+Reason: the data cannot condemn the channel and was not the argument. At email's
+0.14% engaged rate, 201 DMs would be expected to yield 0.29 engaged leads, so
+zero is what a working channel looks like at this sample size, and 1 reply
+against an expected 2.7 is noise. The argument is price. Email is automated and
+costs nothing per send; every DM is sent by Davide's own hand, and casdey has one
+pair of hands (sole founder, see CLAUDE.md Stage 1). Surfacing one engaged lead
+at the demonstrated rate needs roughly 700 messages, which is 35 days of manual
+work at 20/day, while email does 100/day unattended. That founder hour has a
+better-paid job: the US switch, blocked only on a postal address, reopens the
+lead pool that European sourcing has been thinning. A mechanical doubt supports
+it: a cold DM from a 12-follower account lands in Message Requests, where it may
+never be seen, and casdey has no way to measure delivery, so the channel is both
+the most expensive and the least measurable one. Secondary benefit, deliberate:
+the routine was also a daily draw on Davide's weekly Claude usage, which ran out
+on 2026-09-17 and 2026-09-18 and cost two days of email outreach.
+Supersedes in part the 2026-09-13 entry, which diagnosed the empty brand profile
+as the reason 105 DMs got 0 replies. Content was the fix chosen then; this entry
+says the DM half should wait until that content has actually built a profile
+worth checking. Restart condition: a believable Instagram presence (followers and
+a post history a stranger can land on), or cold email genuinely saturating. If it
+restarts, it restarts as a second touch to gyms already emailed, at about 5 a day,
+which is Hormozi's "follow up more times, more ways" (pg 174-175), not as a second
+cold first-touch channel competing with email for the same hour.
