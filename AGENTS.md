@@ -38,6 +38,13 @@ changes the project:
   in `.agents/skills/<name>/SKILL.md`.
 - A new authoritative doc, a moved file, or a new standing rule from Davide
   needs a line here.
+- **More than one agent pushes to `origin/main`, so check before you commit.**
+  Run `git status -sb` and `git pull --rebase` at the start of a session's
+  work, and confirm which branch you are actually on. Learned 2026-09-20:
+  Codex had pushed three commits while two sessions committed locally without
+  pulling, leaving `main` three ahead and three behind, and a fix was
+  committed onto a Codex feature branch by accident. Rebase rather than merge
+  while nothing local has been pushed.
 - The procedure is `.claude/skills/update-project/SKILL.md`.
 
 ## Conventions that apply to everything

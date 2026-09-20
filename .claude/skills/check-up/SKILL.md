@@ -87,10 +87,13 @@ its actions up and start, not just a headline a human would nod at.
      2026-09-02) land in `rowTypeCounts.other`, not a bug.
    - `igOutreach` — the `IG Outreach` tab (cold DMs, sent by hand): sends,
      this-week sends, replies, follow-ups sent, unsent drafts in the queue.
-   - **Instagram content, added 2026-09-13 (Davide: both the DMs and the
-     posting belong in the check-up).** The plan is `content-plan.md` at the
-     repo root: one post a day for 100 days from 2026-09-16. Three tabs, all
-     filled by hand because Claude has no Instagram access:
+   - **Instagram, both halves now switched off (2026-09-20).** The DMs are
+     paused and the posting cadence is retired after 4 posts, leaving two
+     pinned posts; see `content-plan.md` and the ledger. **So do not raise
+     either as an action**: an unsent DM queue and an empty schedule are both
+     intended. Keep reading the tabs, because `igWeekly` still fills itself
+     and any inbound DM is still an engaged lead. Three tabs, all filled by
+     hand because Claude has no Instagram access:
      - `igContent` — the `IG Content` tab: posts drafted by Claude
        (`npm run ig:render` / `npm run ig:sync`), what Davide marked posted,
        `behindBy` against one a day since 2026-09-16, drafts awaiting his
@@ -252,11 +255,11 @@ its actions up and start, not just a headline a human would nod at.
    - **Reply rate vs the 3% target**: state the gap in percentage points.
    - **Engaged leads**: the count, the rate, and who they are, email and
      Instagram (`inboundDms`) shown by source.
-   - **Instagram posting cadence**: `igContent.behindBy`. The plan's one rule
-     is not to stop (*$100M Leads* pg 145), so a gap of 2+ days is worth an
-     action; also name drafts awaiting review and open feedback, since
-     unreviewed posts are what stalls the cadence. Judge content on inputs
-     (posts published) before day 30 (2026-10-15), not on reach.
+   - **Instagram: report, never action (2026-09-20).** `igContent.behindBy`
+     now measures a cadence that was deliberately retired, and the unsent DM
+     drafts a channel deliberately paused, so neither is a finding. Mention
+     them once if at all. The one thing still worth flagging is an inbound DM
+     whose video has not been sent, because that is a live engaged lead.
    - **`/admin`'s written notes vs what Numbers/Marketing just found**: already
      flagged in section 4 above — surface it again here if it changes what
      Davide should actually do (e.g. the offer note still describes a price
