@@ -11,11 +11,17 @@
 // it still reads that same Zoho inbox.
 //
 // Usage: node resend-send.js '<json>'
-//   json: { to, subject, text, replyTo }
+//   json: { to, subject, text, replyTo, scheduledAt }
 // Requires RESEND_API_KEY and CASDEY_OUTREACH_SENDING_ADDRESS in env.
 // Prints { "id": "<resend-email-id>" } to stdout on success.
+//
+// scheduledAt (optional, added 2026-09-20 for the US switch) is an ISO 8601
+// instant in UTC, e.g. "2026-09-21T13:00:00Z". Resend holds the email and
+// delivers it then, which is how a US gym gets its email at about 9am local
+// although this routine runs at 02:00 UTC. Omit it and the email goes now,
+// which is what every European send still does.
 
-async function send({ to, subject, text, replyTo }) {
+async function send({ to, subject, text, replyTo, scheduledAt }) {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY is not set");
   const from = process.env.CASDEY_OUTREACH_SENDING_ADDRESS;
@@ -30,6 +36,7 @@ async function send({ to, subject, text, replyTo }) {
       subject,
       text,
       reply_to: replyTo || undefined,
+      scheduled_at: scheduledAt || undefined,
     }),
   });
 

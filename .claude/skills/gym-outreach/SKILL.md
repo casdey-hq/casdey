@@ -7,7 +7,36 @@ description: Runs casdey's gym/fitness-studio cold-outreach workflow — sourcin
 
 Operating spec for casdey's cold-outreach system, targeting UK/EU gyms and fitness studios (the niche pivot from dental, see CLAUDE.md's "Niche pivot under consideration" and "Go-to-market plan for the niche pivot" sections, both required reading before running this). Invoked as `/gym-outreach`.
 
-## Current state — READ FIRST (2026-09-02 / 2026-09-03 / 2026-09-06 / 2026-09-07 / 2026-09-13 changes)
+## The US switch — BUILT 2026-09-20, OFF until the postal address exists
+
+The routine prompt carries a **US MODE** block with one switch line, `US SENDING: OFF`. While it reads OFF, everything below in this file runs exactly as it always has, European sourcing included, and nothing about a live run changes. Flipping it to ON is the whole switch.
+
+**What ON changes:**
+- **First touch goes US only.** All 100 first-touch emails a day are sourced in the United States; European leads already contacted keep getting their FU1 and FU2 as normal, so nobody is abandoned mid-sequence. European first-touch stops.
+- **Sends are scheduled for about 9am in the gym's own time**, not sent at 02:00 UTC. `scripts/resend-send.js` takes a `scheduledAt` (ISO 8601 UTC) and passes Resend's `scheduled_at`; Resend holds the email and delivers it then. European sends pass nothing and go immediately, as before.
+- **Every US email carries a CAN-SPAM footer**: casdey's postal address and a one-line opt-out. This is law, not preference, and it applies to B2B email with penalties of up to $53,088 per email. Two hard pre-send gates enforce it, so a US email missing either is skipped rather than sent.
+
+**The two new `Leads` columns, added 2026-09-20:** `Country` (V) and `Send Zone` (W), the IANA zone (`America/New_York`, `America/Chicago`, `America/Denver`, `America/Phoenix`, `America/Los_Angeles`). Rows sourced before this date are blank and read as Europe.
+
+**How to flip it on.** The routine prompt is edited through the RemoteTrigger API, which rewrites it wholesale, so the block below was deliberately NOT inserted while it would sit inert: retyping 26,000 characters of a live sending prompt is the risk, not the block. When the mailbox is approved, paste this verbatim into the prompt (after the VOLUME paragraph), change nothing else, then re-read the prompt back to confirm only this was added:
+
+```
+US MODE (built 2026-09-20). SWITCH: US SENDING: ON. While this line reads OFF, ignore this entire block and run exactly as the rest of this prompt says (European sourcing, immediate sends, no footer). When it reads ON:
+(a) FIRST TOUCH IS US ONLY. Source only gyms and fitness studios in the United States, same 40% CrossFit/boutique and 60% general mix, same owner-first preference. Source no new European leads. Set the 'Leads' column V 'Country' to 'United States' and column W 'Send Zone' to the gym's IANA timezone: America/New_York, America/Chicago, America/Denver, America/Phoenix (Arizona, never shifts) or America/Los_Angeles. Skip Alaska and Hawaii. A lead with a blank Country is European.
+(b) FOLLOW-UPS ARE UNCHANGED on both continents. Every European lead already contacted still gets its FU1 and FU2 exactly per the FOLLOW-UPS rules. Never abandon a started sequence.
+(c) SCHEDULE EVERY US SEND for 9am local. Compute the UTC instant of 09:00 on the run date in that lead's Send Zone, honouring US daylight saving (Eastern is UTC-4 in DST and UTC-5 outside it, and so on; America/Phoenix never shifts), and pass it to resend-send.js as scheduledAt, ISO 8601, e.g. "2026-09-21T13:00:00Z". If that instant has already passed, use 09:00 the next day. European sends pass no scheduledAt and go immediately, as now.
+(d) CAN-SPAM FOOTER on EVERY US email, first touch and follow-ups alike. After the 'Davide @casdey' sign-off, one blank line, then exactly:
+casdey, 1550 Wilson Blvd, Ste 700 PMB 389, Arlington, VA 22209, USA
+Not interested? Reply 'stop' and I won't email you again.
+The address line is verbatim and never varied. The opt-out line may be reworded per lead but must always be there and must always offer a real way to opt out. The footer does NOT count toward the ~130 word pre-send limit.
+(e) TWO EXTRA HARD PRE-SEND GATES for US emails, alongside the existing ones: skip the draft if its body does not contain '1550 Wilson Blvd', or if it carries no opt-out line. A US email missing either is never sent.
+(f) OPT-OUTS: treat a reply of 'stop', 'unsubscribe' or 'remove me' as an opt-out, set 'Reply?' to 'Unsubscribed' and never contact that gym again on any channel.
+(g) REPORT: STEP R states how many US and how many European emails went out, and the scheduled delivery times used.
+```
+
+**The postal address.** casdey rents mailbox 389 at **1550 Wilson Blvd, Ste 700 PMB 389, Arlington, VA 22209**, a CMRA registered with USPS, which is what `16 CFR 316.2(p)` requires. It was paid for on 2026-09-20 but **cannot receive mail until USPS Form 1583 is notarised and the mail centre approves it**, and until that completes the address is not usable and `US SENDING` stays OFF. Do not substitute a personal address: publishing a home address to about 3,000 strangers a month is irreversible, and an Italian PO box does not satisfy the rule at all.
+
+## Current state — READ FIRST (2026-09-02 / 2026-09-03 / 2026-09-06 / 2026-09-07 / 2026-09-13 / 2026-09-20 changes)
 - **T2, the outcome-led email, live from the 2026-09-14 run (Sunday review, 2026-09-13, Davide's call). Supersedes the variant B, subject-test and "feedback-first for everyone" bullets below.** Both routine prompts were rewritten via the RemoteTrigger API the same day; they stay authoritative.
   - **Goals the routines now report against:** 1% **engaged leads** for the week, measured on that week's contacts (gyms first contacted in the last 7 days that are now `Interested`/`Committed`, over gyms first contacted in the last 7 days; about 7 from about 700), and 2 paying gyms by 2026-10-13. An engaged lead is a gym interested in casdey, **not a reply**; a "yes, send me the video" counts and is logged `Interested`. The reply rate (target 3%) is reported separately and never called "engaged" any more.
   - **T0 closed** (A kept on direction only; variant B's "I'll set it up free on your lapsed list" got 0 replies in 290 and is retired: handing a member list to a stranger is a hidden cost, *$100M Leads* pg 97). **T1 closed**, no winner: every first touch now uses `S1` verbatim; `S2` is retired for new sends but still matched for replies.
