@@ -111,6 +111,7 @@ mark::before { content: ""; position: absolute; left: -0.08em; right: -0.08em; b
    pairing the brand guide allows (8.7:1). */
 .deep mark { color: var(--deep); padding: 0 0.16em; margin: 0 0.04em; }
 .deep mark::before { left: 0; right: 0; bottom: -0.2em; height: 1.16em; border-radius: 0.24em; }
+.deep .eyebrow { color: var(--leaf); }
 .deep .body p { color: #D9D6C9; }
 .deep .progress i { background: rgba(247,247,244,0.18); }
 .deep .progress i.on { background: var(--leaf); }
@@ -170,7 +171,12 @@ function slideHtml(slide, index, total) {
     default:
       throw new Error(`unknown slide type: ${slide.type}`);
   }
-  const bars = Array.from({ length: total }, (_, i) => `<i class="${i === index ? "on" : ""}"></i>`).join("");
+  // A single-image post has nothing to page through, so the progress bar and
+  // the swipe cue are both suppressed: one lone bar reads as a stray mark.
+  const bars =
+    total > 1
+      ? Array.from({ length: total }, (_, i) => `<i class="${i === index ? "on" : ""}"></i>`).join("")
+      : "";
   return `<!doctype html><html><head><meta charset="utf-8">
 <style>${FONTS}</style><style>${CSS}</style></head><body>
 <div class="slide${slide.type === "cta" ? " deep" : ""}">
@@ -209,9 +215,17 @@ for (const post of posts.filter((p) => !p.reel)) {
     const overflow = await page.evaluate(() => {
       const main = document.querySelector(".main").getBoundingClientRect();
       const bars = document.querySelector(".progress").getBoundingClientRect();
-      return main.bottom > bars.top - 40 || document.querySelector(".slide").scrollHeight > 1350;
+      const slide = document.querySelector(".slide");
+      if (main.bottom > bars.top - 40 || slide.scrollHeight > 1350) return "runs past the bottom";
+      const room = slide.getBoundingClientRect().width - 96;
+      for (const el of slide.querySelectorAll("h1, h2, .big, .label, mark, p")) {
+        if (el.getBoundingClientRect().right > room) {
+          return `"${el.textContent.trim().slice(0, 40)}" runs off the right edge`;
+        }
+      }
+      return null;
     });
-    if (overflow) problems.push(`${post.id} slide ${index + 1} overflows`);
+    if (overflow) problems.push(`${post.id} slide ${index + 1}: ${overflow}`);
     await page.screenshot({ path: path.join(dir, `${index + 1}.png`) });
   }
   console.log(`${post.id}: ${post.slides.length} slides -> ${path.relative(repoRoot, dir)}`);
