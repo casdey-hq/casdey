@@ -266,7 +266,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         <Stat
           label="At risk"
           value={stats.atRisk}
-          hint={`no visit for ${gym.at_risk_after_days}+ days`}
+          hint={`not yet contacted, ${gym.at_risk_after_days}+ days away`}
         />
         <Stat
           label="Gone quiet"
@@ -291,13 +291,14 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         />
       </div>
 
-      {/* The forward figure, paired with Recovered below it: what the quiet
+      {/* The forward figure, paired with Recovered beside it: what the quiet
           half of the list is worth per month, against what casdey has pulled
           back so far. An estimate from the gym's own membership prices, shown
           on every tier (the size of the opportunity is never hidden) and
           deliberately set smaller than Recovered so it does not compete with
           the number the product is actually judged on. */}
-      <Card className="mt-4">
+      <div className="mt-4 grid items-start gap-4 xl:grid-cols-2">
+      <Card>
         <p className="label text-stone">Recurring revenue lapsed</p>
         {opportunity.priced && opportunity.lapsedMembers > 0 ? (
           <>
@@ -333,7 +334,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           of the page: it is the one number the whole product is judged on and
           the first thing anybody opens this page to see. */}
       {priced ? (
-        <Card className="mt-4">
+        <Card>
           <p className="label text-stone">Revenue recovered</p>
           <p className="literal mt-2 text-[2.5rem] leading-none font-medium text-[color-mix(in_srgb,var(--amber)_62%,var(--ink))]">
             {formatMoney(recovered.totalMinor, currency)}
@@ -388,7 +389,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           ) : null}
         </Card>
       ) : (
-        <Card className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <Card className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <CardTitle>See the money, not just the count</CardTitle>
             <p className="text-[0.9375rem] text-graphite">
@@ -402,6 +403,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           </ButtonLink>
         </Card>
       )}
+      </div>
 
       {/* Analytics. Each measure gets its own panel against its own scale:
           messages sent and members returned differ by an order of magnitude,

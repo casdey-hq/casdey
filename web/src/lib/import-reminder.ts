@@ -10,26 +10,43 @@ export type ImportRefreshReminder = {
   daysSinceImport: number;
 };
 
+export type ImportRefreshSchedule = {
+  daysSinceImport: number;
+  nextRefreshAt: Date;
+};
+
 function startOfUtcDay(date: Date): number {
   return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
 }
 
-/** Returns a dashboard reminder once the latest completed member import is a
- * month old. Date-only arithmetic means the wording does not flicker around
- * midnight depending on where the server happens to run. */
-export function importRefreshReminder(
+/** Calculate the next suggested refresh from the latest completed import.
+ * Date-only arithmetic keeps the schedule stable around midnight. */
+export function importRefreshSchedule(
   lastImportAt: string | null | undefined,
   now = new Date(),
-): ImportRefreshReminder | null {
+): ImportRefreshSchedule | null {
   if (!lastImportAt || Number.isNaN(now.getTime())) return null;
 
   const imported = new Date(lastImportAt);
-  if (Number.isNaN(imported.getTime())) return null;
+  if (Number.isNaN(imported.getTime()) || imported.getTime() > now.getTime()) return null;
 
   const daysSinceImport = Math.max(
     0,
     Math.floor((startOfUtcDay(now) - startOfUtcDay(imported)) / DAY),
   );
 
-  return daysSinceImport >= IMPORT_REFRESH_DAYS ? { daysSinceImport } : null;
+  return {
+    daysSinceImport,
+    nextRefreshAt: new Date(startOfUtcDay(imported) + IMPORT_REFRESH_DAYS * DAY),
+  };
+}
+
+export function importRefreshReminder(
+  lastImportAt: string | null | undefined,
+  now = new Date(),
+): ImportRefreshReminder | null {
+  const schedule = importRefreshSchedule(lastImportAt, now);
+  return schedule && schedule.daysSinceImport >= IMPORT_REFRESH_DAYS
+    ? { daysSinceImport: schedule.daysSinceImport }
+    : null;
 }
