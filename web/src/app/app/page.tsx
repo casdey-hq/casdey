@@ -77,6 +77,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
   // range can be linked to and survives a reload, and so the whole page is
   // still one server render.
   const range = RANGES.find((r) => String(r.weeks) === params.range) ?? RANGES[1];
+  const insights = params.view === "insights";
 
   // One wave, not five. Every read below needs only the gym id and the range,
   // both known here, so they fire together: a stack of round trips to a
@@ -162,6 +163,9 @@ export default async function DashboardPage(props: PageProps<"/app">) {
   );
 
   const currency = gymCurrency(gym);
+  const returnRate = Math.round((stats.returned / Math.max(stats.lapsed, 1)) * 100);
+  const orbitCircumference = 2 * Math.PI * 42;
+  const orbitOffset = orbitCircumference * (1 - Math.min(returnRate, 100) / 100);
 
   // Trial With Penalty (Track H). The evidence is exactly what the setup
   // checklist above already read, so this costs no extra queries.
@@ -240,9 +244,11 @@ export default async function DashboardPage(props: PageProps<"/app">) {
   return (
     <>
       <PageHeader
-        eyebrow="Overview"
+        eyebrow={insights ? "Insights" : "Overview"}
         title={gym.name}
-        lede={`Lapsed means ${describeRule(ruleFor(gym))}. Change that in settings.`}
+        lede={insights
+          ? "See how your outreach and returns have changed over time."
+          : `Lapsed means ${describeRule(ruleFor(gym))}. Change that in settings.`}
       />
 
       {/* Nothing links here any more (signup lands on ?welcome=1), so this is
@@ -302,6 +308,17 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         </div>
       ) : null}
 
+      <nav aria-label="Overview views" className="overview-views mb-7 flex gap-1 p-1">
+        <Link href="/app" aria-current={!insights ? "page" : undefined} className="overview-view-link">
+          Workspace
+        </Link>
+        <Link href="/app?view=insights" aria-current={insights ? "page" : undefined} className="overview-view-link">
+          Insights
+        </Link>
+      </nav>
+
+      {!insights ? <>
+
       <section aria-label="Next move" className="focus-panel overview-enter mb-5 flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex min-w-0 gap-4">
           <span className="focus-symbol" aria-hidden="true">↗</span>
@@ -322,15 +339,32 @@ export default async function DashboardPage(props: PageProps<"/app">) {
       <section aria-label="Recovery results" className="recovery-overview overview-enter overview-enter-1 grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
         {priced ? (
           <Card className="revenue-hero relative flex min-h-[17rem] flex-col justify-between overflow-hidden p-7 sm:p-8">
-            <div>
-              <p className="label text-stone">Revenue recovered</p>
-              <p className="literal mt-3 text-[3.25rem] leading-none font-semibold tracking-[-0.055em] text-teal sm:text-[4rem]">
-                {formatMoney(recovered.totalMinor, currency)}
-              </p>
-              <p className="mt-3 max-w-[52ch] text-[0.875rem] leading-relaxed text-graphite">
-                {recovered.bookings - recovered.unpriced}{" "}
-                {recovered.bookings - recovered.unpriced === 1 ? "booking" : "bookings"} won back, valued at the price of each service. This is recovered value, not an amount casdey has billed.
-              </p>
+            <div className="recovery-summary flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
+              <div>
+                <p className="label text-stone">Revenue recovered</p>
+                <p className="literal mt-3 text-[3.25rem] leading-none font-semibold tracking-[-0.055em] text-teal sm:text-[4rem]">
+                  {formatMoney(recovered.totalMinor, currency)}
+                </p>
+                <p className="mt-3 max-w-[46ch] text-[0.875rem] leading-relaxed text-graphite">
+                  {recovered.bookings - recovered.unpriced}{" "}
+                  {recovered.bookings - recovered.unpriced === 1 ? "booking" : "bookings"} won back, valued at the price of each service. This is recovered value, not an amount casdey has billed.
+                </p>
+              </div>
+              <div className="recovery-orbit shrink-0" aria-label={`${returnRate}% of members who went quiet have returned`}>
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <circle className="recovery-orbit-track" cx="50" cy="50" r="42" />
+                  <circle
+                    className="recovery-orbit-progress"
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    strokeDasharray={orbitCircumference}
+                    strokeDashoffset={orbitOffset}
+                  />
+                </svg>
+                <span className="literal">{returnRate}%</span>
+                <small>back</small>
+              </div>
             </div>
             <div className="mt-8 border-t border-ash pt-4">
               <div className="flex items-center justify-between gap-4 text-[0.8125rem]">
@@ -438,11 +472,21 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         </div>
       </section>
 
+      <Link href="/app?view=insights" className="insights-invite overview-enter overview-enter-3 mt-6 flex items-center justify-between gap-4 p-5 sm:p-6">
+        <span>
+          <span className="label text-teal">A closer look</span>
+          <span className="display mt-1 block text-[1.125rem] text-ink">Explore your trends</span>
+          <span className="mt-1 block text-[0.8125rem] text-graphite">Messages, returns and recovered value across time.</span>
+        </span>
+        <span className="insights-invite-arrow" aria-hidden="true">↗</span>
+      </Link>
+      </> : null}
+
       {/* Analytics. Each measure gets its own panel against its own scale:
           messages sent and members returned differ by an order of magnitude,
           and one chart with two y-axes would let the picture imply a
           relationship the data has not earned. */}
-      <section className="overview-enter overview-enter-3 mt-8">
+      {insights ? <section className="overview-enter overview-enter-1 mt-2">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="display text-[1.25rem]">{range.heading}</h2>
@@ -461,7 +505,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
                 <Link
                   key={option.weeks}
                   href={
-                    option.weeks === 12 ? "/app" : `/app?range=${option.weeks}`
+                    option.weeks === 12 ? "/app?view=insights" : `/app?view=insights&range=${option.weeks}`
                   }
                   aria-current={active ? "page" : undefined}
                   className={`rounded-md border px-3 py-1.5 text-[0.8125rem] font-medium transition-colors duration-150 ${
@@ -621,8 +665,9 @@ export default async function DashboardPage(props: PageProps<"/app">) {
             />
           </Card>
         </div>
-      </section>
+      </section> : null}
 
+      {!insights ? <>
       {returned ? (
         <Card className="mt-6">
           <CardTitle>Most recent return</CardTitle>
@@ -655,6 +700,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           checklist this does not disappear when setup is complete: a gym mid
           free week still needs to know what day 7 does and how to opt out. */}
       {trialPanel ? <div className="mt-6">{trialPanel}</div> : null}
+      </> : null}
     </>
   );
 }

@@ -5,7 +5,7 @@ import { CommandMenu } from "@/components/app/command-menu";
 import { IconSignOut } from "@/components/app/icons";
 import { Logo } from "@/components/wordmark";
 import { cookies } from "next/headers";
-import { Geist } from "next/font/google";
+import { Manrope } from "next/font/google";
 
 import { getGymContext } from "@/lib/dal";
 import { BillingBanner } from "@/components/app/billing-banner";
@@ -16,9 +16,10 @@ import { supportThreadForGym } from "@/lib/support";
 
 import "@/styles/product.css";
 
-// A crisp, high-contrast product face. Marketing and the Outfit wordmark keep
-// their own typography; this file loads only in the signed-in workspace.
-const productFont = Geist({
+// A compact, neutral product face with a little more warmth than a system
+// default. Marketing and the Outfit wordmark keep their own typography; this
+// file loads only in the signed-in workspace.
+const productFont = Manrope({
   variable: "--font-product",
   subsets: ["latin"],
   display: "swap",

@@ -20,20 +20,20 @@
 @layer components {
   .product-workspace {
     background: var(--paper);
-    font-family: var(--font-product), system-ui, sans-serif;
+    font-family: var(--font-product), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-size: 15px;
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
   .product-workspace .display {
-    font-family: var(--font-product), system-ui, sans-serif;
+    font-family: var(--font-product), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-weight: 700;
-    letter-spacing: -0.045em;
-    line-height: 1.12;
+    letter-spacing: -0.055em;
+    line-height: 1.08;
   }
 
   .product-workspace .literal {
-    font-family: var(--font-product), system-ui, sans-serif;
+    font-family: var(--font-product), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.035em;
   }
@@ -180,12 +180,43 @@
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 14%, transparent);
   }
 
-  .workspace-content > .page-enter {
-    margin-bottom: 1.5rem;
+  .page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 0;
   }
 
-  .workspace-content > .page-enter h1 {
+  .page-header h1 {
     letter-spacing: -0.05em;
+  }
+
+  .page-header > div:last-child {
+    align-self: center;
+  }
+
+  .overview-views {
+    width: fit-content;
+    border: 1px solid var(--ash);
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--white) 60%, transparent);
+  }
+
+  .overview-view-link {
+    border-radius: 7px;
+    padding: 0.375rem 0.7rem;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    color: var(--stone);
+    transition: background-color 180ms ease, color 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .overview-view-link:hover {
+    color: var(--ink);
+  }
+
+  .overview-view-link[aria-current="page"] {
+    background: var(--white);
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.18);
+    color: var(--ink);
   }
 
   @media (max-width: 767px) {
@@ -252,6 +283,36 @@
   }
 
   .focus-action:hover span {
+    transform: translate(2px, -2px);
+  }
+
+  .insights-invite {
+    border: 1px solid var(--ash);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--white) 74%, var(--paper));
+    transition: border-color 180ms ease, background-color 180ms ease, transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .insights-invite:hover {
+    border-color: color-mix(in srgb, var(--teal) 42%, var(--ash));
+    background: var(--white);
+    transform: translateY(-2px);
+  }
+
+  .insights-invite-arrow {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex: none;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--shallow);
+    color: var(--teal);
+    font-size: 1.25rem;
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .insights-invite:hover .insights-invite-arrow {
     transform: translate(2px, -2px);
   }
 
@@ -351,6 +412,55 @@
     background: #303238;
   }
 
+  .recovery-orbit {
+    position: relative;
+    display: grid;
+    width: 6.75rem;
+    height: 6.75rem;
+    place-content: center;
+    text-align: center;
+  }
+
+  .recovery-orbit svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  .recovery-orbit circle {
+    fill: none;
+    stroke-width: 5;
+  }
+
+  .recovery-orbit-track {
+    stroke: color-mix(in srgb, var(--ash) 75%, transparent);
+  }
+
+  .recovery-orbit-progress {
+    stroke: var(--teal-bright);
+    stroke-linecap: round;
+    transform-origin: center;
+    animation: orbit-reveal 850ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
+  }
+
+  .recovery-orbit > span {
+    position: relative;
+    font-size: 1.3rem;
+    font-weight: 750;
+    letter-spacing: -0.06em;
+    color: var(--ink);
+  }
+
+  .recovery-orbit > small {
+    position: relative;
+    margin-top: -0.15rem;
+    font-size: 0.6875rem;
+    font-weight: 650;
+    color: var(--stone);
+  }
+
   .revenue-hero::after {
     content: "";
     position: absolute;
@@ -397,6 +507,10 @@
   @keyframes recovery-grow {
     from { transform: scaleX(0); }
     to { transform: scaleX(1); }
+  }
+
+  @keyframes orbit-reveal {
+    from { stroke-dashoffset: 264; }
   }
 
   @keyframes path-arrive {
@@ -587,7 +701,7 @@
 /* globals.css declares theme tokens outside a layer. Product tokens must be
    equally unlayered or the global dark values win regardless of specificity. */
 .product-workspace[data-theme="dark"] {
-  --paper: #121317;
+  --paper: #09090a;
   --white: #292b30;
   --mist: #34363c;
   --ash: #45474e;
