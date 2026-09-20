@@ -490,8 +490,10 @@ content lifts cold outreach (pg 114), hold the cadence or do not start it
 (pg 145); $100M Offers / Perceived Likelihood
 Decision: the 100-day Instagram cadence committed on 2026-09-13 is **retired
 after 4 posts**. Instagram is set aside until casdey is bigger. What remains
-is **three pinned posts**, whose only job is that a gym owner who gets a cold
-email and checks the profile finds something real (pg 114). Cold email is the
+is **two pinned posts**, whose only job is that a gym owner who gets a cold
+email and checks the profile finds something real (pg 114): the demo reel
+already published, and one saying plainly what casdey does. A third, an offer
+post stating the prices and the guarantee, was made and rejected the same day. Cold email is the
 single channel. The pipeline is left working and unchanged so a cadence could
 restart without rebuilding anything; `/admin` stops asking for batches behind
 `IG_CADENCE_RETIRED`.

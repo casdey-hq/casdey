@@ -1,6 +1,6 @@
 {
   "batch": "pinned",
-  "note": "The three pinned posts, not part of the retired 100-day cadence (see content-plan.md). Their only reader is a gym owner who got a cold email and is checking whether casdey is real, so the brief is credibility, not reach. 002 (the demo reel, already published) is the third. Single images, one slide each, so no progress bar and no swipe cue.",
+  "note": "The pinned posts, not part of the retired 100-day cadence (see content-plan.md). Their only reader is a gym owner who got a cold email and is checking whether casdey is real before replying, so the brief is credibility, not reach. There are two: this one, and 002 (the demo reel, already published). A third, an offer post on the dark plane, was made and rejected by Davide on 2026-09-20. Single image, one slide, so no progress bar and no swipe cue.",
   "posts": [
     {
       "id": "005",
@@ -16,21 +16,6 @@
         }
       ],
       "caption": "Every gym has them: the members who quietly stopped showing up and then stopped paying. Most never get asked to come back, because nobody has the time to write to two hundred people one at a time.\n\nThat's the whole job casdey does, in your gym's name, not ours.\n\n#gymowner #fitnessbusiness #memberretention #gymsoftware"
-    },
-    {
-      "id": "006",
-      "pillar": "Pinned",
-      "format": "Image",
-      "status": "Draft",
-      "slides": [
-        {
-          "type": "cta",
-          "eyebrow": "What it costs",
-          "title": "The first week is [[1 euro]].",
-          "body": "After that it's €99 a month, or €289 for the full thing with WhatsApp. Start now and 20% comes off for life.\n\nCancel during the week and you pay nothing more: you keep the free plan, import your list and see who lapsed, for as long as you like.\n\nOn Pro, if casdey recovers less than it charged you, you refund yourself in one click. No review, no argument."
-        }
-      ],
-      "caption": "No demo to sit through and no call to book. A euro, seven days, and you see it working on your own members or you don't.\n\nPrices are in euros, dollars and pounds. The price you see is the price you pay, we don't add VAT.\n\ncasdey.com\n\n#gymowner #fitnessbusiness #gymsoftware"
     }
   ]
 }

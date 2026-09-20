@@ -1,9 +1,11 @@
 # casdey content plan: Instagram, 100 days
 
 > **RETIRED 2026-09-20, after 4 posts. Davide's call.** The cadence is over and
-> Instagram is set aside until casdey is bigger. What remains is **three pinned
+> Instagram is set aside until casdey is bigger. What remains is **two pinned
 > posts**, so a gym owner who gets a cold email and checks the profile finds
-> something real (*$100M Leads* pg 114). Everything below is kept as the record
+> something real (*$100M Leads* pg 114): 002, the demo reel, and 005, what
+> casdey does. A third, an offer post on the dark plane, was made and rejected
+> on 2026-09-20. Everything below is kept as the record
 > of how it was built and what was learned, not as instructions to follow.
 >
 > **Why, in one line:** the posts were weak for reasons better tooling cannot
