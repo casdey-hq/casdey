@@ -35,7 +35,7 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 |---|---|---|---|
 | 1 | Personal Notion connection | set aside | Discuss separately with Claude later. |
 | 2 | One live place for everything | done, live | `/admin` is casdey HQ, now with six tabs. See the notes below. |
-| 3 | US market | blocked on mailbox | US signup, USD billing and pricing are live. US outreach changes are held locally; sending stays off while Davide waits for the Arlington mailbox provider's response about USPS Form 1583. |
+| 3 | US market | blocked on mailbox | US signup, USD billing and pricing are live. The outreach switch is **built and deliberately off** (`.claude/skills/gym-outreach/SKILL.md`, "The US switch", on branch `gym-outreach-automation`); sending stays off while Davide waits for the Arlington mailbox provider's response about USPS Form 1583. |
 | 4 | To-dos section | done, live | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
 | 5 | Professional product UI | next | Start the larger visual redesign. |
 | 6 | Independent check-in timing | done, live | Check-in timing no longer has to be below the lapse window. |
