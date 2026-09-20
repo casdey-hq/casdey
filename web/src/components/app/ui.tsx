@@ -20,7 +20,7 @@ export function PageHeader({
 }) {
   return (
     <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 w-full sm:min-w-[20rem] sm:flex-1">
         {eyebrow ? <p className="label mb-2 text-teal">{eyebrow}</p> : null}
         <h1 className="display max-w-[30ch] text-[1.75rem] sm:text-[2rem]">
           {title}
@@ -34,7 +34,7 @@ export function PageHeader({
           </p>
         ) : null}
       </div>
-      {actions ? <div className="flex gap-2">{actions}</div> : null}
+      {actions ? <div className="flex w-full gap-2 sm:w-auto">{actions}</div> : null}
     </header>
   );
 }
