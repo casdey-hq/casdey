@@ -170,15 +170,20 @@ its actions up and start, not just a headline a human would nod at.
    - **Stripe** (live key, `STRIPE_SECRET_KEY_LIVE`): active/trialing
      subscription counts and an approximate MRR (price unit amount,
      annual ÷ 12, coupon applied — approximate, not the accounting figure).
-     **Cross-check this against the DB's `is_internal` flag before reporting
-     it as real MRR.** Stripe has no concept of an internal test gym, so an
-     active internal subscription (e.g. a stress-test account, or one left
-     running past a walkthrough) inflates the raw Stripe number silently.
-     Seen live on 2026-09-11: Stripe reported 1 active sub / ~€99 MRR while
-     the DB's paying count (which excludes `is_internal`) read 0 — that one
-     sub was the internal "Test Admin" gym, not a customer. State the real
-     (non-internal) paying count from the DB as the headline figure, and
-     mention the Stripe total only as a footnote when it disagrees.
+     **`mrrMinor` is already the real figure** (2026-09-20): the script joins
+     each live subscription to its gym row and excludes `is_internal` ones,
+     the same way `src/lib/admin-stats.ts` `mrr()` does, reporting what they
+     bill separately as `internalMrrMinor`. Report `mrrMinor` as MRR; mention
+     `internalMrrMinor` only if someone would otherwise wonder where a Stripe
+     dashboard number went. Why it exists: Stripe has no concept of an
+     internal test gym, so a stress-test or walkthrough subscription is
+     indistinguishable there from a customer. It read ~€99 of "MRR" against 0
+     paying gyms every week from 2026-09-11 (the internal "Test Admin" gym,
+     whose subscription is set to end 2026-10-07) until this was fixed, and
+     it needed a manual footnote every single run to stay honest.
+     `realSubscriptions` counting above 0 while the DB's paying count reads 0
+     is now the thing to question: it means a live subscription matched no
+     gym row at all.
    - **PostHog** (cookieless, EU): 7-day visitors + pageviews via the same
      HogQL host-rewrite `posthog-query.ts` uses (`NEXT_PUBLIC_POSTHOG_HOST`
      with `.i.posthog.com` → `.posthog.com`, `POSTHOG_PROJECT_ID` +

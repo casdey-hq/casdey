@@ -54,7 +54,9 @@ async function supabaseSnapshot() {
   try {
     const { data: gyms, error: gymsError } = await supabase
       .from("gyms")
-      .select("id, is_internal, subscription_status, trial_ends_at, plan_tier, created_at");
+      .select(
+        "id, is_internal, subscription_status, trial_ends_at, plan_tier, created_at, stripe_subscription_id, stripe_customer_id",
+      );
     if (gymsError) throw new Error(`gyms: ${gymsError.message}`);
 
     const now = Date.now();
@@ -124,18 +126,36 @@ async function supabaseSnapshot() {
       .select("id", { count: "exact", head: true });
     if (waitlistError) throw new Error(`waitlist: ${waitlistError.message}`);
 
-    return { gyms: gymTotals, product: productTotals, waitlist: waitlistCount ?? 0 };
+    const internal = gyms.filter((g) => g.is_internal);
+    return {
+      gyms: gymTotals,
+      product: productTotals,
+      waitlist: waitlistCount ?? 0,
+      internalStripe: {
+        subscriptionIds: internal.map((g) => g.stripe_subscription_id).filter(Boolean),
+        customerIds: internal.map((g) => g.stripe_customer_id).filter(Boolean),
+      },
+    };
   } catch (e) {
     return { error: `Supabase REST query failed: ${e.message}` };
   }
 }
 
 // ---------- Stripe (live) ----------
+/**
+ * Returns one row per billing subscription rather than a single pre-summed
+ * MRR, because Stripe has no concept of an internal test gym: an active
+ * stress-test or walkthrough subscription is indistinguishable there from a
+ * customer. The exclusion can only be made once the gym rows say which
+ * subscriptions are internal (gyms.is_internal, migration 0035), so the sum
+ * happens at assembly time below, the same way src/lib/admin-stats.ts
+ * mrr() starts from the non-internal gyms rather than from Stripe.
+ */
 async function stripeSnapshot() {
   const key = env("STRIPE_SECRET_KEY_LIVE") ?? env("STRIPE_SECRET_KEY");
   if (!key) return null;
   const auth = { Authorization: `Bearer ${key}` };
-  let mrrMinor = 0;
+  const subscriptions = [];
   const statusCounts = {};
   let startingAfter;
   let guard = 0;
@@ -151,18 +171,24 @@ async function stripeSnapshot() {
       statusCounts[sub.status] = (statusCounts[sub.status] ?? 0) + 1;
       if (sub.status !== "active" && sub.status !== "trialing") continue;
       const percentOff = sub.discount?.coupon?.percent_off ?? 0;
+      let monthlyMinor = 0;
       for (const item of sub.items.data) {
         const perMonth =
           item.price.recurring.interval === "year"
             ? item.price.unit_amount / 12
             : item.price.unit_amount;
-        mrrMinor += perMonth * item.quantity * (1 - percentOff / 100);
+        monthlyMinor += perMonth * item.quantity * (1 - percentOff / 100);
       }
+      subscriptions.push({
+        id: sub.id,
+        customer: typeof sub.customer === "string" ? sub.customer : sub.customer?.id,
+        monthlyMinor: Math.round(monthlyMinor),
+      });
     }
     startingAfter = res.has_more ? res.data.at(-1)?.id : undefined;
     guard += 1;
   } while (startingAfter && guard < 10);
-  return { mrrMinor: Math.round(mrrMinor), statusCounts };
+  return { subscriptions, statusCounts };
 }
 
 // ---------- PostHog (last 7 days) ----------
@@ -204,6 +230,31 @@ const [supabase, stripe, traffic] = await Promise.all([
   postHogSnapshot(),
 ]);
 
+/* Split the live subscriptions into real and internal. mrrMinor is the real
+   figure, the one safe to report as MRR; internalMrrMinor is what a
+   stress-test or walkthrough account is still billing, kept visible so it
+   cannot quietly inflate the headline (it read EUR 99 of "MRR" against 0
+   paying gyms every week until 2026-09-20). A subscription whose customer
+   matches no gym row counts as real and is flagged, so an unmatched one is
+   investigated rather than silently dropped. */
+let stripeSummary = stripe;
+if (stripe?.subscriptions) {
+  const internalSubs = new Set(supabase.internalStripe?.subscriptionIds ?? []);
+  const internalCustomers = new Set(supabase.internalStripe?.customerIds ?? []);
+  const isInternal = (sub) =>
+    internalSubs.has(sub.id) || (sub.customer && internalCustomers.has(sub.customer));
+  const sum = (rows) => rows.reduce((total, sub) => total + sub.monthlyMinor, 0);
+  const internal = stripe.subscriptions.filter(isInternal);
+  const real = stripe.subscriptions.filter((sub) => !isInternal(sub));
+  stripeSummary = {
+    mrrMinor: sum(real),
+    internalMrrMinor: sum(internal),
+    realSubscriptions: real.length,
+    internalSubscriptions: internal.length,
+    statusCounts: stripe.statusCounts,
+  };
+}
+
 console.log(
   JSON.stringify(
     {
@@ -211,7 +262,7 @@ console.log(
       product: supabase.product ?? null,
       waitlist: supabase.waitlist ?? null,
       supabaseError: supabase.error ?? null,
-      stripe,
+      stripe: stripeSummary,
       traffic,
     },
     null,
