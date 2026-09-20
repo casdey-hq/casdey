@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { IMPORT_REFRESH_DAYS, importRefreshReminder } from "./import-reminder";
+import { IMPORT_REFRESH_DAYS, importRefreshReminder, importRefreshSchedule } from "./import-reminder";
 
 describe("importRefreshReminder", () => {
   const today = new Date("2026-09-19T10:00:00.000Z");
@@ -18,5 +18,16 @@ describe("importRefreshReminder", () => {
     });
     expect(importRefreshReminder("not-a-date", today)).toBeNull();
     expect(importRefreshReminder("2026-09-20T10:00:00.000Z", today)).toBeNull();
+  });
+});
+
+describe("importRefreshSchedule", () => {
+  it("shows the suggested date before a reminder is due", () => {
+    expect(importRefreshSchedule("2026-09-01T22:00:00.000Z", new Date("2026-09-20T10:00:00.000Z"))).toEqual({
+      daysSinceImport: 19,
+      nextRefreshAt: new Date("2026-09-29T00:00:00.000Z"),
+    });
+    expect(importRefreshSchedule("invalid", new Date("2026-09-20T10:00:00.000Z"))).toBeNull();
+    expect(importRefreshSchedule("2026-09-21T10:00:00.000Z", new Date("2026-09-20T10:00:00.000Z"))).toBeNull();
   });
 });

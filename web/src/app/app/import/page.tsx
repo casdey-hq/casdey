@@ -2,9 +2,10 @@ import { requireGym } from "@/lib/dal";
 import { dateOrderFor } from "@/lib/countries";
 import { ImportWizard } from "@/components/app/import-wizard";
 import { ProcessingAgreement } from "./agreement";
-import { Card, PageHeader } from "@/components/app/ui";
+import { Card, PageHeader, formatDate } from "@/components/app/ui";
 import { PastImports } from "./past-imports";
 import { mindbodySource } from "@/lib/ingestion/mindbody";
+import { IMPORT_REFRESH_DAYS, importRefreshSchedule } from "@/lib/import-reminder";
 import type { ImportRun } from "@/lib/types";
 
 export const metadata = { title: "Import members" };
@@ -181,6 +182,9 @@ export default async function ImportPage() {
     .limit(200);
 
   const runs = (data ?? []) as ImportRun[];
+  const latestCompleted = runs.find((run) => run.status === "completed");
+  const refresh = importRefreshSchedule(latestCompleted?.created_at);
+  const refreshDue = refresh !== null && refresh.daysSinceImport >= IMPORT_REFRESH_DAYS;
 
   return (
     <>
@@ -189,6 +193,31 @@ export default async function ImportPage() {
         title="Bring your member list in"
         lede="casdey reads a CSV export from any gym software. Your list stays in the EU and is never shared with anyone."
       />
+
+      {refresh && latestCompleted && (
+        <Card className="mb-6 border-l-4 border-l-teal">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[0.75rem] font-semibold uppercase tracking-[0.1em] text-teal">
+                Keeping your list current
+              </p>
+              <h2 className="display mt-1 text-[1.25rem]">
+                {refreshDue ? "Time for a fresh member export" : "Refresh your member list every 4 weeks"}
+              </h2>
+            </div>
+            <span className={refreshDue ? "pill pill-teal" : "pill pill-quiet"}>
+              {refreshDue ? "Refresh due" : `Next refresh ${formatDate(refresh.nextRefreshAt)}`}
+            </span>
+          </div>
+          <p className="mt-3 max-w-[48rem] text-[0.9375rem] text-graphite">
+            Your last successful import was {formatDate(latestCompleted.created_at)}.
+            {refreshDue
+              ? " Export your full member list again and upload it below so visits and cancellations stay current."
+              : " Export your full member list again around the suggested date so visits and cancellations stay current."}
+            {" "}Repeat imports update existing members instead of adding duplicates.
+          </p>
+        </Card>
+      )}
 
       {/* Importing and seeing who is lapsed is open to every plan, including
           Free. Sending is where a paid plan is required, and that gate lives on
