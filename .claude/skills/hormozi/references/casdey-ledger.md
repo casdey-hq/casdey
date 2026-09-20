@@ -427,3 +427,58 @@ a post history a stranger can land on), or cold email genuinely saturating. If i
 restarts, it restarts as a second touch to gyms already emailed, at about 5 a day,
 which is Hormozi's "follow up more times, more ways" (pg 174-175), not as a second
 cold first-touch channel competing with email for the same hour.
+
+## 2026-09-20 — Sunday sanity check: the diagnosis holds, Instagram has gone dormant by accident, and the paying-gyms goal now lives in three conversations
+Framework: $100M Leads / constraint sequencing, More-Better-New, Rule of 100
+(the consistency half), "100 conversations or 10,000 emails before tweaking"
+(pg 171), "2 to 3 conversations before a close" (pg 171), Post Free Content
+cadence (pg 145); $100M Offers / Value Equation (Perceived Likelihood)
+Decision: a re-confirmation run rather than a new direction. Davide asked
+whether what casdey is doing still makes sense. It does, and nothing from the
+2026-09-10 diagnosis is reversed. Four findings worth not rediscovering:
+
+1. **The constraint is still leads, and volume is still the answer.** Since
+   2026-09-10 contacted went 730 to 1,393, genuine replies 13 to 20 (1.44%),
+   engaged leads 1 to 3 (0.11% to 0.22%), paying gyms 0 to 0. The engaged rate
+   doubled while volume doubled. At about 3,100 sends and **3 conversations**
+   casdey is nowhere near the pg 171 threshold that earns the right to tweak
+   the offer or the money model, so More stays the move and the offer stays
+   shut.
+2. **A tempting misreading, recorded so it is not made later: it is not
+   "0 of 3 engaged leads activated".** Yantra replied 2026-09-16 and CrossFit
+   Kreis 9 said yes on 2026-09-20; neither has had time. Only **BodyActive**
+   has had a real chance and did not take it, twelve days after saying yes,
+   through a done-for-you offer, a written export guide, a trial extension and
+   a no-showed call. That is the 2026-09-10 finding repeating once, not a new
+   pattern. The standing fact underneath it is still the uncomfortable one:
+   **no gym has ever imported a member list**, so casdey has never run on real
+   data and Perceived Likelihood is still a structural zero.
+3. **Instagram has quietly exited as a channel, which nobody decided.** Two
+   sound decisions combined into a third nobody made: the DM pause of
+   2026-09-20 set its restart condition as "a believable Instagram presence",
+   and content stopped on 2026-09-18 at day 3 of 100 with no batch drafted. So
+   the thing meant to unblock the paused channel is itself stopped. The
+   2026-09-13 entry pre-registered exactly this as its own invalidating
+   condition, quoting pg 145: a burst that ends when the week gets busy is
+   worth nothing. Flagged here, decided separately.
+4. **The Rule of 100 is about consistency and it broke for two days.** No
+   sends on 2026-09-17 or 2026-09-18 when the weekly Claude usage ran out,
+   which is why the week's first touches were 467 rather than about 700. The
+   week's 1% engaged-leads goal was therefore missed (0.43%) on a denominator
+   a third short, and was re-set unchanged for the week ending 2026-09-27.
+
+**The goal call.** 2 paying gyms by 2026-10-13 is **kept**, Davide's call,
+made in full view of the arithmetic: 23 days, 0 paying, and no engaged lead
+has ever converted. The point recorded for whoever reads this next is that the
+goal no longer routes through the engaged-lead rate, because leads arriving in
+October cannot pay by the 13th. It lives entirely in the three conversations
+already in hand, which is pg 171's "2 to 3 conversations before a close", and
+none of them has been worked to one. The post-yes playbook written on
+2026-09-13 has never been used because there was nobody to use it on.
+Follows or diverges: **Follows.** No divergence introduced. The accepted ones
+(cold instead of warm, no cold calls, no setup fee, content as channel #2)
+all stand unchanged.
+Reason: numbers pulled live on 2026-09-20 from the `Casdey-Gym-Leads` sheet,
+the production database and Stripe during the Sunday review. Actions agreed:
+work the three live leads to a close, clear the Arlington mailbox blocker on
+the US switch, and resolve Instagram content either way.
