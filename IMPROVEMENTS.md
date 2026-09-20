@@ -27,14 +27,29 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 
 **Davide's priority (2026-09-19):** #3 first (the gym outreach routine is struggling to find leads, and the US is the biggest market), then #2 and #4 together (#4 depends on #2).
 
+**Current focus (2026-09-20):** #5 (product UI) and #17 (incorrect project information). #1 is a separate discussion for later. #3 waits for the Arlington mailbox provider's response before US outreach can go live.
+
 ## Board
 
 | # | Item | Status | Notes |
 |---|---|---|---|
-| 3 | US market | in progress | priority 1. Decisions (2026-09-19): **$99 / $299** a month; **all 100 first-touch emails a day go to the US** once live; postal address for US law (CAN-SPAM) decided later, and **US sending stays off until it exists**; Instagram DMs to the US later, after a separate discussion. **Product side built 2026-09-19** (see below). |
-| 2 | One live place for everything | done 2026-09-19, live | `/admin` is casdey HQ, four tabs. See the notes below. |
-| 4 | To-dos section | done 2026-09-19, live | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
-| 1, 5–17 | the rest | open | order to be agreed |
+| 1 | Personal Notion connection | set aside | Discuss separately with Claude later. |
+| 2 | One live place for everything | done, live | `/admin` is casdey HQ, now with six tabs. See the notes below. |
+| 3 | US market | blocked on mailbox | US signup, USD billing and pricing are live. US outreach changes are held locally; sending stays off while Davide waits for the Arlington mailbox provider's response about USPS Form 1583. |
+| 4 | To-dos section | done, live | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
+| 5 | Professional product UI | next | Start the larger visual redesign. |
+| 6 | Independent check-in timing | done, live | Check-in timing no longer has to be below the lapse window. |
+| 7 | Import export guides | done, live | LegitFit support link corrected; vendor export steps are expandable. |
+| 8 | WhatsApp and sending-domain guides | done, live | Setup guides are present and recede after configuration. Actual WhatsApp sending still needs its approved sender and template. |
+| 9 | Clear save errors | done for reported cases, live | Form validation explains missing information, including a blank new service. Provider failures can still need a retry. |
+| 10 | Booking clarity | done, live | Setup and booking flow explained; the calendar has a direct Google Calendar fallback. |
+| 11 | Cancellation reasons | done, live | Setup and member association explained; saved reasons card offers Close. |
+| 12 | Page-by-page review | in progress | First pass fixed Overview labels and layout, Members search, and phone-width page headers; the wider review continues with #5. |
+| 13 | Permanent internal plans | done, live | Davide's account has Standard and info@casdey.com has Pro independent of the cancelled Stripe subscription. |
+| 14 | Lapsed recurring revenue | done, live | Estimate uses recurring membership prices and the gym's membership mix when counts are supplied. |
+| 15 | Repeat CSV imports | done | Overview warns after four weeks; Import also shows the next suggested refresh date or a due state. |
+| 16 | Live support | done, live | Gym chat, email notification, and the sixth `/admin` Support tab are shipped. |
+| 17 | Incorrect project information | next | Audit and correct stale project facts alongside #5. |
 
 ## #3 US market, working notes
 
@@ -53,8 +68,8 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 **Still open, in order:**
 1. ~~Live Stripe USD prices and the four `STRIPE_PRICE_*_USD_*` vars in Vercel.~~ **Done 2026-09-19**: created with `npm run setup:stripe -- --live` (the eight existing prices untouched), set in Vercel Production and Preview, deployed.
 2. ~~Campaign send time.~~ **Built 2026-09-19**: a gym's campaign email only leaves between 8am and 8pm in its own timezone (`src/lib/send-window.ts`), and the drain now runs at 03, 08, 13, 16 and 19 UTC (`web/vercel.json`), so every zone a gym can pick gets a daytime run. The trial job still runs once, on the 03:00 schedule only. Tested in `send-window.test.ts` and `sender.test.ts`, including a mutation check that the drain does not stop on a first page full of one resting gym.
-3. The postal address for CAN-SPAM (Davide, decided later). Gates everything below.
-4. The outreach routine: US-only sourcing (big metros, CrossFit boxes and boutique studios first), a Country column in the Leads sheet, US emails scheduled for about 9am local with Resend's `scheduled_at`, the postal address and opt-out line on US emails. Europe keeps running until this is switched on; EU leads already contacted still get their follow-ups.
+3. The Arlington mailbox is paid for, but USPS Form 1583 still needs to clear. Davide is waiting for the mailbox provider's response about the identity documents before the address can be used. This gates US sending.
+4. The US outreach switch has been built locally and is held off production. The intended routine is US-only first touches (big metros, CrossFit boxes and boutique studios first), a Country column in the Leads sheet, US emails scheduled for about 9am local with Resend's `scheduled_at`, the postal address and opt-out line on US emails. Europe keeps running until the switch is enabled; EU leads already contacted still get their follow-ups.
 5. Import guides for US gym software (Mindbody, PushPress, Wodify, Zen Planner, ABC Glofox), which overlaps with item #7.
 6. Known and accepted for now: US gyms text members by SMS, not WhatsApp, so Pro's WhatsApp channel is worth less there. Email is the core product.
 
@@ -72,7 +87,7 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
   - Inputs collaboration (where we work together): Improving the software; Improving the marketing side system; Reasoning on what to improve
 
 **Built 2026-09-19:**
-- `/admin` has four tabs. **Overview**: to-dos, goals with live progress, the latest Sunday analysis, who does what. **Numbers**: the previous `/admin`, unchanged. **Marketing**: outreach, this week's cohort, the weekly test review and its history, Instagram, the plan (editable). **Business**: where it stands, the offer (editable), prices from the checkout's catalogue in all three currencies, per-gym economics, cost lines, break-even.
+- `/admin` has six tabs. **Overview**: to-dos, goals with live progress, who does what. **Numbers**: the previous `/admin`. **Marketing**: outreach, the weekly test review and its history, Instagram, the plan (editable). **Business**: the offer, prices from the checkout's catalogue in all three currencies, per-gym economics, cost lines, break-even. **Check-up**: Sunday analyses and proposals. **Support**: gym conversations and feedback.
 - Migration `0041_hq.sql` (applied live): `hq_notes`, `hq_todos`, `hq_goals`, `hq_inputs`, `hq_costs`, readable and writable by the server only.
 - `npm run hq` (`web/scripts/hq.mjs`) writes all of it from a session or the Sunday routine; `npm run hq -- summary` prints it for any agent starting a session.
 - Seeded from the old sources: Davide's inputs verbatim, the two current goals, the marketing plan verbatim, the offer (updated for the US and the VAT line), the cost lines, and the HQ doc's open items as to-dos.
