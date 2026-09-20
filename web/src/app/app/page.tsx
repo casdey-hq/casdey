@@ -266,7 +266,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           went quiet. Opportunity stays visible but subordinate. */}
       <section aria-label="Recovery results" className="recovery-overview overview-enter overview-enter-1 grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
         {priced ? (
-          <Card className="revenue-hero on-deep relative flex min-h-[17rem] flex-col justify-between overflow-hidden p-7 sm:p-8">
+          <Card className="revenue-hero relative flex min-h-[17rem] flex-col justify-between overflow-hidden p-7 sm:p-8">
             <div>
               <p className="label text-stone">Revenue recovered</p>
               <p className="literal mt-3 text-[3.25rem] leading-none font-semibold tracking-[-0.055em] text-teal sm:text-[4rem]">

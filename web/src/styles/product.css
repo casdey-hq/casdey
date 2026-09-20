@@ -3,12 +3,12 @@
  *
  * Imported by the signed-in app, the login page and the unsubscribe page. It is
  * never imported by the landing page or the waitlist, so nothing here can shift
- * a pixel on either. It defines no colours of its own: every value is a token
- * from globals.css, which mirrors brand assets/casdey-brand-guide.html.
+ * a pixel on either. It starts from the tokens in globals.css, then adds small
+ * product-only dark surface adjustments so cards remain distinct from the page.
  *
  * Rules carried over from the guide:
  *   - Three planes. White is the workspace, Chalk is the navigation rail, and
- *     Deep is reserved for the recovered-revenue result.
+ *     cards are distinguished by a quiet edge and measured depth.
  *   - Amber marks a returned member and nothing else. It is never a button and
  *     never a background.
  *   - Transform and opacity only, 200ms, cubic-bezier(.22,1,.36,1).
@@ -19,9 +19,17 @@
 
 @layer components {
   .product-workspace {
+    background: var(--white);
     font-family: var(--font-product), system-ui, sans-serif;
     font-size: 15px;
     line-height: 1.5;
+  }
+
+  .product-workspace[data-theme="dark"] {
+    --white: #1b1b1d;
+    --mist: #242426;
+    --ash: #39393d;
+    background: var(--paper);
   }
 
   .product-workspace .display {
@@ -45,11 +53,76 @@
     border-right: 1px solid var(--ash);
   }
 
+  .product-workspace[data-theme="dark"] .app-sidebar {
+    background: #121214;
+  }
+
   .workspace-identity {
     background: var(--white);
     border: 1px solid var(--ash);
     border-radius: 11px;
     padding: 0.75rem 0.875rem;
+  }
+
+  .command-trigger {
+    border: 1px solid var(--ash);
+    border-radius: 9px;
+    background: var(--white);
+    transition:
+      border-color 180ms ease,
+      transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .command-trigger:hover {
+    border-color: var(--stone);
+    transform: translateY(-1px);
+  }
+
+  .command-trigger kbd {
+    border: 1px solid var(--ash);
+    border-radius: 5px;
+    padding: 0.125rem 0.35rem;
+  }
+
+  .command-dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(34rem, calc(100vw - 2rem));
+    max-height: calc(100dvh - 3rem);
+    overflow: hidden;
+    border: 1px solid var(--ash);
+    border-radius: 16px;
+    background: var(--white);
+    color: var(--ink);
+    box-shadow: var(--shadow-float);
+  }
+
+  .command-dialog[open] {
+    animation: workspace-enter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .command-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.46);
+    backdrop-filter: blur(3px);
+  }
+
+  .command-search:focus-within {
+    border-color: var(--teal);
+  }
+
+  .command-item {
+    transition:
+      background-color 160ms ease,
+      color 160ms ease,
+      transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .command-item:hover,
+  .command-item-active {
+    background: var(--mist);
+    color: var(--ink);
+    transform: translateX(2px);
   }
 
   .app-nav-link {
@@ -109,7 +182,11 @@
   .product-workspace .card {
     border-color: var(--ash);
     border-radius: 16px;
-    box-shadow: none;
+    box-shadow: 0 1px 2px rgba(21, 21, 15, 0.035), 0 8px 24px rgba(21, 21, 15, 0.035);
+  }
+
+  .product-workspace[data-theme="dark"] .card {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 8px 24px rgba(0, 0, 0, 0.1);
   }
 
   /* One continuous read of the member journey, rather than five equal boxes. */
@@ -124,6 +201,7 @@
     min-width: 0;
     border: 0;
     border-radius: 0;
+    box-shadow: none;
     padding: 1.25rem;
   }
 
@@ -156,6 +234,7 @@
     border: 1px solid var(--ash);
     border-radius: 16px;
     background: var(--white);
+    box-shadow: 0 1px 2px rgba(21, 21, 15, 0.035), 0 8px 24px rgba(21, 21, 15, 0.035);
   }
 
   .chart-rail > .chart-panel:not(:first-child) {
@@ -163,8 +242,7 @@
   }
 
   .product-workspace .revenue-hero {
-    border-color: var(--deep-line);
-    background: var(--deep);
+    background: var(--white);
   }
 
   .revenue-hero::after {

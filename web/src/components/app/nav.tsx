@@ -7,7 +7,7 @@ import { IconFind, IconMessage } from "@/components/marks/icons";
 import { IconCalendar, IconOverview, IconSettings, IconUpload } from "./icons";
 import { IconOffer } from "./icons";
 
-const LINKS = [
+export const APP_LINKS = [
   { href: "/app", label: "Overview", Icon: IconOverview, exact: true },
   { href: "/app/members", label: "Members", Icon: IconFind, exact: false },
   { href: "/app/import", label: "Import", Icon: IconUpload, exact: false },
@@ -22,7 +22,7 @@ export function AppNav() {
 
   return (
     <nav aria-label="Sections" className="flex gap-1 md:flex-col">
-      {LINKS.map(({ href, label, Icon, exact }) => {
+      {APP_LINKS.map(({ href, label, Icon, exact }) => {
         const active = exact ? pathname === href : pathname.startsWith(href);
         return (
           <Link

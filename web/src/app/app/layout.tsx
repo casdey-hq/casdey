@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AppNav } from "@/components/app/nav";
+import { CommandMenu } from "@/components/app/command-menu";
 import { IconSignOut } from "@/components/app/icons";
 import { Logo } from "@/components/wordmark";
 import { cookies } from "next/headers";
@@ -51,11 +52,10 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
   const context = await getGymContext();
   const supportThread = context ? await supportThreadForGym(context.gym.id) : null;
 
-  // Read here rather than guessed in the browser, so the first paint is
-  // already the theme the gym owner chose and React never has to reconcile a
-  // document something else has already changed underneath it.
+  // A saved preference wins. New browsers begin in dark mode, and the server
+  // renders it before hydration so the switch never flashes the wrong theme.
   const theme =
-    (await cookies()).get(THEME_COOKIE)?.value === "dark" ? "dark" : "light";
+    (await cookies()).get(THEME_COOKIE)?.value === "light" ? "light" : "dark";
 
   return (
     <div
@@ -65,7 +65,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
       // it kept the light theme's near-black and rendered black on black in
       // dark mode. Re-stating it here resolves the token inside the themed
       // scope, so every descendant inherits the right one.
-      className={`${productFont.variable} product-workspace flex min-h-full flex-1 flex-col bg-white text-ink md:flex-row`}
+      className={`${productFont.variable} product-workspace flex min-h-full flex-1 flex-col text-ink md:flex-row`}
     >
       {/* Sticky and exactly one viewport tall on desktop, with its own scroll.
           As a plain flex child it stretched to the height of whatever page it
@@ -91,6 +91,8 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
             <span className="mt-1 block truncate text-[0.875rem] font-semibold text-ink">{context.gym.name}</span>
           </div>
         ) : null}
+
+        <CommandMenu />
 
         <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:flex-1 md:overflow-visible md:px-0">
           <AppNav />
