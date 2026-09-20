@@ -31,7 +31,7 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 
 | # | Item | Status | Notes |
 |---|---|---|---|
-| 3 | US market | in progress | priority 1. Decisions (2026-09-19): **$99 / $299** a month; **all 100 first-touch emails a day go to the US** once live; postal address for US law (CAN-SPAM) decided later, and **US sending stays off until it exists**; Instagram DMs to the US later, after a separate discussion. **Product side built 2026-09-19** (see below). |
+| 3 | US market | in progress | priority 1. Decisions (2026-09-19): **$99 / $299** a month; **all 100 first-touch emails a day go to the US** once live; postal address for US law (CAN-SPAM) decided later, and **US sending stays off until it exists**; Instagram DMs to the US later, after a separate discussion. **Product side built 2026-09-19** (see below). **Outreach switch built 2026-09-20 and deliberately off** (`.claude/skills/gym-outreach/SKILL.md`, "The US switch"). **Blocked on one thing: the Arlington mailbox clearing USPS Form 1583**, bought 2026-09-20 (see CLAUDE.md, the US bullet under Stage 2). |
 | 2 | One live place for everything | done 2026-09-19, live | `/admin` is casdey HQ, four tabs. See the notes below. |
 | 4 | To-dos section | done 2026-09-19, live | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
 | 1, 5–17 | the rest | open | order to be agreed |
