@@ -114,7 +114,14 @@ export function liveSignals(input: {
       });
     }
 
-    const drafts = marketing.igOutreach?.unsentDrafts ?? 0;
+    // Instagram DMs are paused since 2026-09-20 (Davide's call): 397 messages
+    // bought 1 reply and 0 engaged leads, and every one of them costs an hour
+    // of the only pair of hands casdey has. The drafts already in the sheet are
+    // deliberately left unsent, so this signal would otherwise nag every day.
+    // Set back to false, and re-enable the "casdey gym IG outreach" routine, to
+    // restart the channel. Posting to Instagram is unaffected.
+    const IG_DMS_PAUSED = true;
+    const drafts = IG_DMS_PAUSED ? 0 : (marketing.igOutreach?.unsentDrafts ?? 0);
     if (drafts > 0) {
       signals.push({
         key: `ig-dms:${today}`,

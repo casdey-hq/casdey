@@ -62,7 +62,9 @@ describe("liveSignals", () => {
     expect(due[0].due).toBe("2026-09-19");
   });
 
-  it("names unapproved Instagram days and unsent DMs, and says nothing when there are none", () => {
+  // Instagram DMs are paused since 2026-09-20, so the drafts sitting unsent in
+  // the sheet must not become a daily to-do. See IG_DMS_PAUSED in hq-signals.ts.
+  it("names unapproved Instagram days but never the paused DMs", () => {
     const busy = liveSignals({
       marketing: marketing({
         igContent: {
@@ -75,9 +77,8 @@ describe("liveSignals", () => {
       goals: [],
       now: SATURDAY,
     });
-    expect(busy.map((s) => s.key)).toEqual(["ig-approve:2026-09-19", "ig-dms:2026-09-19"]);
-    expect(busy[1].title).toBe("Send 17 Instagram DMs");
-    expect(busy.map((s) => s.due)).toEqual(["2026-09-19", "2026-09-19"]);
+    expect(busy.map((s) => s.key)).toEqual(["ig-approve:2026-09-19"]);
+    expect(busy.map((s) => s.due)).toEqual(["2026-09-19"]);
 
     const quiet = liveSignals({
       marketing: marketing({
@@ -122,6 +123,6 @@ describe("liveSignals", () => {
       goals: [],
       now: SATURDAY,
     });
-    expect(signals.map((s) => s.key)).toEqual(["lead:1", "trial:x:2026-09-26", "ig-dms:2026-09-19"]);
+    expect(signals.map((s) => s.key)).toEqual(["lead:1", "trial:x:2026-09-26"]);
   });
 });
