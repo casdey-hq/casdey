@@ -10,6 +10,7 @@ import {
 } from "@/lib/lapse";
 import { capabilities } from "@/lib/plan";
 import {
+  Button,
   ButtonLink,
   Card,
   EmptyState,
@@ -160,7 +161,7 @@ export default async function MembersPage(props: PageProps<"/app/members">) {
       <div className="mb-5 flex flex-wrap items-center gap-3">
         {/* A plain GET form, so searching survives a reload, can be linked to,
             and works before any JavaScript has run. */}
-        <form action="/app/members" className="flex items-center gap-2">
+        <form action="/app/members" className="flex w-full items-center gap-2 sm:w-auto">
           <input type="hidden" name="filter" value={filter} />
           {sort !== "last_visit" ? (
             <input type="hidden" name="sort" value={sort} />
@@ -170,16 +171,13 @@ export default async function MembersPage(props: PageProps<"/app/members">) {
             type="search"
             name="q"
             defaultValue={q}
-            placeholder="Search a name or an email address"
+            placeholder="Name or email"
             aria-label="Search members"
-            className="field min-w-[18rem] sm:w-[24rem]"
+            className="field min-w-0 flex-1 sm:w-[24rem]"
           />
-          <button
-            type="submit"
-            className="text-[0.875rem] font-semibold text-teal underline underline-offset-4"
-          >
+          <Button type="submit" variant="quiet" className="px-3.5">
             Search
-          </button>
+          </Button>
         </form>
         {q ? (
           <Link
