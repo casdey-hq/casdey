@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>casdey — Brand Guide v4</title>
+<title>casdey — Brand Guide v5</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Manrope:wght@500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
     /* Chalk & Struck Gold, v4. Same token names as v2 and v3 (see globals.css
@@ -69,28 +69,23 @@
 
 <section>
   <span class="lockup" style="font-size:3rem;color:var(--ink)"><svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><rect x="12" y="12" width="44" height="22" rx="11" fill="var(--teal-bright)"/><rect x="12" y="12" width="44" height="22" rx="11" transform="rotate(90 50 50)"/><rect x="12" y="12" width="44" height="22" rx="11" transform="rotate(180 50 50)"/><rect x="12" y="12" width="44" height="22" rx="11" transform="rotate(270 50 50)"/></svg><span class="wordmark">casdey</span></span>
-  <p class="label" style="margin-top:2rem">brand guide · v4 · chalk &amp; struck gold · september 2026</p>
+  <p class="label" style="margin-top:2rem">brand guide · v5 · charcoal product system · september 2026</p>
   <h2 class="display" style="font-size:clamp(2rem,4vw,2.75rem);max-width:26ch;color:var(--ink)">
-    Earned, not flashy. Gold as a result, not a finish.
+    Quietly decisive. Gold as a result, not a finish.
   </h2>
   <p class="lede">
     casdey is deliberately generic, so the identity can outlast a pivot without touching the
-    domain, the email or the name. v3 rebuilt it in an afternoon to catch the gym pivot. v4 is
-    the considered version: the gym product stayed, the register changed, and the identity
-    finally has a mark rather than a word on its own.
+    domain, the email or the name. v5 is the product expression: a quiet charcoal workspace,
+    restrained texture and one warm signal. It is designed to feel composed under dense work,
+    not decorated for its own sake.
   </p>
   <div class="rule">
-    <p style="margin:0;color:var(--graphite);font-size:.9375rem"><b style="color:var(--ink)">What changed from v3, and why.</b>
-    v3 was a dark iron ground with a matte brass primary. It was not wrong, it was fast: a
-    same-day reaction to the pivot rather than a decision. v4 flips the ground back to light and
-    commits to gold, and makes two choices worth defending. The ground is cool, not cream: warm
-    cream under gold is the most predictable pairing available, and it would have made the gold
-    read as ambient warmth instead of intent. Holding the neutrals slightly cool leaves gold as
-    the only warm thing on the page. And the gold is struck, not shiny, for the same reason it
-    was brass before: what casdey sells is recovered revenue, a number a gym wins back, so the
-    primary is the earned mark rather than the luxury finish every boutique studio's Instagram
-    funnel already uses. The wordmark stays lowercase. That is the one thing the brand guide
-    promises survives every pivot.</p>
+    <p style="margin:0;color:var(--graphite);font-size:.9375rem"><b style="color:var(--ink)">What changed in v5, and why.</b>
+    The signed-in workspace, casdey HQ and public landing now share a cool charcoal register.
+    The #09090A ground is almost black without becoming harsh, cards use one restrained grey
+    plane, and a low-contrast dot field gives large quiet areas a little grain. Gold stays a
+    result marker and primary action, never general decoration. The wordmark stays lowercase.
+    That is the one thing the brand guide promises survives every pivot.</p>
   </div>
 </section>
 
@@ -168,37 +163,34 @@
     <p class="dont">Never assume a token still means what its name says. --white is no longer literally white, it is the raised surface, see globals.css.</p>
   </div>
 
-  <h3 class="display" style="font-size:1.375rem;margin-top:3.5rem">Dark mode: YouTube's near-black product ground.</h3>
+  <h3 class="display" style="font-size:1.375rem;margin-top:3.5rem">Charcoal product ground, by default.</h3>
   <p class="lede" style="margin-top:1rem">
-    The marketing site is light only, on purpose. The app is not: a gym owner has it open at six
-    in the morning and again late at night. Its dark theme uses #09090A, the ground YouTube's own
-    dark theme paints (measured September 2026), after a true #000 looked harsh on a real screen. It is
-    applied by <code>data-theme="dark"</code> on the app shell so the marketing site cannot
-    inherit it. The same token names carry over, only the values move, so no component changes.
-    Every neutral has the warmth taken out, so gold stays the one warm thing; depth is built by
-    each raised plane sitting a shade lighter than the page, since a shadow does nothing this dark.
+    The signed-in workspace and casdey HQ begin in dark mode; an explicit light preference still
+    wins. The public landing uses the same charcoal family. #09090A is the ground: it is deep
+    without reading as a harsh true black. Every neutral has the warmth taken out, so gold stays
+    the one warm thing. Depth comes from one shared #191A1D card plane and an Ash hairline, not
+    a stack of competing greys or a heavy shadow.
   </p>
   <div class="grid swatches">
     <div class="sw"><div class="chip" style="background:#09090A"></div><div class="meta"><b>Paper (dark)</b><code>#09090A</code><p>Page ground. YouTube's dark ground</p></div></div>
-    <div class="sw"><div class="chip" style="background:#0F0F0F"></div><div class="meta"><b>Deep (dark)</b><code>#0F0F0F</code><p>The sidebar, lifting just off the ground</p></div></div>
-    <div class="sw"><div class="chip" style="background:#141414"></div><div class="meta"><b>White (dark)</b><code>#141414</code><p>Raised cards</p></div></div>
-    <div class="sw"><div class="chip" style="background:#1E1E1E"></div><div class="meta"><b>Mist (dark)</b><code>#1E1E1E</code><p>Quiet fills, hover</p></div></div>
-    <div class="sw"><div class="chip" style="background:#313131"></div><div class="meta"><b>Ash (dark)</b><code>#313131</code><p>Hairlines, dividers</p></div></div>
-    <div class="sw"><div class="chip" style="background:#8C8C88"></div><div class="meta"><b>Stone (dark)</b><code>#8C8C88</code><p>Tertiary text, 5.9:1 on the ground</p></div></div>
-    <div class="sw"><div class="chip" style="background:#C8C8C4"></div><div class="meta"><b>Graphite (dark)</b><code>#C8C8C4</code><p>Body text, 11.9:1</p></div></div>
+    <div class="sw"><div class="chip" style="background:#191A1D"></div><div class="meta"><b>Raised (dark)</b><code>#191A1D</code><p>Cards and sidebar</p></div></div>
+    <div class="sw"><div class="chip" style="background:#292A2E"></div><div class="meta"><b>Mist (dark)</b><code>#292A2E</code><p>Quiet fills, hover</p></div></div>
+    <div class="sw"><div class="chip" style="background:#383A40"></div><div class="meta"><b>Ash (dark)</b><code>#383A40</code><p>Hairlines, dividers</p></div></div>
+    <div class="sw"><div class="chip" style="background:#A5A5A9"></div><div class="meta"><b>Stone (dark)</b><code>#A5A5A9</code><p>Tertiary text</p></div></div>
+    <div class="sw"><div class="chip" style="background:#D0D0D2"></div><div class="meta"><b>Graphite (dark)</b><code>#D0D0D2</code><p>Body text</p></div></div>
     <div class="sw"><div class="chip" style="background:#F4F4F1"></div><div class="meta"><b>Ink (dark)</b><code>#F4F4F1</code><p>Headlines, 18:1</p></div></div>
     <div class="sw"><div class="chip" style="background:#D4AF37"></div><div class="meta"><b>Leaf (unchanged)</b><code>#D4AF37</code><p>Primary on the dark ground, 9.5:1</p></div></div>
   </div>
   <div class="rule">
     <p class="do">On the dark ground, the primary is Leaf, the same swap <code>.on-deep</code> already makes. Struck Gold goes muddy here, so never use it as text on the dark ground.</p>
-    <p class="do">Cards read against the ground by being lighter (#141414) and by their Ash hairline, not by a shadow. Keep that ladder intact if you add a plane.</p>
+    <p class="do">Cards and the sidebar read against the ground through the one #191A1D plane and an Ash hairline. Keep that hierarchy intact if you add a plane.</p>
     <p class="dont">Never reach for the old warm near-black (#16160F), which read as brown, or pure #000, which read as harsh. The ground is #09090A.</p>
   </div>
 </section>
 
 <section>
   <p class="label">03 · typography</p>
-  <h2 class="display" style="font-size:2rem">Three families, four roles.</h2>
+  <h2 class="display" style="font-size:2rem">Four families, five roles.</h2>
   <p class="lede">
     v3 carried four families, one of them (Raleway) spent on a single word. v4 folds the wordmark
     into the display face, which costs nothing and makes the logo stop being a stranger to the
@@ -206,7 +198,9 @@
     that gets read, and it is chosen against Outfit rather than to match it: an engineered
     grotesque set beside round geometry is a contrast of temperament, not two neutral sans faces
     stacked, and it was drawn for dense interface data, which the member and campaign tables need.
-    IBM Plex Mono, its own sibling, marks anything literal.
+    IBM Plex Mono, its own sibling, marks anything literal. Inside the product and casdey HQ,
+    Manrope is the interface face: compact, neutral, and used for controls, tables and dense
+    product copy. Do not use it to replace the wordmark or marketing display voice.
   </p>
 
   <div class="grid two">
@@ -230,6 +224,11 @@
       <p style="font-family:'IBM Plex Mono',monospace;margin:.75rem 0 0;color:var(--graphite)">€289/mo · cancelled 8 months ago · #15150F · info@casdey.com</p>
       <p style="font-size:.8125rem;color:var(--stone);margin:.5rem 0 0">weight 400 / 500 · caption size, 12–15px · uppercase with 12% tracking for section labels</p>
     </div>
+    <div class="card">
+      <p class="label" style="color:var(--stone)">Manrope · product UI</p>
+      <p style="font-family:Manrope,system-ui,sans-serif;margin:.75rem 0 0;color:var(--graphite);font-weight:600">412 members · 168 lapsed · worth €14,900</p>
+      <p style="font-size:.8125rem;color:var(--stone);margin:.5rem 0 0">weight 500–700 · product controls, data and workspace copy · never the marketing wordmark</p>
+    </div>
   </div>
 </section>
 
@@ -238,7 +237,7 @@
   <h2 class="display" style="font-size:2rem">One member's history as a line.</h2>
   <p class="lede">
     Two visits close together, a long dashed nothing, then a booking. The shape has survived every
-    version because it does the job. It matters more in v4 than it did before: now that the mark is
+    version because it does the job. It matters more in v5 than it did before: now that the mark is
     abstract, this is the only place in the identity that draws the gap at all. Use it in a hero, on
     the waitlist page, or anywhere the gap needs explaining without a paragraph.
   </p>
@@ -259,15 +258,15 @@
 
 <section>
   <p class="label">05 · surfaces and depth</p>
-  <h2 class="display" style="font-size:2rem">Three planes, never four.</h2>
+  <h2 class="display" style="font-size:2rem">One calm system across product, HQ and landing.</h2>
   <table>
-    <tr><td>Base</td><td>Chalk. The page itself. No border, no shadow.</td></tr>
-    <tr><td>Raised</td><td>White, 22px radius, 1px Ash border at 60%, layered ink-tinted shadow. Cards, panels, the form. On Chalk a card lifts by being whiter than the ground, not by being greyer.</td></tr>
+    <tr><td>Base</td><td>Charcoal #09090A in the workspace, HQ and landing. The public hero and product canvas may carry the 10px dot field, faded into the ground before the next section. Never place the pattern inside a card.</td></tr>
+    <tr><td>Raised</td><td>#191A1D, 14–16px radius, one 1px Ash hairline. Cards, panels and the desktop sidebar all use this single plane. A darker control inside it provides the next level of hierarchy.</td></tr>
     <tr><td>Floating</td><td>Same but with the heavier shadow, and it overlaps something. Used once per screen at most.</td></tr>
     <tr><td>Inverted</td><td>Deep, full-bleed or 28px radius. Steps, calls to action. Two per page maximum. Always mark the container <code>.on-deep</code>: globals.css redefines the neutral and gold roles inside that class, so <code>text-ink</code>, <code>border-ash</code> and the primary resolve to their dark-plane values on their own. Never hand-pick a light token instead, and never nest a light plane inside it.</td></tr>
     <tr><td>Radius</td><td>10px controls · 14–16px small tiles · 20–22px cards · 28px full-bleed blocks</td></tr>
-    <tr><td>Shadows</td><td>Layered and tinted with Ink's warm black at low opacity, never a single flat layer and never pure black, which reads as a grey box sitting on chalk rather than light falling on it.</td></tr>
-    <tr><td>Motion</td><td>Transform and opacity only, 200–220ms, cubic-bezier(.22,1,.36,1). Never transition-all. Reduced motion is respected.</td></tr>
+    <tr><td>Shadows</td><td>Subtle and black-tinted at low opacity. On the charcoal ground the hairline and raised plane do the real work, so never use a bright or diffuse shadow to force depth.</td></tr>
+    <tr><td>Motion</td><td>Transform and opacity only, 180–220ms, cubic-bezier(.22,1,.36,1). Hover lifts are 1–2px. Scroll storytelling changes one focused step at a time inside a pinned card-height stage, with a visible progress line. Never transition-all. Reduced motion is respected.</td></tr>
   </table>
 </section>
 
@@ -289,18 +288,18 @@
   <p class="label">07 · in use</p>
   <h2 class="display" style="font-size:2rem">What it looks like doing something.</h2>
   <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:2rem">
-    <a class="btn" href="#">Join the waitlist</a>
+    <a class="btn" href="#">Start your week for €1</a>
     <a class="btn quiet" href="#">How it works</a>
   </div>
   <div class="deep" style="margin-top:2.5rem">
     <p class="label">try it first</p>
     <h3 class="display" style="font-size:1.75rem;margin:.75rem 0 0;max-width:22ch">Ready to work the quiet half of your list?</h3>
-    <p style="margin:1rem 0 0;max-width:40ch;font-size:.9375rem">Join the waitlist and you get first access, a free first week, and a say in what casdey does next.</p>
+    <p style="margin:1rem 0 0;max-width:40ch;font-size:.9375rem">€1 buys your first week. Import your list and see casdey find who has gone quiet before you decide anything.</p>
   </div>
 </section>
 
 <footer>
-  casdey brand guide · v4, "chalk &amp; struck gold", compiled September 2026 · palette and type mirrored in
+  casdey brand guide · v5, "charcoal product system", compiled September 2026 · palette and type mirrored in
   <code style="font-family:'IBM Plex Mono',monospace">web/src/app/globals.css</code> ·
   keep the two in step
 </footer>

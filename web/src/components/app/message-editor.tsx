@@ -120,7 +120,7 @@ export function MessageEditor({
         maxLength={5000}
         disabled={disabled}
         aria-labelledby={ariaLabelledBy}
-        className="field font-[family-name:var(--font-inter)] leading-relaxed"
+        className="field leading-relaxed"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />

@@ -211,6 +211,8 @@ export function CampaignForm({
         <input type="hidden" name="reasonFilter" value={reasonFilter} />
       ) : null}
 
+      <div className="space-y-6">
+
       <Card>
         <CardTitle>How it goes out</CardTitle>
         <p className="mt-1 mb-5 text-[0.875rem] text-stone">
@@ -376,6 +378,7 @@ export function CampaignForm({
           <p className="field-hint">Only you see this.</p>
         </div>
       </Card>
+      </div>
 
       {!isWhatsApp ? (
         <>
@@ -410,6 +413,7 @@ export function CampaignForm({
             </div>
           </Card>
 
+          <div className="campaign-compose-grid grid items-start gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(22rem,0.9fr)]">
           <Card>
             <CardTitle>The message casdey will send</CardTitle>
             <p className="mt-1 mb-5 text-[0.875rem] text-stone">
@@ -455,6 +459,47 @@ export function CampaignForm({
               />
             </div>
           </Card>
+
+          <aside className="campaign-preview-column xl:sticky xl:top-5" aria-label="Live member preview">
+            <Card className="campaign-preview-card">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <CardTitle>Member preview</CardTitle>
+                <span className="label text-teal">Live</span>
+              </div>
+              <p className="mt-1 mb-4 text-[0.875rem] text-stone">
+                {sample
+                  ? "Rendered against a real member from your list, with the same code that sends it."
+                  : "No member to preview against yet."}
+              </p>
+              <div className="campaign-preview-message rounded-[14px] border border-ash bg-paper p-5">
+                <p className="literal mb-1 text-[0.75rem] text-stone">From: {gymName}</p>
+                <p className="literal mb-4 text-[0.75rem] text-stone">Reply-to: {replyTo}</p>
+                <p className="mb-4 border-b border-ash pb-3 text-[0.9375rem] font-semibold text-ink">
+                  {renderTemplate(subject, context)}
+                </p>
+                <pre className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-graphite">
+                  {composeBody({
+                    body,
+                    context,
+                    unsubscribeUrl: "https://casdey.com/u/example",
+                    replyTo,
+                    providerCanSetReplyTo: true,
+                  })}
+                </pre>
+              </div>
+              <p className="field-hint">The unsubscribe line is added to every message and cannot be removed.</p>
+              <div className="mt-5 border-t border-ash pt-4">
+                <p className="label text-stone">Send sequence</p>
+                <ol className="campaign-sequence mt-3 space-y-2 text-[0.8125rem] text-graphite">
+                  <li><span className="literal">1</span> This note, after approval</li>
+                  {followUps.map((step, index) => (
+                    <li key={index}><span className="literal">{index + 2}</span> Follow-up {index + 1}, after {step.afterDays} {step.afterDays === 1 ? "day" : "days"} if they have not booked</li>
+                  ))}
+                </ol>
+              </div>
+            </Card>
+          </aside>
+          </div>
 
           <Card>
             <CardTitle>Personalisation</CardTitle>
@@ -590,40 +635,6 @@ export function CampaignForm({
             )}
           </Card>
 
-          <Card>
-            <CardTitle>What one member will receive</CardTitle>
-            <p className="mt-1 mb-4 text-[0.875rem] text-stone">
-              {sample
-                ? "Rendered against a real member from your list, with the same code that sends it."
-                : "No member to preview against yet."}
-            </p>
-
-            <div className="rounded-[14px] border border-ash bg-paper p-5">
-              <p className="literal mb-1 text-[0.75rem] text-stone">
-                From: {gymName}
-              </p>
-              <p className="literal mb-4 text-[0.75rem] text-stone">
-                Reply-to: {replyTo}
-              </p>
-              <p className="mb-4 border-b border-ash pb-3 text-[0.9375rem] font-semibold text-ink">
-                {renderTemplate(subject, context)}
-              </p>
-              <pre className="font-[family-name:var(--font-inter)] text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-graphite">
-                {composeBody({
-                  body,
-                  context,
-                  unsubscribeUrl: "https://casdey.com/u/example",
-                  replyTo,
-                  providerCanSetReplyTo: true,
-                })}
-              </pre>
-            </div>
-
-            <p className="field-hint">
-              The unsubscribe line is added to every message and cannot be
-              removed.
-            </p>
-          </Card>
         </>
       ) : (
         <Card>

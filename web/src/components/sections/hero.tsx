@@ -27,7 +27,11 @@ export async function Hero() {
     <section className="relative overflow-hidden pt-14 sm:pt-20">
       <div
         aria-hidden="true"
-        className="grain pointer-events-none absolute inset-x-0 top-0 h-[640px] bg-[radial-gradient(ellipse_70%_55%_at_50%_-10%,color-mix(in_srgb,var(--teal-bright)_16%,transparent),transparent_72%),radial-gradient(ellipse_50%_40%_at_85%_10%,color-mix(in_srgb,var(--amber)_8%,transparent),transparent_70%)]"
+        className="marketing-hero-grid pointer-events-none absolute inset-0"
+      />
+      <div
+        aria-hidden="true"
+        className="grain pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_-10%,color-mix(in_srgb,var(--teal-bright)_16%,transparent),transparent_72%),radial-gradient(ellipse_50%_40%_at_85%_10%,color-mix(in_srgb,var(--amber)_8%,transparent),transparent_70%)]"
       />
 
       <Container className="relative text-center">
@@ -99,21 +103,27 @@ export async function Hero() {
         </p>
       </Container>
 
-      <Container className="relative mt-16 sm:mt-20">
-        <div className="flex flex-col items-center gap-5 border-t border-ash/70 pt-8 sm:flex-row sm:justify-center sm:gap-10">
-          <p className="label text-stone">Works with any gym software</p>
-          <ul className="flex flex-wrap items-center justify-center gap-x-9 gap-y-3">
-            {SOFTWARE.map((name) => (
-              <li
-                key={name}
-                className="display text-[1.25rem] font-semibold text-graphite"
-              >
-                {name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Container>
+      <div className="relative mt-16 sm:mt-20">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-1/2 -top-52 bottom-0 z-0 w-screen -translate-x-1/2 bg-[linear-gradient(to_bottom,transparent,var(--paper)_13rem)]"
+        />
+        <Container className="relative z-10">
+          <div className="flex flex-col items-center gap-5 border-t border-ash/70 pt-8 sm:flex-row sm:justify-center sm:gap-10">
+            <p className="label text-stone">Works with any gym software</p>
+            <ul className="flex flex-wrap items-center justify-center gap-x-9 gap-y-3">
+              {SOFTWARE.map((name) => (
+                <li
+                  key={name}
+                  className="display text-[1.25rem] font-semibold text-graphite"
+                >
+                  {name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Container>
+      </div>
     </section>
   );
 }

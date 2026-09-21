@@ -1,10 +1,17 @@
 import { cookies } from "next/headers";
+import { Manrope } from "next/font/google";
 
 import { Logo } from "@/components/wordmark";
 import { ThemeToggle, THEME_COOKIE } from "@/components/app/theme-toggle";
 import { requireAdmin } from "@/lib/admin";
 
 import "@/styles/product.css";
+
+const productFont = Manrope({
+  variable: "--font-product",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 /**
  * The founder-only shell.
@@ -33,22 +40,24 @@ export default async function AdminLayout({
 }: LayoutProps<"/admin">) {
   await requireAdmin();
 
+  // HQ follows the product's default: new browsers begin in dark mode, while
+  // an explicit saved light preference still wins before the first paint.
   const theme =
-    (await cookies()).get(THEME_COOKIE)?.value === "dark" ? "dark" : "light";
+    (await cookies()).get(THEME_COOKIE)?.value === "light" ? "light" : "dark";
 
   return (
     <div
       data-theme={theme}
-      className="flex min-h-full flex-1 flex-col bg-paper text-ink"
+      className={`${productFont.variable} admin-workspace flex min-h-full flex-1 flex-col text-ink`}
     >
-      <header className="flex items-center justify-between border-b border-ash px-6 py-4">
+      <header className="admin-topbar sticky top-0 z-20 flex items-center justify-between border-b border-ash px-6 py-4">
         <Logo className="text-[1.25rem]" />
         <div className="flex items-center gap-4">
           <span className="label text-stone">Founder view</span>
           <ThemeToggle initial={theme} compact />
         </div>
       </header>
-      <main className="mx-auto w-full max-w-[1100px] flex-1 px-6 py-8">
+      <main className="mx-auto w-full max-w-[82rem] flex-1 px-6 py-8 sm:px-10 sm:py-10">
         {children}
       </main>
     </div>

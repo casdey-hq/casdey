@@ -166,6 +166,111 @@ export async function activityWithComparison(
   };
 }
 
+/** Exact inclusive calendar dates, UTC. The comparison is the same number of
+ * days immediately before the chosen start. Up to a year keeps charts legible
+ * and bounds the underlying row reads. */
+export function calendarToday(now: Date, timezone: string): string {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(now);
+  const part = (type: string) => parts.find((item) => item.type === type)!.value;
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
+export function customActivityDates(from: unknown, to: unknown, now = new Date(), timezone = "UTC") {
+  if (typeof from !== "string" || typeof to !== "string") return null;
+  const parse = (value: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+    const date = new Date(`${value}T00:00:00Z`);
+    return !Number.isNaN(date.getTime()) && key(date) === value ? date : null;
+  };
+  const start = parse(from);
+  const end = parse(to);
+  const today = new Date(`${calendarToday(now, timezone)}T00:00:00Z`);
+  if (!start || !end || start > end || end > today) return null;
+  const days = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+  return days <= 366 ? { start, end, days, timezone } : null;
+}
+
+export function localMidnight(date: Date, timezone: string): Date {
+  const target = date.getTime();
+  const formatter = new Intl.DateTimeFormat("en-GB", {
+    timeZone: timezone, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+  });
+  let instant = target;
+  // Re-evaluate the offset at the resulting instant to cover DST transitions.
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const parts = formatter.formatToParts(new Date(instant));
+    const part = (type: string) => Number(parts.find((item) => item.type === type)!.value);
+    const wallAsUtc = Date.UTC(part("year"), part("month") - 1, part("day"), part("hour"), part("minute"), part("second"));
+    instant = target - (wallAsUtc - instant);
+  }
+  return new Date(instant);
+}
+
+export async function activityForDates(
+  gymId: string,
+  dates: NonNullable<ReturnType<typeof customActivityDates>>,
+): Promise<Period> {
+  const day = 86400000;
+  const { start, end, days, timezone } = dates;
+  const earlierStart = new Date(start.getTime() - days * day);
+  const endExclusive = new Date(end.getTime() + day);
+  const client = supabaseAdmin();
+
+  // A page is needed for busy gyms: Supabase limits an unpaged select to 1000
+  // rows. A truncated first page would quietly undercount campaign sends.
+  async function rows(table: "campaign_messages" | "members" | "bookings", column: string, fields: string) {
+    const result: Record<string, unknown>[] = [];
+    for (let offset = 0; ; offset += 1000) {
+      let query = client.from(table).select(fields).eq("gym_id", gymId)
+        .gte(column, localMidnight(earlierStart, timezone).toISOString())
+        .lt(column, localMidnight(endExclusive, timezone).toISOString())
+        .order(column, { ascending: true }).order("id", { ascending: true }).range(offset, offset + 999);
+      if (table === "campaign_messages") query = query.eq("status", "sent");
+      if (table === "members") query = query.eq("is_test", false).eq("status", "returned");
+      if (table === "bookings") query = query.neq("status", "cancelled");
+      const { data, error } = await query;
+      if (error) throw error;
+      result.push(...((data ?? []) as unknown as Record<string, unknown>[]));
+      if (!data || data.length < 1000) break;
+    }
+    return result;
+  }
+
+  const [messages, returns, bookings] = await Promise.all([
+    rows("campaign_messages", "sent_at", "sent_at"),
+    rows("members", "returned_at", "returned_at"),
+    rows("bookings", "created_at", "created_at,value_minor"),
+  ]);
+  const bucketCount = Math.min(12, days);
+  const makeBuckets = (base: Date) => Array.from({ length: bucketCount }, (_, index) => {
+    const date = new Date(base.getTime() + Math.floor(index * days / bucketCount) * day);
+    const last = new Date(base.getTime() + (Math.floor((index + 1) * days / bucketCount) - 1) * day);
+    const label = key(date) === key(last) ? LABEL.format(date) : `${LABEL.format(date)} to ${LABEL.format(last)}`;
+    return { weekStart: key(date), label, sent: 0, returned: 0, revenueMinor: 0 };
+  });
+  const current = makeBuckets(start);
+  const earlier = makeBuckets(earlierStart);
+  const add = (items: Record<string, unknown>[], column: string, field: "sent" | "returned" | "revenueMinor") => {
+    for (const row of items) {
+      const timestamp = new Date(row[column] as string).getTime();
+      if (!Number.isFinite(timestamp)) continue;
+      const localDate = new Date(`${calendarToday(new Date(timestamp), timezone)}T00:00:00Z`).getTime();
+      const isCurrent = localDate >= start.getTime();
+      const origin = isCurrent ? start.getTime() : earlierStart.getTime();
+      const offset = Math.floor((localDate - origin) / day);
+      const bucket = (isCurrent ? current : earlier)[Math.min(bucketCount - 1, Math.floor(offset * bucketCount / days))];
+      if (bucket) bucket[field] += field === "revenueMinor" ? (row.value_minor as number | null) ?? 0 : 1;
+    }
+  };
+  add(messages, "sent_at", "sent");
+  add(returns, "returned_at", "returned");
+  add(bookings, "created_at", "revenueMinor");
+  return { weeks: current, total: sum(current), previous: sum(earlier), previousWeeks: earlier };
+}
+
 /**
  * Percentage change, or null when there is nothing to compare against.
  *

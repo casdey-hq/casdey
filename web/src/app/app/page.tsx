@@ -15,14 +15,14 @@ import { formatMoney, gymCurrency } from "@/lib/money";
 import { buildSetupState } from "@/lib/setup";
 import { paidTrialEnabled } from "@/lib/plan";
 import { activationFor } from "@/lib/trial";
-import { activityWithComparison, change } from "@/lib/dashboard";
+import { activityForDates, activityWithComparison, calendarToday, change, customActivityDates } from "@/lib/dashboard";
 import { importRefreshReminder } from "@/lib/import-reminder";
 import { Funnel, LineChart, MetricChart, Split } from "@/components/app/chart";
 import { calendarConnectionView } from "@/lib/calendar/provider";
 import { isGoogleCalendarConfigured } from "@/lib/calendar/google";
 import { isCalendarKeyConfigured } from "@/lib/calendar/tokens";
 import { isSendingConfigured } from "@/lib/email/domains";
-import { MemberTimeline } from "@/components/app/member-timeline";
+import { ReturnStory } from "@/components/app/return-story";
 import { SetupChecklist } from "@/components/app/setup-checklist";
 import { TrialPanel } from "@/components/app/trial-panel";
 import {
@@ -77,6 +77,17 @@ export default async function DashboardPage(props: PageProps<"/app">) {
   // range can be linked to and survives a reload, and so the whole page is
   // still one server render.
   const range = RANGES.find((r) => String(r.weeks) === params.range) ?? RANGES[1];
+  const customRequested = params.from !== undefined || params.to !== undefined;
+  const today = calendarToday(new Date(), gym.timezone);
+  const customDates = customActivityDates(params.from, params.to, new Date(), gym.timezone);
+  const custom = customDates !== null;
+  const periodLabel = customDates
+    ? `${customDates.days} ${customDates.days === 1 ? "day" : "days"}`
+    : range.label;
+  const comparisonLabel = customDates
+    ? `the previous ${periodLabel}`
+    : `the ${range.label.toLowerCase()} before`;
+  const insights = params.view === "insights";
 
   // One wave, not five. Every read below needs only the gym id and the range,
   // both known here, so they fire together: a stack of round trips to a
@@ -100,7 +111,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
       hasPricedServices(session.supabase, gym.id),
     ]),
     gymStats(session.supabase, gym.id, rule, atRiskRuleFor(gym)),
-    activityWithComparison(gym.id, range.weeks),
+    customDates ? activityForDates(gym.id, customDates) : activityWithComparison(gym.id, range.weeks),
     Promise.all([
       session.supabase
         .from("campaigns")
@@ -162,6 +173,9 @@ export default async function DashboardPage(props: PageProps<"/app">) {
   );
 
   const currency = gymCurrency(gym);
+  const returnRate = Math.round((stats.returned / Math.max(stats.lapsed, 1)) * 100);
+  const orbitCircumference = 2 * Math.PI * 42;
+  const orbitOffset = orbitCircumference * (1 - Math.min(returnRate, 100) / 100);
 
   // Trial With Penalty (Track H). The evidence is exactly what the setup
   // checklist above already read, so this costs no extra queries.
@@ -173,6 +187,50 @@ export default async function DashboardPage(props: PageProps<"/app">) {
   const trialPanel = paidTrialEnabled() ? (
     <TrialPanel gym={gym} steps={trialSteps} />
   ) : null;
+
+  // One honest next step, chosen from information already on this page. It
+  // never guesses whether a campaign has finished sending.
+  const nextMove = calendar.needsReauth
+    ? {
+        title: "Reconnect your calendar",
+        body: "Booking is paused until Google Calendar is connected again.",
+        href: "/app/settings/booking",
+        action: "Fix booking",
+      }
+    : refreshReminder
+      ? {
+          title: "Refresh your member list",
+          body: `The last import was ${refreshReminder.daysSinceImport} days ago. A fresh file keeps the list and return counts current.`,
+          href: "/app/import",
+          action: "Import a fresh list",
+        }
+      : stats.reachable === 0
+        ? {
+            title: "Add reachable members",
+            body: "No lapsed member has an email address casdey can use. Map the email column on your next import.",
+            href: "/app/import",
+            action: "Update your list",
+          }
+        : !priced
+          ? {
+              title: "Price what you sell",
+              body: "Add service prices so each return has a value alongside the member count.",
+              href: "/app/settings/services",
+              action: "Add services",
+            }
+          : (approvedCampaigns ?? 0) === 0
+            ? {
+                title: "Write to members who went quiet",
+                body: `${stats.reachable} ${stats.reachable === 1 ? "member has" : "members have"} an email address. Review the draft before anything sends.`,
+                href: "/app/campaigns/new",
+                action: "Build a campaign",
+              }
+            : {
+                title: "See who needs attention",
+                body: "Review members who have gone quiet, what was sent, and who came back.",
+                href: "/app/members?filter=lapsed",
+                action: "Open member list",
+              };
 
   if (stats.members === 0) {
     return (
@@ -196,12 +254,11 @@ export default async function DashboardPage(props: PageProps<"/app">) {
   return (
     <>
       <PageHeader
-        eyebrow="Overview"
+        eyebrow={insights ? "Insights" : "Overview"}
         title={gym.name}
-        lede={`Lapsed means ${describeRule(ruleFor(gym))}. Change that in settings.`}
-        actions={
-          <ButtonLink href="/app/campaigns/new">Build a campaign</ButtonLink>
-        }
+        lede={insights
+          ? "See how your outreach and returns have changed over time."
+          : `Lapsed means ${describeRule(ruleFor(gym))}. Change that in settings.`}
       />
 
       {/* Nothing links here any more (signup lands on ?welcome=1), so this is
@@ -261,17 +318,144 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         </div>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <Stat label="Members" value={stats.members} />
+      <nav aria-label="Overview views" className="overview-views mb-7 flex gap-1 p-1">
+        <Link href="/app" aria-current={!insights ? "page" : undefined} className="overview-view-link">
+          Workspace
+        </Link>
+        <Link href="/app?view=insights" aria-current={insights ? "page" : undefined} className="overview-view-link">
+          Insights
+        </Link>
+      </nav>
+
+      {!insights ? <>
+
+      {/* The outcome and the next action share the opening row. The estimated
+          opportunity follows beneath, quieter than either of them. */}
+      <section aria-label="Result and next move" className="recovery-overview overview-enter grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
+        {priced ? (
+          <Card className="revenue-hero relative flex min-h-[17rem] flex-col justify-between overflow-hidden p-7 sm:p-8">
+            <div className="recovery-summary flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
+              <div>
+                <p className="label text-stone">Revenue recovered</p>
+                <p className="literal mt-3 text-[3.25rem] leading-none font-semibold tracking-[-0.055em] text-teal sm:text-[4rem]">
+                  {formatMoney(recovered.totalMinor, currency)}
+                </p>
+                <p className="mt-3 max-w-[46ch] text-[0.875rem] leading-relaxed text-graphite">
+                  {recovered.bookings - recovered.unpriced}{" "}
+                  {recovered.bookings - recovered.unpriced === 1 ? "booking" : "bookings"} won back, valued at the price of each service. This is recovered value, not an amount casdey has billed.
+                </p>
+              </div>
+              <div className="recovery-orbit shrink-0" aria-label={`${returnRate}% of members who went quiet have returned`}>
+                <svg viewBox="0 0 100 100" aria-hidden="true">
+                  <circle className="recovery-orbit-track" cx="50" cy="50" r="42" />
+                  <circle
+                    className="recovery-orbit-progress"
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    strokeDasharray={orbitCircumference}
+                    strokeDashoffset={orbitOffset}
+                  />
+                </svg>
+                <span className="literal">{returnRate}%</span>
+                <small>back</small>
+              </div>
+            </div>
+            <div className="mt-8 border-t border-ash pt-4">
+              <div className="flex items-center justify-between gap-4 text-[0.8125rem]">
+                <span className="text-graphite">Members who came back</span>
+                <span className="literal font-semibold text-ink">{stats.returned} of {stats.lapsed}</span>
+              </div>
+              <div className="mt-2 h-[3px] overflow-hidden rounded-full bg-ash">
+                <div className="recovery-fill h-full rounded-full bg-teal-bright" style={{ width: `${Math.min(100, stats.returned / Math.max(stats.lapsed, 1) * 100)}%` }} />
+              </div>
+              {recovered.recurringMinor > 0 || recovered.oneOffMinor > 0 ? (
+                <p className="mt-3 text-[0.8125rem] text-stone">
+                  {formatMoney(recovered.recurringMinor, currency)} recurring · {formatMoney(recovered.oneOffMinor, currency)} one off
+                  {recovered.annualisedRecurringMinor > recovered.recurringMinor
+                    ? ` · roughly ${formatMoney(recovered.annualisedRecurringMinor, currency)} over a year if recurring members stay`
+                    : ""}
+                </p>
+              ) : null}
+              {recovered.unpriced > 0 ? (
+                <p className="mt-3 text-[0.8125rem] text-stone">
+                  {recovered.unpriced} {recovered.unpriced === 1 ? "booking has" : "bookings have"} no service, so {recovered.unpriced === 1 ? "its value is" : "their value is"} left out.
+                </p>
+              ) : null}
+            </div>
+          </Card>
+        ) : (
+          <Card className="flex flex-col justify-between gap-5 p-7 sm:p-8">
+            <div>
+              <CardTitle>See the money, not just the count</CardTitle>
+              <p className="mt-2 max-w-[52ch] text-[0.9375rem] text-graphite">
+                Add what you sell and what it costs. casdey then values each booking it wins back at the price of that service.
+              </p>
+            </div>
+            <ButtonLink href="/app/settings/services" variant="quiet" className="self-start">Add your services</ButtonLink>
+          </Card>
+        )}
+
+        <section aria-label="Next move" className="focus-panel flex flex-col justify-between gap-8 p-7 sm:p-8">
+          <div>
+            <p className="label text-teal">Next move</p>
+            <h2 className="display mt-3 text-[1.375rem] text-ink sm:text-[1.5rem]">{nextMove.title}</h2>
+            <p className="mt-3 max-w-[44ch] text-[0.875rem] leading-relaxed text-graphite">{nextMove.body}</p>
+          </div>
+          <ButtonLink href={nextMove.href} variant="quiet" className="focus-action self-start">
+            {nextMove.action}<span aria-hidden="true">↗</span>
+          </ButtonLink>
+        </section>
+      </section>
+
+        <Card className="opportunity-panel overview-enter overview-enter-1 mt-4 flex flex-wrap items-center justify-between gap-5 p-5 sm:p-6">
+          <div>
+            <p className="label text-stone">Recurring revenue lapsed</p>
+            {opportunity.priced && opportunity.lapsedMembers > 0 ? (
+              <>
+                <p className="literal mt-2 text-[1.5rem] leading-none font-semibold text-ink">
+                  {formatMoney(opportunity.monthlyMinor, currency)}<span className="ml-1 text-[0.875rem] font-normal text-stone">/month</span>
+                </p>
+                <p className="mt-2 max-w-[65ch] text-[0.8125rem] leading-relaxed text-graphite">
+                  Estimated value of {opportunity.lapsedMembers} members who have gone quiet. A rough measure of opportunity, not a promise.
+                </p>
+              </>
+            ) : (
+              <p className="mt-3 text-[0.875rem] leading-relaxed text-graphite">
+                Add an active recurring membership in <Link href="/app/settings/services" className="text-teal underline underline-offset-4">Services</Link> to estimate the monthly value of members who have gone quiet. One-off services are left out.
+              </p>
+            )}
+          </div>
+          {opportunity.priced && opportunity.lapsedMembers > 0 ? (
+            <details className="opportunity-detail text-[0.8125rem] text-stone">
+              <summary className="cursor-pointer font-medium text-graphite">How this is estimated</summary>
+              <p className="mt-2 leading-relaxed">
+                Based on a typical membership of {formatMoney(opportunity.typicalMonthlyMinor, currency)}. {opportunity.basis === "member_counts"
+                  ? `Weighted by the ${opportunity.weightedMembers} current members recorded across your memberships.`
+                  : "Add current-member counts to every recurring membership to weight this by your actual membership mix."} Some of these members may already have cancelled with you.
+              </p>
+            </details>
+          ) : null}
+        </Card>
+
+      <section aria-label="Member journey" className="overview-enter overview-enter-2 mt-7">
+        <div className="mb-3 flex items-baseline justify-between gap-3">
+          <h2 className="display text-[1.125rem]">The path back</h2>
+          <p className="hidden text-[0.8125rem] text-stone sm:block">Open a stage to see its members</p>
+        </div>
+        <div className="metric-rail grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
+        <Stat label="Members" value={stats.members} href="/app/members?filter=all" />
         <Stat
           label="At risk"
           value={stats.atRisk}
+          href="/app/members?filter=at_risk"
           hint={`not yet contacted, ${gym.at_risk_after_days}+ days away`}
         />
         <Stat
           label="Gone quiet"
           value={stats.lapsed}
           tone="teal"
+          href="/app/members?filter=lapsed"
           hint={
             stats.reachable < stats.lapsed
               ? `${stats.reachable} have an email address`
@@ -281,154 +465,53 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         <Stat
           label="Contacted"
           value={stats.contacted}
+          href="/app/members?filter=contacted"
           hint="sent at least one message"
         />
         <Stat
           label="Returned"
           value={stats.returned}
           tone="returned"
+          href="/app/members?filter=returned"
           hint="came back after we wrote"
         />
-      </div>
+        </div>
+      </section>
 
-      {/* The forward figure, paired with Recovered beside it: what the quiet
-          half of the list is worth per month, against what casdey has pulled
-          back so far. An estimate from the gym's own membership prices, shown
-          on every tier (the size of the opportunity is never hidden) and
-          deliberately set smaller than Recovered so it does not compete with
-          the number the product is actually judged on. */}
-      <div className="mt-4 grid items-start gap-4 xl:grid-cols-2">
-      <Card>
-        <p className="label text-stone">Recurring revenue lapsed</p>
-        {opportunity.priced && opportunity.lapsedMembers > 0 ? (
-          <>
-          <p className="literal mt-2 text-[1.75rem] leading-none font-medium text-ink">
-            {formatMoney(opportunity.monthlyMinor, currency)}
-            <span className="text-[0.9375rem] font-normal text-stone">
-              /month
-            </span>
-          </p>
-          <p className="mt-3 max-w-xl text-[0.8125rem] text-stone">
-            Your {opportunity.lapsedMembers} lapsed{" "}
-            {opportunity.lapsedMembers === 1 ? "member" : "members"} represent
-            about this much a month between them, at a typical membership of{" "}
-            {formatMoney(opportunity.typicalMonthlyMinor, currency)}. {opportunity.basis === "member_counts"
-              ? `That figure is weighted by the ${opportunity.weightedMembers} current members you recorded across your memberships.`
-              : "Add current-member counts to every recurring membership to weight this figure by your actual membership mix."} A rough measure of the opportunity, not a promise, and some may already have cancelled with you.
-          </p>
-          </>
-        ) : (
-          <p className="mt-3 max-w-xl text-[0.8125rem] text-stone">
-            Add an active recurring membership, such as one charged weekly or
-            monthly, in{" "}
-            <Link href="/app/settings/services" className="text-teal underline underline-offset-4">
-              Services
-            </Link>{" "}
-            to estimate the recurring value of members who have gone quiet.
-            One-off classes and sessions are deliberately left out.
-          </p>
-        )}
-      </Card>
-
-      {/* Recovered revenue belongs with the counts above it, not at the bottom
-          of the page: it is the one number the whole product is judged on and
-          the first thing anybody opens this page to see. */}
-      {priced ? (
-        <Card>
-          <p className="label text-stone">Revenue recovered</p>
-          <p className="literal mt-2 text-[2.5rem] leading-none font-medium text-[color-mix(in_srgb,var(--amber)_62%,var(--ink))]">
-            {formatMoney(recovered.totalMinor, currency)}
-          </p>
-          <p className="mt-3 max-w-xl text-[0.8125rem] text-stone">
-            {recovered.bookings - recovered.unpriced}{" "}
-            {recovered.bookings - recovered.unpriced === 1
-              ? "booking"
-              : "bookings"}{" "}
-            casdey won back, each one at the price of the service it was for.
-            Not an average, and not a number casdey has billed.
-          </p>
-
-          {/* What the money is made of. Thirty monthly memberships and thirty
-              single sessions are the same total and completely different
-              businesses. */}
-          {recovered.recurringMinor > 0 || recovered.oneOffMinor > 0 ? (
-            <div className="mt-4 border-t border-ash pt-4">
-              <p className="text-[0.875rem] text-graphite">
-                <span className="literal text-ink">
-                  {formatMoney(recovered.recurringMinor, currency)}
-                </span>{" "}
-                of it is recurring and{" "}
-                <span className="literal text-ink">
-                  {formatMoney(recovered.oneOffMinor, currency)}
-                </span>{" "}
-                is one off.
-              </p>
-              {recovered.annualisedRecurringMinor > recovered.recurringMinor ? (
-                <p className="mt-1 text-[0.8125rem] text-stone">
-                  The recurring part is worth about{" "}
-                  {formatMoney(recovered.annualisedRecurringMinor, currency)} over
-                  a year if those members stay, which is the figure worth
-                  holding against what casdey costs.
-                </p>
-              ) : null}
-            </div>
-          ) : null}
-
-          {/* Said out loud rather than quietly depressing the total. A gym
-              seeing a number lower than it expected deserves to know why. */}
-          {recovered.unpriced > 0 ? (
-            <p className="mt-3 text-[0.8125rem] text-stone">
-              {recovered.unpriced}{" "}
-              {recovered.unpriced === 1 ? "booking has" : "bookings have"} no
-              service on{" "}
-              {recovered.unpriced === 1 ? "it" : "them"}, so casdey cannot say
-              what {recovered.unpriced === 1 ? "it was" : "they were"} worth and
-              {recovered.unpriced === 1 ? " it is" : " they are"} left out of
-              this total.
-            </p>
-          ) : null}
-        </Card>
-      ) : (
-        <Card className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <CardTitle>See the money, not just the count</CardTitle>
-            <p className="text-[0.9375rem] text-graphite">
-              Add what you sell and what it costs. casdey then values every
-              booking it wins back at the price of the service it was for, and
-              those are the same prices your members read when they book.
-            </p>
-          </div>
-          <ButtonLink href="/app/settings/services" variant="quiet">
-            Add your services
-          </ButtonLink>
-        </Card>
-      )}
-      </div>
+      <Link href="/app?view=insights" className="insights-invite overview-enter overview-enter-3 mt-6 flex items-center justify-between gap-4 p-5 sm:p-6">
+        <span>
+          <span className="label text-teal">A closer look</span>
+          <span className="display mt-1 block text-[1.125rem] text-ink">Explore your trends</span>
+          <span className="mt-1 block text-[0.8125rem] text-graphite">Messages, returns and recovered value across time.</span>
+        </span>
+        <span className="insights-invite-arrow" aria-hidden="true">↗</span>
+      </Link>
+      </> : null}
 
       {/* Analytics. Each measure gets its own panel against its own scale:
           messages sent and members returned differ by an order of magnitude,
           and one chart with two y-axes would let the picture imply a
           relationship the data has not earned. */}
-      <section className="mt-8">
+      {insights ? <section className="overview-enter overview-enter-1 mt-2">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="display text-[1.25rem]">{range.heading}</h2>
+            <h2 className="display text-[1.25rem]">{customDates ? `${formatDate(params.from as string)} to ${formatDate(params.to as string)}` : range.heading}</h2>
             <p className="text-[0.875rem] text-stone">
               {totals.sent === 0
                 ? "Fills in as soon as your first campaign goes out."
-                : `Compared with the ${range.label.toLowerCase()} before.`}
+                : `Compared with ${comparisonLabel}.`}
             </p>
           </div>
 
           {/* Links, not a control with state. Each range is a URL. */}
           <nav aria-label="Chart period" className="flex flex-wrap gap-1">
             {RANGES.map((option) => {
-              const active = option.weeks === range.weeks;
+              const active = !custom && option.weeks === range.weeks;
               return (
                 <Link
                   key={option.weeks}
                   href={
-                    option.weeks === 12 ? "/app" : `/app?range=${option.weeks}`
+                    option.weeks === 12 ? "/app?view=insights" : `/app?view=insights&range=${option.weeks}`
                   }
                   aria-current={active ? "page" : undefined}
                   className={`rounded-md border px-3 py-1.5 text-[0.8125rem] font-medium transition-colors duration-150 ${
@@ -444,14 +527,29 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           </nav>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-3">
+        <form action="/app" method="get" className={`insights-date-form mb-5 flex flex-wrap items-end gap-3 rounded-xl border bg-white p-4 ${custom ? "border-teal" : "border-ash"}`}>
+          <input type="hidden" name="view" value="insights" />
+          <span className="label self-center text-stone">Custom dates</span>
+          <label className="text-[0.75rem] font-medium text-stone">From
+            <input type="date" name="from" required max={today} defaultValue={typeof params.from === "string" ? params.from : ""} className="insights-date-input mt-1 block rounded-md border border-ash bg-paper px-2.5 py-1.5 text-[0.875rem] text-ink" />
+          </label>
+          <label className="text-[0.75rem] font-medium text-stone">To
+            <input type="date" name="to" required max={today} defaultValue={typeof params.to === "string" ? params.to : ""} className="insights-date-input mt-1 block rounded-md border border-ash bg-paper px-2.5 py-1.5 text-[0.875rem] text-ink" />
+          </label>
+          <button type="submit" className="insights-date-apply rounded-md bg-teal-bright px-3 py-2 text-[0.8125rem] font-semibold text-[#15150F]">Apply dates</button>
+          <span className="text-[0.75rem] text-stone">Up to one year, through today in your gym&apos;s timezone.</span>
+        </form>
+        {customRequested && !custom ? <p role="alert" className="mb-4 text-[0.8125rem] text-amber">Choose valid dates in the past, no more than one year apart.</p> : null}
+
+        <div className="chart-rail grid lg:grid-cols-3">
           <MetricChart
             title="Messages sent"
+            periodUnit={custom ? "date" : "week"}
             hero={String(totals.sent)}
             changePercent={change(totals.sent, previous.sent)}
             changeLabel={
               previous.sent > 0
-                ? `${previous.sent} in the ${range.label.toLowerCase()} before`
+                ? `${previous.sent} in ${comparisonLabel}`
                 : "nothing sent before this"
             }
             points={weeks.map((week) => ({
@@ -462,12 +560,13 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           />
           <MetricChart
             title="Members back"
+            periodUnit={custom ? "date" : "week"}
             tone="returned"
             hero={String(totals.returned)}
             changePercent={change(totals.returned, previous.returned)}
             changeLabel={
               previous.returned > 0
-                ? `${previous.returned} in the ${range.label.toLowerCase()} before`
+                ? `${previous.returned} in ${comparisonLabel}`
                 : "none came back before this"
             }
             points={weeks.map((week) => ({
@@ -478,12 +577,13 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           />
           <MetricChart
             title="Recovered"
+            periodUnit={custom ? "date" : "week"}
             tone="amber"
             hero={formatMoney(totals.revenueMinor, currency)}
             changePercent={change(totals.revenueMinor, previous.revenueMinor)}
             changeLabel={
               previous.revenueMinor > 0
-                ? `${formatMoney(previous.revenueMinor, currency)} in the ${range.label.toLowerCase()} before`
+                ? `${formatMoney(previous.revenueMinor, currency)} in ${comparisonLabel}`
                 : "nothing recovered before this"
             }
             points={weeks.map((week) => ({
@@ -500,6 +600,8 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         <div className="mt-4 grid gap-4 xl:grid-cols-2">
           <LineChart
             title="Revenue recovered"
+            periodLabel={periodLabel}
+            periodUnit={custom ? "date" : "week"}
             tone="amber"
             hero={formatMoney(totals.revenueMinor, currency)}
             changePercent={change(totals.revenueMinor, previous.revenueMinor)}
@@ -515,6 +617,8 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           />
           <LineChart
             title="Members back"
+            periodLabel={periodLabel}
+            periodUnit={custom ? "date" : "week"}
             tone="returned"
             hero={String(totals.returned)}
             changePercent={change(totals.returned, previous.returned)}
@@ -588,8 +692,9 @@ export default async function DashboardPage(props: PageProps<"/app">) {
             />
           </Card>
         </div>
-      </section>
+      </section> : null}
 
+      {!insights ? <>
       {returned ? (
         <Card className="mt-6">
           <CardTitle>Most recent return</CardTitle>
@@ -600,40 +705,16 @@ export default async function DashboardPage(props: PageProps<"/app">) {
             </span>
             .
           </p>
-          <MemberTimeline
+          <ReturnStory
+            memberId={returned.id}
+            name={memberName(returned)}
             visitCount={returned.visit_count}
-            monthsAway={monthsSince(returned.last_visit_at)}
-            returned
+            lastVisit={returned.last_visit_at ? formatDate(returned.last_visit_at) : null}
+            returnedOn={formatDate(returned.returned_at)}
+            monthsAway={monthsSince(returned.last_visit_at, new Date(returned.returned_at!))}
           />
         </Card>
       ) : null}
-
-      {stats.reachable > 0 ? (
-        <Card className="mt-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <CardTitle>Ready to work</CardTitle>
-            <p className="text-[0.9375rem] text-graphite">
-              <span className="literal font-medium text-ink">
-                {stats.reachable}
-              </span>{" "}
-              lapsed {stats.reachable === 1 ? "member has" : "members have"}{" "}
-              an email address on file. A campaign writes to them once, and
-              stops.
-            </p>
-          </div>
-          <ButtonLink href="/app/campaigns/new">Build a campaign</ButtonLink>
-        </Card>
-      ) : (
-        <Card className="mt-6">
-          <CardTitle>No email addresses yet</CardTitle>
-          <p className="text-[0.9375rem] text-graphite">
-            {stats.lapsed} lapsed{" "}
-            {stats.lapsed === 1 ? "member" : "members"}, none with an email
-            address casdey can use. Re-import with the email column mapped and
-            they become contactable.
-          </p>
-        </Card>
-      )}
 
       {/* Below the numbers, deliberately. The checklist is scaffolding: it is
           there for the first week and then never again, while the dashboard is
@@ -649,6 +730,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           checklist this does not disappear when setup is complete: a gym mid
           free week still needs to know what day 7 does and how to opt out. */}
       {trialPanel ? <div className="mt-6">{trialPanel}</div> : null}
+      </> : null}
     </>
   );
 }

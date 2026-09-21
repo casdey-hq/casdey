@@ -74,7 +74,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
 
       <nav
         aria-label="Sections"
-        className="mb-8 flex gap-1 overflow-x-auto border-b border-ash"
+        className="mb-8 flex gap-1 overflow-x-auto overflow-y-hidden overscroll-y-none border-b border-ash"
       >
         {TABS.map((t) => {
           const active = t.id === tab;

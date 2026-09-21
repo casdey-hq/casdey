@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AppShot, type View } from "../app-shot";
 import { Reveal } from "../motion";
 import { Container } from "../ui";
 
 /**
- * The one interactive block on the page: pick a step, the screen changes.
+ * The one interactive block on the page: scroll through a step and the screen
+ * changes with it. Clicking remains useful when somebody wants to inspect one
+ * step without changing their reading position.
  *
  * This replaces a row of three numbered cards, and then a scroll-drawn
  * timeline, neither of which showed the software. A gym owner clicking
@@ -44,63 +46,142 @@ const STEPS: { view: View; title: string; body: string }[] = [
   },
 ];
 
+function ProcessIntro() {
+  return (
+    <>
+      <h2 className="display max-w-[24ch] text-[clamp(1.6rem,2.6vw,2.15rem)] text-ink text-balance">
+        You import your list. casdey does the rest.
+      </h2>
+      <p className="mt-5 max-w-[52ch] text-[1.0625rem] leading-relaxed text-graphite text-pretty">
+        Not a dashboard telling you who to chase. It writes to every one of
+        them itself, follows up when they go quiet, answers the replies in
+        your name, and books them in.
+      </p>
+    </>
+  );
+}
+
 export function WhatItDoes() {
   const [active, setActive] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const stageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const stage = stageRef.current;
+      if (!stage || window.innerWidth < 1024) return;
+
+      const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const stickyTop = rootFontSize * 11;
+      const range = Math.max(stage.offsetHeight - window.innerHeight, 1);
+      const nextProgress = Math.min(0.9999, Math.max(0, (stickyTop - stage.getBoundingClientRect().top) / range));
+      const next = Math.floor(nextProgress * STEPS.length);
+      setProgress(nextProgress);
+      setActive((current) => (current === next ? current : next));
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   return (
     <section id="what-it-does" className="scroll-mt-24 py-24 sm:py-32">
       <Container>
+        <div className="lg:hidden">
         <Reveal>
-          <h2 className="display max-w-[24ch] text-[clamp(1.6rem,2.6vw,2.15rem)] text-ink text-balance">
-            You import your list. casdey does the rest.
-          </h2>
-          <p className="mt-5 max-w-[52ch] text-[1.0625rem] leading-relaxed text-graphite text-pretty">
-            Not a dashboard telling you who to chase. It writes to every one of
-            them itself, follows up when they go quiet, answers the replies in
-            your name, and books them in.
-          </p>
+          <ProcessIntro />
+        </Reveal>
 
-          <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
-            <ol className="list-none">
-              {STEPS.map((step, i) => {
-                const on = i === active;
-                return (
-                  <li key={step.view}>
-                    <button
-                      type="button"
-                      onClick={() => setActive(i)}
-                      aria-current={on ? "true" : undefined}
-                      className={
-                        "w-full border-l-2 py-4 pl-5 text-left transition-colors duration-200 " +
-                        (on ? "border-teal" : "border-ash hover:border-stone")
-                      }
-                    >
-                      <span
-                        className={
-                          "block text-[1.0625rem] font-medium transition-colors duration-200 " +
-                          (on ? "text-ink" : "text-stone")
-                        }
-                      >
-                        {step.title}
-                      </span>
-                      {on && (
-                        <span className="mt-2 block text-[0.9375rem] leading-relaxed text-graphite">
-                          {step.body}
-                        </span>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
+        <div className="mt-12">
+          <ol className="list-none">
+            {STEPS.map((step, i) => {
+              const on = i === active;
+              return (
+                <li key={step.view}>
+                  <button
+                    type="button"
+                    onClick={() => setActive(i)}
+                    aria-current={on ? "true" : undefined}
+                    className={
+                      "w-full border-l-2 py-4 pl-5 text-left transition-colors duration-200 " +
+                      (on ? "border-teal" : "border-ash hover:border-stone")
+                    }
+                  >
+                    <span className={"block text-[1.0625rem] font-medium " + (on ? "text-ink" : "text-stone")}>
+                      {step.title}
+                    </span>
+                    {on && <span className="mt-2 block text-[0.9375rem] leading-relaxed text-graphite">{step.body}</span>}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+          <div key={active} className="view-fade mt-8">
+            <AppShot view={STEPS[active].view} />
+          </div>
+        </div>
+        </div>
 
-            <div className="lg:pt-1">
-              <div key={active} className="view-fade">
-                <AppShot view={STEPS[active].view} />
+        <div ref={stageRef} className="relative hidden min-h-[360vh] lg:block">
+          <div className="sticky top-44">
+            <Reveal>
+              <ProcessIntro />
+            </Reveal>
+
+            <div className="mt-8 grid grid-cols-[minmax(0,20rem)_minmax(0,1fr)] gap-14">
+            <div className="relative h-[405px] overflow-hidden pl-5">
+              <span aria-hidden="true" className="absolute inset-y-0 left-0 w-px bg-ash" />
+              <span
+                aria-hidden="true"
+                className="absolute left-0 top-0 w-px bg-teal"
+                style={{ height: `${progress * 100}%` }}
+              />
+              <div
+                className="will-change-transform transition-transform duration-200 ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none"
+                style={{ transform: `translateY(-${active * (100 / STEPS.length)}%)` }}
+              >
+                {STEPS.map((step, i) => (
+                  <article key={step.view} className="h-[405px] pt-8">
+                    <p className="label text-teal">{String(i + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}</p>
+                    <h3 className="mt-3 text-[1.0625rem] font-medium text-ink">{step.title}</h3>
+                    <p className="mt-2 text-[0.9375rem] leading-relaxed text-graphite">{step.body}</p>
+                  </article>
+                ))}
               </div>
             </div>
+
+            <div key={active} className="view-fade">
+              <AppShot view={STEPS[active].view} />
+            </div>
+            </div>
+
+            {progress < 0.995 ? (
+              <div className="scroll-cue mt-7 flex flex-col items-center gap-1.5 text-stone">
+                <span className="label">Scroll down</span>
+                <span aria-hidden="true" className="flex flex-col -space-y-2 text-teal">
+                  <svg viewBox="0 0 24 16" className="scroll-cue-chevron h-4 w-8 fill-none stroke-current" strokeWidth="1.15">
+                    <path d="m2 2 10 11 10-11" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  <svg viewBox="0 0 24 16" className="scroll-cue-chevron h-4 w-8 fill-none stroke-current" strokeWidth="1.15">
+                    <path d="m2 2 10 11 10-11" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </div>
+            ) : null}
           </div>
-        </Reveal>
+
+        </div>
       </Container>
     </section>
   );

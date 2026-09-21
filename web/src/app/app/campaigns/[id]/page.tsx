@@ -138,7 +138,7 @@ export default async function CampaignPage(
             <p className="mb-4 border-b border-ash pb-3 text-[0.9375rem] font-semibold text-ink">
               {campaign.subject}
             </p>
-            <pre className="font-[family-name:var(--font-inter)] text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-graphite">
+            <pre className="text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-graphite">
               {campaign.body}
             </pre>
           </div>

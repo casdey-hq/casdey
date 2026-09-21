@@ -19,10 +19,10 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+    <header className="page-header page-enter flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0 w-full sm:min-w-[20rem] sm:flex-1">
         {eyebrow ? <p className="label mb-2 text-teal">{eyebrow}</p> : null}
-        <h1 className="display max-w-[30ch] text-[1.75rem] sm:text-[2rem]">
+        <h1 className="display max-w-[30ch] text-[1.875rem] sm:text-[2.125rem]">
           {title}
         </h1>
         {/* The measure belongs to the heading, not to the paragraph under it.
@@ -58,8 +58,8 @@ export function CardTitle({ children }: { children: ReactNode }) {
 }
 
 /**
- * A single number with its label. The number is set in mono because it is a
- * literal, per the brand guide.
+ * A single number with its label. Product numbers use tabular figures so the
+ * values stay easy to compare without reading like code.
  *
  * `tone="returned"` is the one place amber appears in the product. Nothing else
  * may pass it.
@@ -69,11 +69,15 @@ export function Stat({
   value,
   hint,
   tone = "default",
+  href,
+  className = "",
 }: {
   label: string;
   value: string | number;
   hint?: string;
   tone?: "default" | "teal" | "returned";
+  href?: string;
+  className?: string;
 }) {
   const valueTone =
     tone === "returned"
@@ -82,8 +86,8 @@ export function Stat({
         ? "text-teal"
         : "text-ink";
 
-  return (
-    <div className="card p-5">
+  const content = (
+    <>
       <p className="label text-stone">{label}</p>
       <p
         className={`literal mt-2 text-[2rem] leading-none font-medium ${valueTone}`}
@@ -91,8 +95,14 @@ export function Stat({
         {value}
       </p>
       {hint ? <p className="mt-2 text-[0.8125rem] text-stone">{hint}</p> : null}
-    </div>
+      {href ? <span className="journey-arrow" aria-hidden="true">↗</span> : null}
+    </>
   );
+
+  if (href) {
+    return <Link href={href} className={`card journey-link p-5 ${className}`}>{content}</Link>;
+  }
+  return <div className={`card p-5 ${className}`}>{content}</div>;
 }
 
 export function EmptyState({

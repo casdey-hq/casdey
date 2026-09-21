@@ -27,6 +27,30 @@ const UNCOVERED = [
   "The reply, answered and booked",
 ];
 
+function FeatureMark({ quiet }: { quiet?: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={
+        "mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-[7px] border " +
+        (quiet
+          ? "border-ash bg-mist text-stone"
+          : "border-[color-mix(in_srgb,var(--teal)_45%,var(--ash))] bg-shallow text-teal")
+      }
+    >
+      {quiet ? (
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 fill-none stroke-current" strokeWidth="1.5">
+          <path d="M3 4.5h10M3 8h10M3 11.5h6" strokeLinecap="round" />
+        </svg>
+      ) : (
+        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 fill-none stroke-current" strokeWidth="1.7">
+          <path d="m3.25 8.25 2.8 2.8 6.7-6.1" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </span>
+  );
+}
+
 function Column({
   heading,
   note,
@@ -55,12 +79,7 @@ function Column({
               (quiet ? "text-stone" : "text-ink")
             }
           >
-            <span
-              aria-hidden="true"
-              className={
-                "mt-[0.6em] h-px w-3 shrink-0 " + (quiet ? "bg-ash" : "bg-teal")
-              }
-            />
+            <FeatureMark quiet={quiet} />
             {item}
           </li>
         ))}

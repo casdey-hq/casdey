@@ -42,7 +42,7 @@ export default async function OfferPage(props: PageProps<"/app/offer">) {
   const offers = (savedOffers ?? []) as SavedOffer[];
 
   return (
-    <div className="max-w-[46rem] space-y-6">
+    <div className="space-y-6">
       <PageHeader
         eyebrow="Offer"
         title="Give them a reason to come back"
