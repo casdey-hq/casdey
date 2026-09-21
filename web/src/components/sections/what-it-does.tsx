@@ -61,6 +61,22 @@ function ProcessIntro() {
   );
 }
 
+function ScrollCue() {
+  return (
+    <div className="scroll-cue flex flex-col items-center gap-1.5 text-stone">
+      <span className="label">Scroll down</span>
+      <span aria-hidden="true" className="flex flex-col -space-y-2 text-teal">
+        <svg viewBox="0 0 24 16" className="scroll-cue-chevron h-4 w-8 fill-none stroke-current" strokeWidth="1.15">
+          <path d="m2 2 10 11 10-11" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <svg viewBox="0 0 24 16" className="scroll-cue-chevron h-4 w-8 fill-none stroke-current" strokeWidth="1.15">
+          <path d="m2 2 10 11 10-11" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+    </div>
+  );
+}
+
 export function WhatItDoes() {
   const [active, setActive] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -76,7 +92,7 @@ export function WhatItDoes() {
       if (!stage) return;
 
       const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      const stickyTop = rootFontSize * (desktop ? 11 : 6);
+      const stickyTop = rootFontSize * (desktop ? 11 : 8);
       const range = Math.max(stage.offsetHeight - window.innerHeight, 1);
       const nextProgress = Math.min(0.9999, Math.max(0, (stickyTop - stage.getBoundingClientRect().top) / range));
       const next = Math.floor(nextProgress * STEPS.length);
@@ -106,21 +122,23 @@ export function WhatItDoes() {
           </Reveal>
 
           <div ref={mobileStageRef} className="relative mt-10 min-h-[280vh]">
-            <div className="sticky top-24">
-              <div className="h-px overflow-hidden bg-ash">
+            <div className="sticky top-32">
+              <div className="relative pl-5">
+                <span aria-hidden="true" className="absolute inset-y-0 left-0 w-px bg-ash" />
                 <span
                   aria-hidden="true"
-                  className="block h-full bg-teal transition-[width] duration-200 ease-out"
-                  style={{ width: `${progress * 100}%` }}
+                  className="absolute left-0 top-0 w-px bg-teal transition-[height] duration-200 ease-out"
+                  style={{ height: `${progress * 100}%` }}
                 />
-              </div>
-              <article key={active} className="view-fade pt-5">
-                <p className="label text-teal">{String(active + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}</p>
-                <h3 className="mt-2 text-[1.0625rem] font-medium text-ink">{STEPS[active].title}</h3>
-                <p className="mt-2 text-[0.9375rem] leading-relaxed text-graphite">{STEPS[active].body}</p>
-              </article>
-              <div key={STEPS[active].view} className="view-fade mt-6">
-                <AppShot view={STEPS[active].view} />
+                <article key={active} className="view-fade">
+                  <p className="label text-teal">{String(active + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}</p>
+                  <h3 className="mt-2 text-[1.0625rem] font-medium text-ink">{STEPS[active].title}</h3>
+                  <p className="mt-2 text-[0.9375rem] leading-relaxed text-graphite">{STEPS[active].body}</p>
+                </article>
+                <div key={STEPS[active].view} className="view-fade mt-6">
+                  <AppShot view={STEPS[active].view} />
+                </div>
+                {progress < 0.995 ? <div className="mt-6"><ScrollCue /></div> : null}
               </div>
             </div>
           </div>
@@ -160,17 +178,7 @@ export function WhatItDoes() {
             </div>
 
             {progress < 0.995 ? (
-              <div className="scroll-cue mt-7 flex flex-col items-center gap-1.5 text-stone">
-                <span className="label">Scroll down</span>
-                <span aria-hidden="true" className="flex flex-col -space-y-2 text-teal">
-                  <svg viewBox="0 0 24 16" className="scroll-cue-chevron h-4 w-8 fill-none stroke-current" strokeWidth="1.15">
-                    <path d="m2 2 10 11 10-11" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                  <svg viewBox="0 0 24 16" className="scroll-cue-chevron h-4 w-8 fill-none stroke-current" strokeWidth="1.15">
-                    <path d="m2 2 10 11 10-11" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              </div>
+              <div className="mt-7"><ScrollCue /></div>
             ) : null}
           </div>
 
