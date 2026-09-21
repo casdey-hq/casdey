@@ -1,6 +1,6 @@
 ---
 name: cold-outreach
-description: Runs casdey's automated cold-outreach workflow — sourcing UK/EU dental practice leads, drafting personalized cold emails and follow-ups, sending via Zoho, and logging everything. Use when asked to run outreach, draft/send a batch of cold emails, source new leads, or check outreach status/tracking.
+description: RETIRED. The historical dental cold-outreach spec (UK/EU dental practices, sent via Zoho). Not the live outreach: casdey now emails gyms, on the gym-outreach-automation branch. Do not use this to run, draft or send anything; only to read how the dental system worked.
 ---
 
 # casdey cold outreach

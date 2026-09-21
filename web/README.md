@@ -1,8 +1,10 @@
 # casdey web
 
-The casdey marketing site and waitlist. Next.js 16 (App Router) + Tailwind v4,
-built to be deployed on Vercel. The SaaS itself will live in this same app under
-its own routes, which is why it is a full Next app rather than a static page.
+The casdey website and the SaaS behind it, in one app. Next.js 16 (App Router) +
+Tailwind v4, deployed on Vercel (Root Directory `web`, `main` is production).
+Public pages (landing, pricing, waitlist, legal), the gym product under `/app`,
+and the founder-only casdey HQ under `/admin` all live here. For what the
+product does and how it is deployed, read `SAAS_HANDOFF.md`.
 
 ## Running it
 
@@ -20,11 +22,19 @@ Then open http://localhost:3000.
 
 - `/` — the landing page. Its hero has a single email field that carries the
   address to `/waitlist` rather than submitting on its own.
-- `/waitlist` — the full signup: practice name, email (prefilled if it arrived
-  from `/`), practice software, and the FAQ.
+- `/pricing`, `/contact`, `/privacy`, `/terms/processing`, `/terms/refunds`:
+  the public pages. `/see` is a hidden (unlinked, `noindex`) product film used
+  in outreach.
+- `/waitlist`: the waitlist signup (gym name, email, gym software, FAQ). It is
+  no longer the front door, but cold outreach has linked to it since August, so
+  it keeps its URL.
+- `/login`, `/reset-password`, `/auth/*`: sign-in and account recovery.
+- `/app/*`: the gym product (overview, members, campaigns, import, calendar,
+  offer, settings, support). `/book/*` and `/u/*` are the member-facing
+  booking and unsubscribe pages.
+- `/admin`: casdey HQ, for the founder only (gate in `src/lib/admin.ts`).
 - `/homepage` redirects to `/` (see `next.config.ts`), so a link written that
   way still lands somewhere sensible.
-- `/privacy` — the waitlist's privacy notice. Not yet complete, see below.
 
 ## Brand
 
@@ -38,7 +48,8 @@ lets a whole palette swap land without touching component code:
   something to be warm against), White `#FFFFFF`, Mist `#EFEFEA`, Ash `#E2E2DA`,
   Stone `#6D6D63`, Graphite `#4B4B44`, Ink `#15150F`.
 - Deep `#16160F` (plus `--deep-raised`, `--deep-line`) for the one inverted
-  plane, at most once per screen. Anything on it needs the `.on-deep` scope
+  plane on the light pages, at most once per screen (the dark theme overrides
+  these values). Anything on it needs the `.on-deep` scope
   class, which remaps the neutral and gold roles; without it `text-ink` on
   `bg-deep` is invisible.
 - Gold is two values, not one. `--teal` Struck Gold `#8F6A10` is the READ value:
@@ -55,11 +66,17 @@ lets a whole palette swap land without touching component code:
   anything literal.
 - The logo lives in `src/components/wordmark.tsx` (`Mark` / `Wordmark` /
   `Logo`), drawn in code so it re-themes with the tokens. Use the `Logo` lockup
-  in chrome. `../brand assets/casdey Logo.png` is the v2/v3 wordmark-only file
-  and is superseded.
-- The page commits to a light appearance rather than following system dark
-  mode: the dark bands only read as deliberate when they are the only dark
-  thing on the page.
+  in chrome. `../brand assets/casdey Logo.png` is the v4 mark on its own
+  (1080x1080), for places that need an image file.
+- Appearance does not follow system dark mode; it is set per surface. The
+  signed-in product (`/app`) and casdey HQ (`/admin`) default to the v5 dark
+  "Charcoal Product System" (ground `#09090A`, one raised `#191A1D` card
+  plane), set by the `data-theme` cookie, and use Manrope for the interface
+  (rules in `src/styles/product.css`). The homepage `/` is dark too, through a
+  `.marketing-surface` wrapper in `globals.css`. The other public pages, such
+  as `/pricing`, are still the light Chalk of v4, so as of
+  2026-09-21 the site mixes a dark homepage with light inner pages. The
+  authoritative reference is the v5 brand guide.
 
 Copy rules, which apply to every string on the site: "casdey" is always
 lowercase, and em dashes are never used as punctuation. No invented statistics;
@@ -95,7 +112,9 @@ node scripts/screenshot.mjs http://localhost:3000 mobile-label --mobile
   being dropped. Only if that also fails does the visitor see an error.
 
 Two emails go out per new signup, both via Zoho and neither able to fail the
-signup: an alert to `WAITLIST_NOTIFY_TO`, and a confirmation to the practice.
+signup: an alert to `WAITLIST_NOTIFY_TO`, and a confirmation to the gym. The
+column names `practice_name` and `practice_software` are left over from the
+dental era on purpose: renaming them would have broken the live form.
 
 ## Database
 
@@ -132,12 +151,14 @@ paste it into chat, a commit, or anywhere client-visible.
 
 ## Deploying
 
-Vercel, with **Root Directory** set to `web`. Everything else is default. Push
-to any branch other than `main` for a preview URL; merging to `main` is
-production. `casdey.com` currently points at GoDaddy, so its DNS needs to move
-to Vercel (or have records added) before the domain resolves here. Until then
-the site is local-only, reachable at `http://localhost:3000` while the dev
-server is running.
+Vercel, with **Root Directory** set to `web`. Push to any branch other than
+`main` for a preview URL; merging to `main` is production, so pushing to
+`main` deploys `casdey.com`. The domain's DNS points at Vercel (moved
+2026-08-13), and the canonical host is `www.casdey.com`: the apex answers a 308
+redirect, so anything that calls casdey back (Stripe, Twilio) must use the
+`www` URL. `vercel.json` registers the crons (the campaign drain five times a
+day, the Instagram publisher once). `SAAS_HANDOFF.md` has the env vars and what
+is set in Production.
 
 ## Before this goes live
 

@@ -22,11 +22,9 @@ import { Logo } from "./wordmark";
  * without knowing about it.
  */
 /**
- * Anchors on the homepage. These are what `sections` gates, because the
- * homepage still redirects to /waitlist in production (see next.config.ts),
- * so following one bounces a visitor to the page they are already on, and
- * /waitlist is where the live cold outreach sends people. Turn it back on
- * everywhere once the homepage is published.
+ * Anchors on the homepage. These are what `sections` gates: every other page
+ * passes sections={false}. The homepage has been published since 2026-09-07
+ * (see next.config.ts).
  */
 const SECTION_LINKS = [
   { href: "/#what-it-does", label: "What it does" },
@@ -34,7 +32,7 @@ const SECTION_LINKS = [
 ];
 
 /**
- * Real pages, unaffected by that redirect, so they are always shown. Pricing
+ * Real pages rather than homepage anchors, so they are always shown. Pricing
  * used to sit in the list above and was hidden alongside the anchors, which
  * took a live page out of the nav for no reason.
  */

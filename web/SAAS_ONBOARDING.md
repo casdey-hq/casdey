@@ -4,8 +4,13 @@
 > `SAAS_V1_PLAN.md` (Track A + Track C). This file stays as the detail on the
 > self-serve flow itself and the post-signup playbook.
 
-Drafted 2026-09-02. This is a **plan on the shelf**, to execute when V1 is ready
-and it's time to onboard the engaged leads coming out of outreach. Not built yet.
+Drafted 2026-09-02. Written as a plan on the shelf; **V1 has since been built,
+declared complete and published (2026-09-07)**, and V1.1 (`SAAS_V1_1_PLAN.md`) has
+changed the signup: it now takes a card and €1 for a paid first week. Read the
+flow below as the intent it was written as, and treat the product, the
+`SAAS_HANDOFF.md` and `SAAS_V1_1_PLAN.md` as what is actually true. So far only
+one real gym (BodyActive Skibbereen) has signed up, and no gym has yet imported
+its own member list.
 
 ## The decision that shapes everything
 **Self-serve is the goal** (Davide, 2026-09-02): the product should walk a gym
@@ -39,8 +44,9 @@ self-serve breaks:
 Self-serve is unforgiving, so these must be solid first:
 
 1. **A guided first-run wizard exists** — steps 2a→2e as one walked path, not
-   scattered settings pages. **Likely the biggest build gap; verify this first.**
-   Self-serve lives or dies on it.
+   scattered settings pages. (Built as the setup checklist on the Overview page,
+   which the Overview lists step by step; walked by Davide in D1.) Self-serve
+   lives or dies on it.
 2. **CSV import tested against real** Mindbody / Glofox / TeamUp / ABC exports
    (formats differ; the import path is generic CSV, the direct integration is a
    Mindbody stub).
@@ -74,7 +80,9 @@ you out of needing this.
 
 ## Where the engaged leads come from
 Both outreach channels feed this (see the routines + `CLAUDE.md`):
-- **Email** (automated, 75/day): a positive reply lands in davide@casdey.com.
-- **Instagram** (semi-auto, manual send): a reply lands in casdey's IG DMs.
+- **Email** (automated, 100 first-touch a day plus every follow-up due): a positive
+  reply lands in davide@casdey.com.
+- **Instagram** (DM drafts sent by hand): **paused since 2026-09-20**, and posting
+  was retired the same day. Email is the single live channel.
 Track each engaged lead through the playbook stages (a simple pipeline: the
 lead sheet's status columns, or a dedicated tab, when volume warrants it).

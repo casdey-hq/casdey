@@ -19,12 +19,14 @@ the same Next.js app as the marketing site, under `/app`. Domain model:
 practice / patient / appointment / dormant — was renamed throughout in the
 2026-08 pivot; see `CLAUDE.md`).
 
-## Deployment state (as of 2026-09-03)
+## Deployment state (env-var detail as of 2026-09-03, corrected 2026-09-21)
 
-- **Marketing homepage `/`** redirects to `/waitlist` in production (gym-facing
-  waitlist). **`/app`, `/login`, `/book/*`, `/u/*`, `/terms/*`, `/privacy` are
-  reachable in production** — V1 is invited-only, so the homepage stays behind
-  the redirect until a separate "go fully public" decision.
+- **casdey.com is fully public since 2026-09-07.** The `/` → `/waitlist`
+  redirect was deleted from `next.config.ts` (only a `/homepage` → `/` alias
+  remains), so the landing page, `/pricing`, `/app`, `/login`, `/book/*`,
+  `/u/*`, `/terms/*` and `/privacy` are all reachable. `/waitlist` keeps its
+  URL because cold outreach links to it. The product UI refresh (v5 charcoal
+  workspace, HQ and landing) is merged to `main` and live (PR #1, 2026-09-21).
 - **Email + billing env vars are set in Vercel Production** and `/app` serves:
   `NEXT_PUBLIC_SUPABASE_*`, `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`,
   `RESEND_API_KEY`, `CASDEY_SENDING_ADDRESS`, `CRON_SECRET`. Email/password
@@ -36,8 +38,9 @@ practice / patient / appointment / dormant — was renamed throughout in the
   exists, and all 9 vars
   (`STRIPE_PRICE_{STANDARD,PRO}_{EUR,GBP}_{MONTH,YEAR}` +
   `STRIPE_COUPON_PERCENT`) are set in Vercel Production and Preview. The 6
-  retired vars were removed, so Production carries exactly 11 `STRIPE_*` vars:
-  8 prices, 1 coupon, secret key, webhook secret. Verified by
+  retired vars were removed, so Production carried exactly 11 `STRIPE_*` vars
+  then: 8 prices, 1 coupon, secret key, webhook secret. Four USD prices were
+  added on 2026-09-19 for the US market, so it is 15 now (12 prices). Verified by
   `npm run check:stripe` against the live key.
   **Check the result with `npm run check:stripe`** rather than by eye: it calls
   Stripe and confirms all 9 values resolve to real, active, correctly-priced
@@ -71,14 +74,17 @@ practice / patient / appointment / dormant — was renamed throughout in the
   honestly disabled rather than claiming to be enabled — see `SAAS_V1_PLAN.md`
   B8. Until then it degrades cleanly.
 - **Database:** one Supabase project (`lxnzktbnustbimhdoyyw`, EU/Ireland
-  eu-west-1) backs the waitlist and the SaaS. Migrations exist through `0017`
-  (`0011` dental→gym rename, `0012` at-risk campaigns, `0013` cancellation
-  reason, `0014` WhatsApp channel revival, `0015` booking overlap guard,
-  `0016` `plan_tier` for 3-tier pricing, `0017` per-gym sending identity).
-  **`0011`–`0013` confirmed applied via
-  a read-only probe (2026-09-03, plan item B3); `0014`/`0015`/`0016` applied
-  the same day in verified transactions over `SUPABASE_DB_URL`; `0017` applied
-  2026-09-04, also in a verified transaction.**
+  eu-west-1) backs the waitlist and the SaaS. Migrations exist through `0045`
+  and are applied to the live project (`0011` dental→gym rename, `0012` at-risk
+  campaigns, `0013` cancellation reason, `0014` WhatsApp channel revival,
+  `0015` booking overlap guard, `0016` `plan_tier` for 3-tier pricing, `0017`
+  per-gym sending identity, `0040` USD, `0041` casdey HQ tables, `0042` check-in
+  timing decoupled from the lapse window, `0043` lapsed revenue weighted by
+  membership mix, `0044` `internal_plan_tier`, `0045` support conversations).
+  Each was applied in a verified transaction over `SUPABASE_DB_URL`; the
+  newest tables and columns (`hq_todos`, `support_conversations`,
+  `internal_plan_tier`) were re-confirmed present on 2026-09-21. The full list
+  is `supabase/migrations/`.
 - **Vercel plan confirmed Hobby (2026-09-03, plan item B5 done).** The
   campaign-send route has five once-a-day schedules in `vercel.json` (03, 08,
   13, 16 and 19 UTC, since 2026-09-19), each within Hobby's once-a-day-per-job
@@ -170,16 +176,19 @@ sender number rather than the message.
 
 ## What's verified
 
-- `tsc` / `lint` / `next build` clean; **`npm run test` 164/164** as of
-  2026-09-04 (dormancy/lapse, CSV parsing + platform headers, phone
+- `tsc` / `lint` / `next build` clean; **`npm run test` 509/509** as of
+  2026-09-21 (was 164 on 2026-09-04; dormancy/lapse, CSV parsing + platform headers, phone
   normalisation, the plan model, the Free import cap, the setup checklist,
   calendar availability, the Stripe price→tier mapping, and more — the number is
   a floor, it moves per session).
 - The **full customer path was walked end-to-end pre-pivot** (2026-08-16):
   signup → import → lapsed detection → campaign → Stripe checkout → guarantee
-  claim → refund → Google Calendar booking. **It has NOT been re-walked in
-  production since the gym rebuild** — that is plan Track C (prod verification)
-  and Track D (Davide's walkthrough).
+  claim → refund → Google Calendar booking. **It was re-walked after the gym
+  rebuild:** Davide's own walkthrough (plan Track D1, 2026-09-06 to 2026-09-07,
+  70 findings, all closed, record in `D1_WALKTHROUGH.md`) and a real live-mode
+  checkout, refund and cancellation (Track C1, 2026-09-07). The paid first week
+  was then run live end to end on 2026-09-12. What has never happened is a real
+  gym importing its own member list.
 - The self-serve onboarding surfaces (first-run setup checklist, import wizard,
   Free-plan locks, booking fail-closed, support FAQ) were verified in the local
   browser 2026-09-03.
@@ -193,9 +202,11 @@ In `web/.env.local` (local) or Vercel (production):
   `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
 - **Google OAuth (sign-in):** an OAuth client in Supabase → Auth → Providers →
   Google. Email/password works without it; the Google button needs it. The
-  consent screen must be published/verified (plan B1) for real prospects.
-- **Stripe:** `STRIPE_SECRET_KEY`, eight
-  `STRIPE_PRICE_{STANDARD,PRO}_{EUR,GBP}_{MONTH,YEAR}`, `STRIPE_COUPON_PERCENT`
+  consent screen was published to production on 2026-09-03 (plan B1, no
+  verification review needed).
+- **Stripe:** `STRIPE_SECRET_KEY`, twelve
+  `STRIPE_PRICE_{STANDARD,PRO}_{EUR,GBP,USD}_{MONTH,YEAR}` (USD added
+  2026-09-19), `STRIPE_COUPON_PERCENT`
   (`casdey_early_20pct_plans` since 2026-09-12), and `STRIPE_WEBHOOK_SECRET`.
   The webhook endpoint sits on `www.casdey.com`, never the apex. It must include
   **`invoice.paid`** (feeds `premium_started_at` + `subscription_payments`,

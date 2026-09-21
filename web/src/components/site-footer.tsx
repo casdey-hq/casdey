@@ -7,9 +7,9 @@ import type { Currency } from "@/lib/countries";
 import { visitorCurrency } from "@/lib/visitor";
 
 /*
- * Restored for V1. The Product and Get started columns were removed while
+ * The Product and Get started columns were removed for a while when
  * casdey.com redirected everything to /waitlist, which made them dead ends.
- * They are live routes again, so they are back.
+ * They are live routes again (published 2026-09-07), so they are back.
  *
  * The columns are built per render rather than being a module constant,
  * because the signup label names the price of the first week and that moves

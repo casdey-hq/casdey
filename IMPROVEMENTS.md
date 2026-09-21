@@ -27,7 +27,7 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 
 **Davide's priority (2026-09-19):** #3 first (the gym outreach routine is struggling to find leads, and the US is the biggest market), then #2 and #4 together (#4 depends on #2).
 
-**Current focus (2026-09-20):** #5 (product UI) and #17 (incorrect project information). #1 is a separate discussion for later. #3 waits for the Arlington mailbox provider's response before US outreach can go live.
+**Current focus (2026-09-21):** #5 and #17 are done (see the board). #1 is a separate discussion for later. #3 waits for the Arlington mailbox provider's response before US outreach can go live.
 
 ## Board
 
@@ -37,7 +37,7 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 | 2 | One live place for everything | done, live | `/admin` is casdey HQ, now with six tabs. See the notes below. |
 | 3 | US market | blocked on mailbox | US signup, USD billing and pricing are live. The outreach switch is **built and deliberately off** (`.claude/skills/gym-outreach/SKILL.md`, "The US switch", on branch `gym-outreach-automation`); sending stays off while Davide waits for the Arlington mailbox provider's response about USPS Form 1583. |
 | 4 | To-dos section | done, live | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
-| 5 | Professional product UI | done, local branch | Full signed-in workspace, casdey HQ and landing refresh: charcoal default, one raised card plane, restrained dot texture, product navigation and interaction polish. Reviewed locally; branch is not pushed. |
+| 5 | Professional product UI | done, live | Full signed-in workspace, casdey HQ and homepage refresh: charcoal default, one raised card plane, restrained dot texture, product navigation and interaction polish. Merged to `main` as PR #1 and deployed 2026-09-21. **Still inconsistent:** the homepage is dark but the other public pages (checked `/pricing`) are still the light Chalk of v4; that is for the page-by-page review in #12. |
 | 6 | Independent check-in timing | done, live | Check-in timing no longer has to be below the lapse window. |
 | 7 | Import export guides | done, live | LegitFit support link corrected; vendor export steps are expandable. |
 | 8 | WhatsApp and sending-domain guides | done, live | Setup guides are present and recede after configuration. Actual WhatsApp sending still needs its approved sender and template. |
@@ -49,7 +49,7 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 | 14 | Lapsed recurring revenue | done, live | Estimate uses recurring membership prices and the gym's membership mix when counts are supplied. |
 | 15 | Repeat CSV imports | done | Overview warns after four weeks; Import also shows the next suggested refresh date or a due state. |
 | 16 | Live support | done, live | Gym chat, email notification, and the sixth `/admin` Support tab are shipped. |
-| 17 | Incorrect project information | next | Audit and correct stale project facts alongside #5. |
+| 17 | Incorrect project information | done (first audit, 2026-09-21) | Checked the docs against the code, the live database and the live site, and corrected: `web/README.md` (it still described a waitlist-only site pointing at GoDaddy with a light-only theme), `web/SAAS_HANDOFF.md` (homepage "redirects to /waitlist", migrations "through 0017", 164 tests, "never re-walked in production", eight prices), `web/SAAS_ONBOARDING.md`, `web/.env.example` (no USD prices, a "live prices by hand" note the script had outgrown), two stale code comments about the homepage redirect, `wiki/CLAUDE.md` (still "the dental SaaS", Abhi, the dental sheet), the dental `cold-outreach` skill's description (it advertised itself as live), and in `CLAUDE.md` the dental data-sensitivity note, the skill and `web/` bullets, the cold-email conventions, the HQ tab count, the migration count and the "UI refresh is unpushed" claim. **Left on purpose:** dated history in `CLAUDE.md`, `SAAS_ROADMAP.md`, `SAAS_V1_PLAN.md` and `D1_WALKTHROUGH.md`, which is labelled as superseded and records how decisions were reached. It is not wrong, only old, and rewriting it would lose the reasoning. |
 
 ## #3 US market, working notes
 
