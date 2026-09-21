@@ -1,10 +1,10 @@
 /**
- * Regrades the existing /see film without changing its edit.
+ * Finishes the existing V1.2 /see film without changing its edit.
  *
- * The committed MP4 is treated as the master: each original frame is sampled
- * at its existing timestamp, color-remapped, and encoded with explicit frame
- * timestamps. The original mixed audio is retained, with only the closing
- * card reduced after 63 seconds.
+ * The committed MP4 is treated as the master: each frame is sampled at its
+ * existing timestamp and encoded with explicit frame timestamps. The closing
+ * email CTA is removed from its otherwise empty field. Audio is retained at
+ * the already-approved V1.2 level.
  */
 
 import fs from "node:fs";
@@ -80,7 +80,7 @@ try {
     posterTime: 67,
     closingStartsAt: 63,
     closingFadeSeconds: 0.5,
-    closingGain: 0.48,
+    closingGain: 1,
   }));
   fs.renameSync(sink, output);
   sink = null;

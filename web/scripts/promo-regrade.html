@@ -63,15 +63,17 @@
       }
     }
 
-    function drawRegradedFrame() {
+    function drawFinishedFrame(time) {
       ctx.save();
       ctx.fillStyle = '#09090a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      // Inversion followed by a half-turn preserves hue while reversing the
-      // old lightness scale: Chalk becomes charcoal, Ink becomes warm white,
-      // and the existing gold remains gold. No geometry or timing changes.
-      ctx.filter = 'invert(0.94) hue-rotate(180deg) saturate(0.95) brightness(0.92) contrast(1.05)';
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      if (time >= 66) {
+        // The closing CTA sat on an otherwise uninterrupted field. Replace
+        // only that strip with the same clean field from directly below it;
+        // the shot, logo, headline, timing, and texture remain untouched.
+        ctx.drawImage(canvas, 420, 575, 440, 64, 420, 505, 440, 64);
+      }
       ctx.restore();
     }
 
@@ -133,15 +135,16 @@
         // ambiguity while retaining every cut and motion beat exactly.
         const time = Math.min((index + 0.5) / spec.fps, duration - 0.001);
         await seek(time);
-        drawRegradedFrame();
+        drawFinishedFrame(time);
         if (!poster && time >= spec.posterTime) poster = canvas.toDataURL('image/webp', 0.9);
         const frame = new VideoFrame(canvas, {
           timestamp: Math.round(index * frameDuration),
           duration: Math.round(frameDuration),
         });
+        if (failure) throw failure;
         videoEncoder.encode(frame, { keyFrame: index % (spec.fps * 2) === 0 });
         frame.close();
-        while (videoEncoder.encodeQueueSize > 7) await sleep(2);
+        while (videoEncoder.encodeQueueSize > 4) await sleep(2);
         if (index % 150 === 0) await window.__progress(index, totalFrames);
         if (failure) throw failure;
       }
