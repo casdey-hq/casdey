@@ -69,7 +69,7 @@ export default async function PricingPage() {
   const FAQ = faq(paidTrial);
 
   return (
-    <>
+    <div className="marketing-surface pricing-surface">
       <SiteHeader
         currency={currency}
         sections={false}
@@ -149,6 +149,6 @@ export default async function PricingPage() {
         <CtaBand />
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }

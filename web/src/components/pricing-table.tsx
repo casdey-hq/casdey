@@ -40,7 +40,7 @@ function Switch<T extends string>({
     <div
       role="group"
       aria-label={label}
-      className="inline-flex rounded-full border border-ash bg-white p-1"
+      className="pricing-switch inline-flex rounded-full border border-ash bg-white p-1"
     >
       {options.map((option) => {
         const on = option.value === value;
@@ -53,7 +53,7 @@ function Switch<T extends string>({
             className={
               "rounded-full px-4 py-1.5 text-[0.875rem] transition-colors duration-200 " +
               (on
-                ? "bg-ink font-medium text-paper"
+                ? "bg-teal-bright font-medium text-deep"
                 : "text-graphite hover:text-ink")
             }
           >
@@ -157,12 +157,12 @@ export function PricingTable({
         />
       </div>
 
-      <div className="mt-10 overflow-hidden rounded-[20px] border border-ash bg-white">
+      <div className="pricing-table mt-10 overflow-hidden rounded-[20px] border border-ash bg-white">
         <div className="grid divide-y divide-ash sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           {TIER_ORDER.map((tier) => {
             const price = priceFor(tier);
             return (
-              <div key={tier} className="flex flex-col p-8 sm:p-9">
+              <div key={tier} className={`pricing-tier flex flex-col p-8 sm:p-9 ${tier === "pro" ? "pricing-tier-pro" : ""}`}>
                 <div className="flex items-center gap-3">
                   <p className="label text-ink">{TIER_NAMES[tier]}</p>
                   {tier === "pro" && (

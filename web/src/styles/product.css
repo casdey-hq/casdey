@@ -247,6 +247,18 @@
     .app-nav-link:hover {
       transform: none;
     }
+
+    /* The active dot is an independent status cue, not part of the label.
+       Reserve its lane in the horizontally scrolling mobile navigation so it
+       never lands on the last letter of short links such as Overview. */
+    .app-nav-link {
+      min-width: max-content;
+      padding-right: 2rem;
+    }
+
+    .nav-active-mark {
+      right: 0.85rem;
+    }
   }
 
   /* --- Raised plane ------------------------------------------------------- */

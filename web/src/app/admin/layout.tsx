@@ -48,7 +48,7 @@ export default async function AdminLayout({
   return (
     <div
       data-theme={theme}
-      className={`${productFont.variable} admin-workspace flex min-h-full flex-1 flex-col text-ink`}
+      className={`${productFont.variable} admin-workspace flex min-h-[100dvh] flex-1 flex-col text-ink`}
     >
       <header className="admin-topbar sticky top-0 z-20 flex items-center justify-between border-b border-ash px-6 py-4">
         <Logo className="text-[1.25rem]" />
