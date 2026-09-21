@@ -25,8 +25,10 @@ practice / patient / appointment / dormant — was renamed throughout in the
   redirect was deleted from `next.config.ts` (only a `/homepage` → `/` alias
   remains), so the landing page, `/pricing`, `/app`, `/login`, `/book/*`,
   `/u/*`, `/terms/*` and `/privacy` are all reachable. `/waitlist` keeps its
-  URL because cold outreach links to it. The product UI refresh (v5 charcoal
-  workspace, HQ and landing) is merged to `main` and live (PR #1, 2026-09-21).
+  URL because cold outreach links to it. **V1.2 (2026-09-21)** is the current
+  visual release: the v5 charcoal system covers the workspace, HQ, homepage
+  and `/pricing`; mobile public/admin elastic overscroll stays charcoal; and
+  the landing product story has a mobile progress rail and scroll cue.
 - **Email + billing env vars are set in Vercel Production** and `/app` serves:
   `NEXT_PUBLIC_SUPABASE_*`, `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET`,
   `RESEND_API_KEY`, `CASDEY_SENDING_ADDRESS`, `CRON_SECRET`. Email/password

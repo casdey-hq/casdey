@@ -37,14 +37,14 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 | 2 | One live place for everything | done, live | `/admin` is casdey HQ, now with six tabs. See the notes below. |
 | 3 | US market | blocked on mailbox | US signup, USD billing and pricing are live. The outreach switch is **built and deliberately off** (`.claude/skills/gym-outreach/SKILL.md`, "The US switch", on branch `gym-outreach-automation`); sending stays off while Davide waits for the Arlington mailbox provider's response about USPS Form 1583. |
 | 4 | To-dos section | done, live | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
-| 5 | Professional product UI | done, live | Full signed-in workspace, casdey HQ and homepage refresh: charcoal default, one raised card plane, restrained dot texture, product navigation and interaction polish. Merged to `main` as PR #1 and deployed 2026-09-21. **Still inconsistent:** the homepage is dark but the other public pages (checked `/pricing`) are still the light Chalk of v4; that is for the page-by-page review in #12. |
+| 5 | Professional product UI | done, live | V1.2: full signed-in workspace, casdey HQ, homepage and `/pricing` refresh. Charcoal default, one raised card plane, restrained dot texture, product navigation and interaction polish. Mobile public/admin elastic overscroll stays charcoal; the landing product story works on mobile with a side progress rail and scroll cue. |
 | 6 | Independent check-in timing | done, live | Check-in timing no longer has to be below the lapse window. |
 | 7 | Import export guides | done, live | LegitFit support link corrected; vendor export steps are expandable. |
 | 8 | WhatsApp and sending-domain guides | done, live | Setup guides are present and recede after configuration. Actual WhatsApp sending still needs its approved sender and template. |
 | 9 | Clear save errors | done for reported cases, live | Form validation explains missing information, including a blank new service. Provider failures can still need a retry. |
 | 10 | Booking clarity | done, live | Setup and booking flow explained; the calendar has a direct Google Calendar fallback. |
 | 11 | Cancellation reasons | done, live | Setup and member association explained; saved reasons card offers Close. |
-| 12 | Page-by-page review | in progress | First pass fixed Overview labels and layout, Members search, and phone-width page headers; the wider review continues with #5. |
+| 12 | Page-by-page review | in progress | First pass fixed Overview labels and layout, Members search, phone-width page headers, homepage and pricing; the wider review continues. |
 | 13 | Permanent internal plans | done, live | Davide's account has Standard and info@casdey.com has Pro independent of the cancelled Stripe subscription. |
 | 14 | Lapsed recurring revenue | done, live | Estimate uses recurring membership prices and the gym's membership mix when counts are supplied. |
 | 15 | Repeat CSV imports | done | Overview warns after four weeks; Import also shows the next suggested refresh date or a due state. |
