@@ -15,14 +15,14 @@ import { formatMoney, gymCurrency } from "@/lib/money";
 import { buildSetupState } from "@/lib/setup";
 import { paidTrialEnabled } from "@/lib/plan";
 import { activationFor } from "@/lib/trial";
-import { activityWithComparison, change } from "@/lib/dashboard";
+import { activityForDates, activityWithComparison, calendarToday, change, customActivityDates } from "@/lib/dashboard";
 import { importRefreshReminder } from "@/lib/import-reminder";
 import { Funnel, LineChart, MetricChart, Split } from "@/components/app/chart";
 import { calendarConnectionView } from "@/lib/calendar/provider";
 import { isGoogleCalendarConfigured } from "@/lib/calendar/google";
 import { isCalendarKeyConfigured } from "@/lib/calendar/tokens";
 import { isSendingConfigured } from "@/lib/email/domains";
-import { MemberTimeline } from "@/components/app/member-timeline";
+import { ReturnStory } from "@/components/app/return-story";
 import { SetupChecklist } from "@/components/app/setup-checklist";
 import { TrialPanel } from "@/components/app/trial-panel";
 import {
@@ -77,6 +77,16 @@ export default async function DashboardPage(props: PageProps<"/app">) {
   // range can be linked to and survives a reload, and so the whole page is
   // still one server render.
   const range = RANGES.find((r) => String(r.weeks) === params.range) ?? RANGES[1];
+  const customRequested = params.from !== undefined || params.to !== undefined;
+  const today = calendarToday(new Date(), gym.timezone);
+  const customDates = customActivityDates(params.from, params.to, new Date(), gym.timezone);
+  const custom = customDates !== null;
+  const periodLabel = customDates
+    ? `${customDates.days} ${customDates.days === 1 ? "day" : "days"}`
+    : range.label;
+  const comparisonLabel = customDates
+    ? `the previous ${periodLabel}`
+    : `the ${range.label.toLowerCase()} before`;
   const insights = params.view === "insights";
 
   // One wave, not five. Every read below needs only the gym id and the range,
@@ -101,7 +111,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
       hasPricedServices(session.supabase, gym.id),
     ]),
     gymStats(session.supabase, gym.id, rule, atRiskRuleFor(gym)),
-    activityWithComparison(gym.id, range.weeks),
+    customDates ? activityForDates(gym.id, customDates) : activityWithComparison(gym.id, range.weeks),
     Promise.all([
       session.supabase
         .from("campaigns")
@@ -319,24 +329,9 @@ export default async function DashboardPage(props: PageProps<"/app">) {
 
       {!insights ? <>
 
-      <section aria-label="Next move" className="focus-panel overview-enter mb-5 flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex min-w-0 gap-4">
-          <span className="focus-symbol" aria-hidden="true">↗</span>
-          <div>
-            <p className="label text-teal">Next move</p>
-            <h2 className="display mt-1 text-[1.25rem] text-ink sm:text-[1.375rem]">{nextMove.title}</h2>
-            <p className="mt-1 max-w-[65ch] text-[0.875rem] leading-relaxed text-graphite">{nextMove.body}</p>
-          </div>
-        </div>
-        <ButtonLink href={nextMove.href} variant="quiet" className="focus-action shrink-0 self-start lg:self-auto">
-          {nextMove.action}<span aria-hidden="true">↗</span>
-        </ButtonLink>
-      </section>
-
-      {/* The outcome is the visual anchor. Its progress line uses the same
-          denominator as the funnel below: returned members among those who
-          went quiet. Opportunity stays visible but subordinate. */}
-      <section aria-label="Recovery results" className="recovery-overview overview-enter overview-enter-1 grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
+      {/* The outcome and the next action share the opening row. The estimated
+          opportunity follows beneath, quieter than either of them. */}
+      <section aria-label="Result and next move" className="recovery-overview overview-enter grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)]">
         {priced ? (
           <Card className="revenue-hero relative flex min-h-[17rem] flex-col justify-between overflow-hidden p-7 sm:p-8">
             <div className="recovery-summary flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
@@ -401,15 +396,27 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           </Card>
         )}
 
-        <Card className="opportunity-panel flex flex-col justify-between p-7 sm:p-8">
+        <section aria-label="Next move" className="focus-panel flex flex-col justify-between gap-8 p-7 sm:p-8">
+          <div>
+            <p className="label text-teal">Next move</p>
+            <h2 className="display mt-3 text-[1.375rem] text-ink sm:text-[1.5rem]">{nextMove.title}</h2>
+            <p className="mt-3 max-w-[44ch] text-[0.875rem] leading-relaxed text-graphite">{nextMove.body}</p>
+          </div>
+          <ButtonLink href={nextMove.href} variant="quiet" className="focus-action self-start">
+            {nextMove.action}<span aria-hidden="true">↗</span>
+          </ButtonLink>
+        </section>
+      </section>
+
+        <Card className="opportunity-panel overview-enter overview-enter-1 mt-4 flex flex-wrap items-center justify-between gap-5 p-5 sm:p-6">
           <div>
             <p className="label text-stone">Recurring revenue lapsed</p>
             {opportunity.priced && opportunity.lapsedMembers > 0 ? (
               <>
-                <p className="literal mt-3 text-[2rem] leading-none font-semibold text-ink">
+                <p className="literal mt-2 text-[1.5rem] leading-none font-semibold text-ink">
                   {formatMoney(opportunity.monthlyMinor, currency)}<span className="ml-1 text-[0.875rem] font-normal text-stone">/month</span>
                 </p>
-                <p className="mt-3 text-[0.875rem] leading-relaxed text-graphite">
+                <p className="mt-2 max-w-[65ch] text-[0.8125rem] leading-relaxed text-graphite">
                   Estimated value of {opportunity.lapsedMembers} members who have gone quiet. A rough measure of opportunity, not a promise.
                 </p>
               </>
@@ -420,7 +427,7 @@ export default async function DashboardPage(props: PageProps<"/app">) {
             )}
           </div>
           {opportunity.priced && opportunity.lapsedMembers > 0 ? (
-            <details className="opportunity-detail mt-5 border-t border-ash pt-4 text-[0.8125rem] text-stone">
+            <details className="opportunity-detail text-[0.8125rem] text-stone">
               <summary className="cursor-pointer font-medium text-graphite">How this is estimated</summary>
               <p className="mt-2 leading-relaxed">
                 Based on a typical membership of {formatMoney(opportunity.typicalMonthlyMinor, currency)}. {opportunity.basis === "member_counts"
@@ -430,7 +437,6 @@ export default async function DashboardPage(props: PageProps<"/app">) {
             </details>
           ) : null}
         </Card>
-      </section>
 
       <section aria-label="Member journey" className="overview-enter overview-enter-2 mt-7">
         <div className="mb-3 flex items-baseline justify-between gap-3">
@@ -489,18 +495,18 @@ export default async function DashboardPage(props: PageProps<"/app">) {
       {insights ? <section className="overview-enter overview-enter-1 mt-2">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="display text-[1.25rem]">{range.heading}</h2>
+            <h2 className="display text-[1.25rem]">{customDates ? `${formatDate(params.from as string)} to ${formatDate(params.to as string)}` : range.heading}</h2>
             <p className="text-[0.875rem] text-stone">
               {totals.sent === 0
                 ? "Fills in as soon as your first campaign goes out."
-                : `Compared with the ${range.label.toLowerCase()} before.`}
+                : `Compared with ${comparisonLabel}.`}
             </p>
           </div>
 
           {/* Links, not a control with state. Each range is a URL. */}
           <nav aria-label="Chart period" className="flex flex-wrap gap-1">
             {RANGES.map((option) => {
-              const active = option.weeks === range.weeks;
+              const active = !custom && option.weeks === range.weeks;
               return (
                 <Link
                   key={option.weeks}
@@ -521,14 +527,29 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           </nav>
         </div>
 
+        <form action="/app" method="get" className={`insights-date-form mb-5 flex flex-wrap items-end gap-3 rounded-xl border bg-white p-4 ${custom ? "border-teal" : "border-ash"}`}>
+          <input type="hidden" name="view" value="insights" />
+          <span className="label self-center text-stone">Custom dates</span>
+          <label className="text-[0.75rem] font-medium text-stone">From
+            <input type="date" name="from" required max={today} defaultValue={typeof params.from === "string" ? params.from : ""} className="insights-date-input mt-1 block rounded-md border border-ash bg-paper px-2.5 py-1.5 text-[0.875rem] text-ink" />
+          </label>
+          <label className="text-[0.75rem] font-medium text-stone">To
+            <input type="date" name="to" required max={today} defaultValue={typeof params.to === "string" ? params.to : ""} className="insights-date-input mt-1 block rounded-md border border-ash bg-paper px-2.5 py-1.5 text-[0.875rem] text-ink" />
+          </label>
+          <button type="submit" className="insights-date-apply rounded-md bg-teal-bright px-3 py-2 text-[0.8125rem] font-semibold text-[#15150F]">Apply dates</button>
+          <span className="text-[0.75rem] text-stone">Up to one year, through today in your gym&apos;s timezone.</span>
+        </form>
+        {customRequested && !custom ? <p role="alert" className="mb-4 text-[0.8125rem] text-amber">Choose valid dates in the past, no more than one year apart.</p> : null}
+
         <div className="chart-rail grid lg:grid-cols-3">
           <MetricChart
             title="Messages sent"
+            periodUnit={custom ? "date" : "week"}
             hero={String(totals.sent)}
             changePercent={change(totals.sent, previous.sent)}
             changeLabel={
               previous.sent > 0
-                ? `${previous.sent} in the ${range.label.toLowerCase()} before`
+                ? `${previous.sent} in ${comparisonLabel}`
                 : "nothing sent before this"
             }
             points={weeks.map((week) => ({
@@ -539,12 +560,13 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           />
           <MetricChart
             title="Members back"
+            periodUnit={custom ? "date" : "week"}
             tone="returned"
             hero={String(totals.returned)}
             changePercent={change(totals.returned, previous.returned)}
             changeLabel={
               previous.returned > 0
-                ? `${previous.returned} in the ${range.label.toLowerCase()} before`
+                ? `${previous.returned} in ${comparisonLabel}`
                 : "none came back before this"
             }
             points={weeks.map((week) => ({
@@ -555,12 +577,13 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           />
           <MetricChart
             title="Recovered"
+            periodUnit={custom ? "date" : "week"}
             tone="amber"
             hero={formatMoney(totals.revenueMinor, currency)}
             changePercent={change(totals.revenueMinor, previous.revenueMinor)}
             changeLabel={
               previous.revenueMinor > 0
-                ? `${formatMoney(previous.revenueMinor, currency)} in the ${range.label.toLowerCase()} before`
+                ? `${formatMoney(previous.revenueMinor, currency)} in ${comparisonLabel}`
                 : "nothing recovered before this"
             }
             points={weeks.map((week) => ({
@@ -577,6 +600,8 @@ export default async function DashboardPage(props: PageProps<"/app">) {
         <div className="mt-4 grid gap-4 xl:grid-cols-2">
           <LineChart
             title="Revenue recovered"
+            periodLabel={periodLabel}
+            periodUnit={custom ? "date" : "week"}
             tone="amber"
             hero={formatMoney(totals.revenueMinor, currency)}
             changePercent={change(totals.revenueMinor, previous.revenueMinor)}
@@ -592,6 +617,8 @@ export default async function DashboardPage(props: PageProps<"/app">) {
           />
           <LineChart
             title="Members back"
+            periodLabel={periodLabel}
+            periodUnit={custom ? "date" : "week"}
             tone="returned"
             hero={String(totals.returned)}
             changePercent={change(totals.returned, previous.returned)}
@@ -678,10 +705,13 @@ export default async function DashboardPage(props: PageProps<"/app">) {
             </span>
             .
           </p>
-          <MemberTimeline
+          <ReturnStory
+            memberId={returned.id}
+            name={memberName(returned)}
             visitCount={returned.visit_count}
-            monthsAway={monthsSince(returned.last_visit_at)}
-            returned
+            lastVisit={returned.last_visit_at ? formatDate(returned.last_visit_at) : null}
+            returnedOn={formatDate(returned.returned_at)}
+            monthsAway={monthsSince(returned.last_visit_at, new Date(returned.returned_at!))}
           />
         </Card>
       ) : null}

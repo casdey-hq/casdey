@@ -22,6 +22,9 @@ import {
   memberName,
 } from "@/components/app/ui";
 import type { Member } from "@/lib/types";
+import type { MemberEventType } from "@/lib/types";
+import { MemberPreviewShell } from "@/components/app/member-preview-shell";
+import { MemberTimeline } from "@/components/app/member-timeline";
 
 export const metadata = { title: "Members" };
 
@@ -152,12 +155,24 @@ export default async function MembersPage(props: PageProps<"/app/members">) {
     limit != null ? Math.max(0, total - visibleMembers.length) : 0;
   const showPagination = limit == null && pages > 1;
 
+  // A preview is only available for a row already visible on this page. The
+  // free-plan cap and current filters cannot be bypassed with a query string.
+  const selected = visibleMembers.find((member) => member.id === params.member);
+  const { data: eventRows } = selected
+    ? await session.supabase.from("member_events")
+        .select("id, type, occurred_at")
+        .eq("gym_id", gym.id)
+        .eq("member_id", selected.id)
+        .order("occurred_at", { ascending: false })
+        .limit(6)
+    : { data: null };
+
   return (
     <>
       <PageHeader
         eyebrow="Members"
         title="Your list"
-        lede="Sorted by how long they have been away. Open a member to record why they left or that they have returned."
+        lede="Sorted by how long they have been away. Select a member to preview their history, then open their full page to update it."
         actions={
           filter === "lapsed" && total > 0 ? (
             <ButtonLink href="/app/campaigns/new">Build a campaign</ButtonLink>
@@ -277,8 +292,9 @@ export default async function MembersPage(props: PageProps<"/app/members">) {
                     <tr key={member.id}>
                       <td className="font-medium text-ink">
                         <Link
-                          href={`/app/members/${member.id}`}
-                          className="hover:text-teal hover:underline"
+                          href={link({ member: member.id })}
+                          scroll={false}
+                          className="member-row-link hover:text-teal hover:underline"
                         >
                           {memberName(member)}
                         </Link>
@@ -338,9 +354,60 @@ export default async function MembersPage(props: PageProps<"/app/members">) {
           ) : null}
         </>
       )}
+      {selected ? (
+        <MemberPreviewShell closeHref={link({ member: undefined })} title={memberName(selected)}>
+          <div className="member-preview-body">
+            <div className="mb-5 flex flex-wrap items-center gap-3">
+              <h2 className="display text-[1.75rem]">{memberName(selected)}</h2>
+              <StatusPill member={selected} />
+            </div>
+            <MemberTimeline
+              visitCount={selected.visit_count}
+              monthsAway={monthsSince(selected.last_visit_at)}
+              returned={selected.status === "returned"}
+              className="mb-6"
+            />
+            <dl className="member-preview-facts grid grid-cols-2 gap-4 border-y border-ash py-5">
+              <div><dt>Last visit</dt><dd>{formatDate(selected.last_visit_at)}</dd></div>
+              <div><dt>Visits</dt><dd>{selected.visit_count}</dd></div>
+              <div className="col-span-2"><dt>Email</dt><dd className="break-all">{selected.email ?? "No email on file"}</dd></div>
+              {selected.phone ? <div className="col-span-2"><dt>Phone</dt><dd>{selected.phone}</dd></div> : null}
+            </dl>
+            <div className="mt-6">
+              <h3 className="display text-[1.125rem]">Recent activity</h3>
+              {eventRows?.length ? (
+                <ol className="mt-3 border-l border-ash pl-4">
+                  {eventRows.map((event) => (
+                    <li key={event.id} className="member-preview-event">
+                      <span className="text-[0.875rem] text-ink">{PREVIEW_EVENT_LABEL[event.type as MemberEventType] ?? event.type}</span>
+                      <span className="literal block text-[0.75rem] text-stone">{formatDate(event.occurred_at)}</span>
+                    </li>
+                  ))}
+                </ol>
+              ) : <p className="mt-3 text-[0.875rem] text-stone">No activity recorded yet.</p>}
+            </div>
+          </div>
+          <div className="member-preview-footer">
+            <Link href={`/app/members/${selected.id}`} className="member-preview-open">Open full member page <span aria-hidden="true">↗</span></Link>
+            <p className="mt-2 text-[0.75rem] text-stone">Edit their status and reason for leaving there.</p>
+          </div>
+        </MemberPreviewShell>
+      ) : null}
     </>
   );
 }
+
+const PREVIEW_EVENT_LABEL: Record<MemberEventType, string> = {
+  imported: "Added from an import",
+  message_sent: "Message sent",
+  message_failed: "Message could not be delivered",
+  replied: "Replied",
+  returned: "Marked as returned",
+  return_undone: "Return undone",
+  booked: "Booked online",
+  opted_out: "Asked not to be contacted",
+  cancelled: "Marked as cancelled",
+};
 
 /** A column header that sorts, and says which way it is sorting. */
 function SortHeader({

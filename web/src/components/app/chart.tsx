@@ -31,6 +31,7 @@ export function MetricChart({
   changeLabel,
   tone = "teal",
   caption,
+  periodUnit = "week",
 }: {
   title: string;
   hero: string;
@@ -40,6 +41,7 @@ export function MetricChart({
   changeLabel: string;
   tone?: Tone;
   caption?: string;
+  periodUnit?: string;
 }) {
   const max = Math.max(...points.map((p) => p.value), 0);
   const width = 320;
@@ -72,7 +74,7 @@ export function MetricChart({
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={`${title} by week, last ${points.length} weeks`}
+        aria-label={`${title} in ${points.length} ${periodUnit === "week" ? "weekly" : "date-range"} intervals`}
         className="mt-4 block h-[96px] w-full"
         preserveAspectRatio="none"
       >
@@ -261,6 +263,7 @@ export function LineChart({
   tone = "amber",
   caption,
   periodLabel = "twelve weeks",
+  periodUnit = "week",
 }: {
   title: string;
   hero: string;
@@ -273,6 +276,7 @@ export function LineChart({
   /** What one period is called, for the legend and the change caption.
    *  Defaults to "twelve weeks" — the per-gym dashboard's fixed window. */
   periodLabel?: string;
+  periodUnit?: string;
 }) {
   const width = 600;
   const height = 200;
@@ -330,7 +334,7 @@ export function LineChart({
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label={`${title} over the last ${points.length} weeks, against the ${comparison.length} weeks before`}
+        aria-label={`${title} over ${points.length} ${periodUnit === "week" ? "weekly" : "date-range"} intervals, against the ${comparison.length} intervals before`}
         className="mt-4 block h-[200px] w-full"
       >
         <defs>

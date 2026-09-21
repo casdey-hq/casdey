@@ -50,7 +50,7 @@ export default async function NewCampaignPage() {
     whatsAppAudience.length === 0;
 
   return (
-    <div className="max-w-[44rem]">
+    <div>
       <PageHeader
         eyebrow="New campaign"
         title="Write to the ones who stopped coming"

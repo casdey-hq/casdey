@@ -12,7 +12,7 @@ import { visitorCurrency } from "@/lib/visitor";
 export default async function Home() {
   const currency = await visitorCurrency();
   return (
-    <>
+    <div className="marketing-surface">
       <SiteHeader
         currency={currency}
         paidTrial={paidTrialEnabled()}
@@ -27,6 +27,6 @@ export default async function Home() {
         <CtaBand />
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }
