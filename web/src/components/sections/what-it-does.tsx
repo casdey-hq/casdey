@@ -73,9 +73,10 @@ export function WhatItDoes() {
       const stage = stageRef.current;
       if (!stage || window.innerWidth < 1024) return;
 
-      const focusLine = window.innerHeight * 0.42;
-      const range = Math.max(stage.offsetHeight - window.innerHeight * 0.58, 1);
-      const nextProgress = Math.min(0.9999, Math.max(0, (focusLine - stage.getBoundingClientRect().top) / range));
+      const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const stickyTop = rootFontSize * 11;
+      const range = Math.max(stage.offsetHeight - window.innerHeight, 1);
+      const nextProgress = Math.min(0.9999, Math.max(0, (stickyTop - stage.getBoundingClientRect().top) / range));
       const next = Math.floor(nextProgress * STEPS.length);
       setProgress(nextProgress);
       setActive((current) => (current === next ? current : next));
@@ -147,8 +148,8 @@ export function WhatItDoes() {
                 style={{ height: `${progress * 100}%` }}
               />
               <div
-                className="will-change-transform"
-                style={{ transform: `translateY(-${progress * 80}%)` }}
+                className="will-change-transform transition-transform duration-200 ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none"
+                style={{ transform: `translateY(-${active * (100 / STEPS.length)}%)` }}
               >
                 {STEPS.map((step, i) => (
                   <article key={step.view} className="h-[405px] pt-8">
