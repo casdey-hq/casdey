@@ -47,7 +47,7 @@ const CHANNELS = [
 export default async function ContactPage() {
   const currency = await visitorCurrency();
   return (
-    <>
+    <div className="marketing-surface">
       <SiteHeader
         currency={currency}
         sections={false}
@@ -112,6 +112,6 @@ export default async function ContactPage() {
         </section>
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }

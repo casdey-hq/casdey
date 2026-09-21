@@ -93,7 +93,7 @@ export default async function WaitlistPage({
   const defaultEmail = typeof raw === "string" ? raw.slice(0, 320) : "";
 
   return (
-    <>
+    <div className="marketing-surface">
       <SiteHeader
         currency={currency}
         sections={false}
@@ -192,6 +192,6 @@ export default async function WaitlistPage({
         </section>
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }

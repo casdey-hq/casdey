@@ -345,14 +345,23 @@
      system. Its sparse field keeps the page cinematic without competing with
      the film itself. */
   .see-surface {
-    background-image:
-      linear-gradient(to bottom, color-mix(in srgb, var(--paper) 18%, transparent), var(--paper) 46rem),
-      radial-gradient(circle, color-mix(in srgb, var(--ash) 34%, transparent) 0.75px, transparent 0.9px);
-    background-size: 10px 10px;
+    background: var(--paper);
   }
 
-  .see-surface .grain::after {
-    opacity: 0.018;
+  .see-film-field {
+    height: 39rem;
+    background-image:
+      linear-gradient(to bottom, color-mix(in srgb, var(--paper) 18%, transparent), var(--paper) 70%),
+      radial-gradient(circle, color-mix(in srgb, var(--ash) 34%, transparent) 0.75px, transparent 0.9px);
+    background-size: 10px 10px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 10rem), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 10rem), transparent);
+  }
+
+  @media (min-width: 640px) {
+    .see-film-field {
+      height: 60rem;
+    }
   }
 
   .see-video-stage {
@@ -360,6 +369,22 @@
       0 1px 1px rgba(0, 0, 0, 0.35),
       0 32px 80px -38px rgba(0, 0, 0, 0.9),
       0 0 72px -48px color-mix(in srgb, var(--teal-bright) 44%, transparent);
+  }
+
+  /* Legal content is intentionally quiet and unpatterned: a single raised
+     document lets dense policy text remain the page's focus. */
+  .legal-document {
+    border: 1px solid var(--ash);
+    border-radius: 24px;
+    background: var(--white);
+    padding: 1.75rem;
+    box-shadow: 0 20px 48px -38px rgba(0, 0, 0, 0.8);
+  }
+
+  @media (min-width: 640px) {
+    .legal-document {
+      padding: 3rem;
+    }
   }
 
   .pricing-switch {

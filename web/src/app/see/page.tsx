@@ -37,6 +37,7 @@ export default async function SeePage() {
       />
       <main>
         <section className="relative overflow-hidden pt-10 pb-20 sm:pt-16 sm:pb-28">
+          <div aria-hidden="true" className="see-film-field pointer-events-none absolute inset-x-0 top-0" />
           <div
             aria-hidden="true"
             className="grain pointer-events-none absolute inset-x-0 top-0 h-[680px] bg-[radial-gradient(ellipse_64%_52%_at_68%_10%,color-mix(in_srgb,var(--teal-bright)_13%,transparent),transparent_72%)]"

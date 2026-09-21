@@ -67,7 +67,7 @@ function List({ items }: { items: React.ReactNode[] }) {
 export default async function RefundPolicyPage() {
   const currency = await visitorCurrency();
   return (
-    <>
+    <div className="marketing-surface legal-surface">
       <SiteHeader
         currency={currency}
         sections={false}
@@ -76,7 +76,7 @@ export default async function RefundPolicyPage() {
       />
       <main className="py-20 sm:py-24">
         <Container>
-          <div className="max-w-2xl">
+          <div className="legal-document max-w-2xl">
             <p className="label text-stone">last updated {LAST_UPDATED}</p>
             <h1 className="display mt-4 text-[clamp(2rem,5vw,3rem)] text-ink">
               Refund policy
@@ -217,6 +217,6 @@ export default async function RefundPolicyPage() {
         </Container>
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }
