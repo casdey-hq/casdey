@@ -242,6 +242,13 @@
     overscroll-behavior-y: none;
   }
 
+  /* Safari uses the body's paint for elastic scrolling. Apply the same dark
+     canvas when one of casdey's dark shells is present, while legacy light
+     pages keep their own readable ground. */
+  body:has(.marketing-surface, .product-workspace, .admin-workspace) {
+    background-color: #09090a;
+  }
+
   ::selection {
     background-color: var(--shallow);
     color: var(--ink);
