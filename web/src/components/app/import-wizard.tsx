@@ -9,8 +9,8 @@ import {
   detectDateOrder,
   guessMapping,
   headerOffset,
-  normalizeRow,
 } from "@/lib/ingestion/csv";
+import { importReadiness } from "@/lib/ingestion/import-readiness";
 import type {
   ColumnMapping,
   DateFormat,
@@ -173,15 +173,11 @@ export function ImportWizard({
   const contradictsFile =
     chosenFormat !== null && detected !== null && chosenFormat !== "iso" && chosenFormat !== detected;
 
-  /* --- Preview of the mapping, computed with the same code the server uses --- */
-  const preview = mapping.lastVisitAt
-    ? sample
-        .slice(0, 5)
-        .map((row, index) =>
-          normalizeRow(row, mapping as ColumnMapping, dateFormat, index + 2),
-        )
-    : [];
-  const previewOk = preview.filter((r) => r.ok).length;
+  /* --- Preview of the mapping, computed with the same code the server uses ---
+     The button is judged on the whole sample, not the five rows shown, and
+     when it is blocked the reason is printed next to it. */
+  const { results, blocker } = importReadiness(sample, mapping, dateFormat);
+  const preview = results.slice(0, 5);
 
   if (step === "done" && summary) {
     return (
@@ -434,11 +430,14 @@ export function ImportWizard({
         </p>
       ) : null}
 
+      {blocker ? (
+        <p role="status" className="notice">
+          {blocker}
+        </p>
+      ) : null}
+
       <div className="flex flex-wrap gap-2">
-        <Button
-          onClick={onImport}
-          disabled={busy || !mapping.lastVisitAt || previewOk === 0}
-        >
+        <Button onClick={onImport} disabled={busy || blocker !== null}>
           {busy ? "Importing" : "Import these members"}
         </Button>
         <Button
