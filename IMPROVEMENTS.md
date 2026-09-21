@@ -37,7 +37,7 @@ Davide's list, sent 2026-09-19, recorded **verbatim** and never paraphrased (the
 | 2 | One live place for everything | done, live | `/admin` is casdey HQ, now with six tabs. See the notes below. |
 | 3 | US market | blocked on mailbox | US signup, USD billing and pricing are live. The outreach switch is **built and deliberately off** (`.claude/skills/gym-outreach/SKILL.md`, "The US switch", on branch `gym-outreach-automation`); sending stays off while Davide waits for the Arlington mailbox provider's response about USPS Form 1583. |
 | 4 | To-dos section | done, live | On `/admin`'s Overview tab: live signals, check-up proposals, and ones added by hand. |
-| 5 | Professional product UI | next | Start the larger visual redesign. |
+| 5 | Professional product UI | done, local branch | Full signed-in workspace, casdey HQ and landing refresh: charcoal default, one raised card plane, restrained dot texture, product navigation and interaction polish. Reviewed locally; branch is not pushed. |
 | 6 | Independent check-in timing | done, live | Check-in timing no longer has to be below the lapse window. |
 | 7 | Import export guides | done, live | LegitFit support link corrected; vendor export steps are expandable. |
 | 8 | WhatsApp and sending-domain guides | done, live | Setup guides are present and recede after configuration. Actual WhatsApp sending still needs its approved sender and template. |
