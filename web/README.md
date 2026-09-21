@@ -18,6 +18,10 @@ Then open http://localhost:3000.
 `npm run build` runs the production build, `npm run lint` runs ESLint, and
 `npx tsc --noEmit` typechecks.
 
+`npm run promo:regrade` rebuilds the hidden `/see` film from the committed MP4
+without changing its edit. It writes a review copy to `.promo-regrade/`; after
+visual and audio review, promote that copy to `public/video/` deliberately.
+
 ## Pages
 
 - `/` — the landing page. Its hero has a single email field that carries the
