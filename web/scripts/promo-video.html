@@ -1,0 +1,905 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>casdey V1.2 promo renderer</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #09090a; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<canvas id="film" width="1280" height="720"></canvas>
+<script>
+const BASE_W = 1280;
+const BASE_H = 720;
+const C = {
+  ground: '#09090a',
+  panel: '#191a1d',
+  panel2: '#202125',
+  line: '#34353a',
+  lineSoft: '#28292d',
+  ink: '#f4f4f2',
+  muted: '#a7a8ad',
+  dim: '#74767d',
+  gold: '#e2b93f',
+  goldSoft: '#42391d',
+  green: '#65c98c',
+  red: '#e47777',
+};
+
+const canvas = document.getElementById('film');
+const ctx = canvas.getContext('2d', { alpha: false });
+let WIDTH = BASE_W;
+let HEIGHT = BASE_H;
+let SCALE = 1;
+let FPS = 30;
+
+const clamp = (n, min = 0, max = 1) => Math.min(max, Math.max(min, n));
+const mix = (a, b, t) => a + (b - a) * t;
+const progress = (t, start, duration) => clamp((t - start) / duration);
+const easeOut = (t) => 1 - Math.pow(1 - clamp(t), 3);
+const easeInOut = (t) => {
+  t = clamp(t);
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+};
+
+function font(size, weight = 500, family = 'Manrope') {
+  return `${weight} ${size}px "${family}", system-ui, sans-serif`;
+}
+
+function rounded(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+}
+
+function fillRounded(x, y, w, h, r, color) {
+  ctx.fillStyle = color;
+  rounded(x, y, w, h, r);
+  ctx.fill();
+}
+
+function strokeRounded(x, y, w, h, r, color = C.line, width = 1) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  rounded(x, y, w, h, r);
+  ctx.stroke();
+}
+
+function text(value, x, y, options = {}) {
+  const {
+    size = 24,
+    weight = 500,
+    family = 'Manrope',
+    color = C.ink,
+    align = 'left',
+    alpha = 1,
+  } = options;
+  ctx.save();
+  ctx.globalAlpha *= alpha;
+  ctx.font = font(size, weight, family);
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(value, x, y);
+  ctx.restore();
+}
+
+function wrap(value, x, y, maxWidth, lineHeight, options = {}) {
+  ctx.save();
+  ctx.font = font(options.size || 24, options.weight || 500, options.family || 'Manrope');
+  const words = value.split(' ');
+  let line = '';
+  let row = 0;
+  for (const word of words) {
+    const next = line ? `${line} ${word}` : word;
+    if (ctx.measureText(next).width > maxWidth && line) {
+      text(line, x, y + row * lineHeight, options);
+      line = word;
+      row += 1;
+    } else {
+      line = next;
+    }
+  }
+  if (line) text(line, x, y + row * lineHeight, options);
+  ctx.restore();
+  return row + 1;
+}
+
+function line(x1, y1, x2, y2, color = C.line, width = 1) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
+
+function dotGrid(alpha = 0.18) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = '#707177';
+  for (let y = 18; y < BASE_H; y += 18) {
+    for (let x = 18; x < BASE_W; x += 18) {
+      ctx.beginPath();
+      ctx.arc(x, y, 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+function mark(x, y, size, reveal = 1) {
+  const bars = [
+    { a: 0, color: C.gold },
+    { a: Math.PI / 2, color: C.ink },
+    { a: Math.PI, color: C.ink },
+    { a: Math.PI * 1.5, color: C.ink },
+  ];
+  ctx.save();
+  ctx.translate(x, y);
+  bars.forEach((bar, index) => {
+    const a = easeOut(progress(reveal, index * 0.15, 0.45));
+    if (!a) return;
+    ctx.save();
+    ctx.rotate(bar.a);
+    ctx.globalAlpha *= a;
+    ctx.fillStyle = bar.color;
+    rounded(-size * 0.38, -size * 0.38, size * 0.48, size * 0.2, size * 0.1);
+    ctx.fill();
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+function iconCheck(x, y, color = C.green) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.4;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x - 6, y);
+  ctx.lineTo(x - 1, y + 5);
+  ctx.lineTo(x + 8, y - 6);
+  ctx.stroke();
+}
+
+function iconArrow(x, y, color = C.gold) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x - 8, y + 6);
+  ctx.lineTo(x + 7, y - 7);
+  ctx.moveTo(x - 1, y - 7);
+  ctx.lineTo(x + 7, y - 7);
+  ctx.lineTo(x + 7, y + 1);
+  ctx.stroke();
+}
+
+function pill(value, x, y, options = {}) {
+  ctx.font = font(options.size || 13, options.weight || 600, options.family || 'Manrope');
+  const padding = options.padding || 12;
+  const width = ctx.measureText(value).width + padding * 2;
+  fillRounded(x, y, width, options.height || 30, (options.height || 30) / 2, options.bg || C.panel2);
+  text(value, x + padding, y + (options.baseline || 20), {
+    size: options.size || 13,
+    weight: options.weight || 600,
+    color: options.color || C.muted,
+    family: options.family || 'Manrope',
+  });
+  return width;
+}
+
+function workspaceChrome(active, sceneProgress = 1) {
+  const x = 72;
+  const y = 38;
+  const w = 1136;
+  const h = 500;
+  fillRounded(x, y, w, h, 22, C.panel);
+  strokeRounded(x, y, w, h, 22, C.line, 1);
+  ctx.save();
+  rounded(x, y, w, h, 22);
+  ctx.clip();
+  ctx.fillStyle = '#111214';
+  ctx.fillRect(x, y, 214, h);
+  line(x + 214, y, x + 214, y + h, C.lineSoft);
+  mark(x + 37, y + 39, 34, 1);
+  text('casdey', x + 61, y + 47, { size: 21, weight: 650 });
+  const nav = ['Overview', 'Members', 'Import', 'Offer', 'Campaigns'];
+  nav.forEach((item, index) => {
+    const yy = y + 105 + index * 48;
+    if (item === active) {
+      fillRounded(x + 18, yy - 25, 178, 39, 10, C.panel2);
+      ctx.fillStyle = C.gold;
+      ctx.beginPath();
+      ctx.arc(x + 36, yy - 5, 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    text(item, x + 51, yy, { size: 15, weight: item === active ? 650 : 500, color: item === active ? C.ink : C.muted });
+  });
+  text('Test gym', x + 28, y + h - 31, { size: 13, color: C.dim });
+  ctx.restore();
+
+  const railX = x + 231;
+  const railY = y + 30;
+  line(railX, railY, railX, y + h - 30, C.line, 1);
+  line(railX, railY, railX, railY + (h - 60) * clamp(sceneProgress), C.gold, 2);
+  return { x: x + 248, y: y + 28, w: w - 276, h: h - 56 };
+}
+
+function sectionHeader(bounds, eyebrow, titleValue, body, enter) {
+  const lift = 18 * (1 - easeOut(enter));
+  text(eyebrow.toUpperCase(), bounds.x, bounds.y + 18 + lift, { size: 12, weight: 700, family: 'Manrope', color: C.gold, alpha: enter });
+  text(titleValue, bounds.x, bounds.y + 58 + lift, { size: 30, weight: 700, family: 'Outfit', alpha: enter });
+  if (body) text(body, bounds.x, bounds.y + 85 + lift, { size: 14, color: C.muted, alpha: enter });
+}
+
+function subtitle(kicker, first, second, alpha = 1) {
+  ctx.save();
+  ctx.globalAlpha *= alpha;
+  fillRounded(72, 565, 1136, 118, 20, '#111214');
+  strokeRounded(72, 565, 1136, 118, 20, C.lineSoft);
+  ctx.fillStyle = C.gold;
+  rounded(92, 585, 4, 77, 2);
+  ctx.fill();
+  text(kicker.toUpperCase(), 116, 602, { size: 12, weight: 700, color: C.gold });
+  text(first, 116, 635, { size: 25, weight: 650, family: 'Outfit' });
+  if (second) text(second, 116, 663, { size: 25, weight: 650, family: 'Outfit', color: C.muted });
+  ctx.restore();
+}
+
+function sceneAlpha(t, start, end, fade = 0.45) {
+  return Math.min(easeOut(progress(t, start, fade)), 1 - easeInOut(progress(t, end - fade, fade)));
+}
+
+function drawIntro(t, start, end) {
+  const a = sceneAlpha(t, start, end, 0.55);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  const glow = ctx.createRadialGradient(640, 260, 20, 640, 260, 430);
+  glow.addColorStop(0, 'rgba(226,185,63,0.14)');
+  glow.addColorStop(1, 'rgba(226,185,63,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, BASE_W, BASE_H);
+  const reveal = easeOut(progress(local, 0.15, 1.1));
+  mark(640, 208, 106, reveal);
+  text('casdey', 640, 330, { size: 68, weight: 650, family: 'Outfit', align: 'center', alpha: reveal });
+  text('The members who stopped coming', 640, 402, { size: 38, weight: 600, family: 'Outfit', align: 'center', alpha: easeOut(progress(local, 0.75, 0.8)) });
+  text('are still in your records.', 640, 449, { size: 38, weight: 600, family: 'Outfit', align: 'center', color: C.muted, alpha: easeOut(progress(local, 1.05, 0.8)) });
+  const bar = easeOut(progress(local, 1.7, 1.2));
+  fillRounded(500, 500, 280 * bar, 4, 2, C.gold);
+  ctx.restore();
+}
+
+function drawImport(t, start, end) {
+  const a = sceneAlpha(t, start, end);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  const bounds = workspaceChrome('Import', progress(local, 0, end - start));
+  const enter = easeOut(progress(local, 0.05, 0.65));
+  sectionHeader(bounds, '01 / Import', 'Bring your member list', 'A CSV export from the software you already use.', enter);
+  const cardY = bounds.y + 115;
+  fillRounded(bounds.x, cardY, 560, 300, 16, C.panel2);
+  strokeRounded(bounds.x, cardY, 560, 300, 16, C.line);
+  fillRounded(bounds.x + 28, cardY + 28, 504, 70, 12, '#17181b');
+  strokeRounded(bounds.x + 28, cardY + 28, 504, 70, 12, C.lineSoft);
+  text('members-export.csv', bounds.x + 52, cardY + 59, { size: 16, weight: 650 });
+  text('Name · email · last visit · membership', bounds.x + 52, cardY + 82, { size: 12, color: C.dim });
+  const rows = [
+    ['M. Reed', '12 Mar', 'Monthly'],
+    ['A. Silva', '28 Feb', 'Annual'],
+    ['J. Okafor', '09 Jan', '10-class pack'],
+  ];
+  rows.forEach((row, index) => {
+    const show = easeOut(progress(local, 0.75 + index * 0.32, 0.5));
+    const yy = cardY + 130 + index * 47;
+    ctx.save();
+    ctx.globalAlpha *= show;
+    text(row[0], bounds.x + 48, yy + 18, { size: 14, weight: 600 });
+    text(row[1], bounds.x + 235, yy + 18, { size: 13, color: C.muted });
+    text(row[2], bounds.x + 355, yy + 18, { size: 13, color: C.muted });
+    line(bounds.x + 48, yy + 35, bounds.x + 512, yy + 35, C.lineSoft);
+    ctx.restore();
+  });
+  const done = easeOut(progress(local, 2.25, 0.65));
+  fillRounded(bounds.x + 595, cardY + 45, 228, 112, 16, C.goldSoft);
+  ctx.fillStyle = C.gold;
+  ctx.beginPath();
+  ctx.arc(bounds.x + 635, cardY + 83, 17, 0, Math.PI * 2);
+  ctx.fill();
+  iconCheck(bounds.x + 635, cardY + 83, C.ground);
+  text('Import ready', bounds.x + 666, cardY + 80, { size: 16, weight: 700, alpha: done });
+  text('Nothing changes in your source file.', bounds.x + 617, cardY + 123, { size: 12, color: C.muted, alpha: done });
+  subtitle('Start here', 'Export once. Import once.', 'casdey sorts the list.', a);
+  ctx.restore();
+}
+
+function drawMembers(t, start, end) {
+  const a = sceneAlpha(t, start, end);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  const bounds = workspaceChrome('Members', progress(local, 0, end - start));
+  const enter = easeOut(progress(local, 0.05, 0.65));
+  sectionHeader(bounds, '02 / Find', 'Members who went quiet', 'Sorted by the time since their last visit.', enter);
+  const top = bounds.y + 112;
+  fillRounded(bounds.x, top, bounds.w, 307, 16, C.panel2);
+  strokeRounded(bounds.x, top, bounds.w, 307, 16, C.line);
+  const cols = [bounds.x + 28, bounds.x + 300, bounds.x + 482, bounds.x + 657];
+  ['Member', 'Last visit', 'Time away', 'Status'].forEach((label, i) => text(label, cols[i], top + 34, { size: 12, weight: 650, color: C.dim }));
+  line(bounds.x + 22, top + 52, bounds.x + bounds.w - 22, top + 52, C.line);
+  const rows = [
+    ['M. Reed', '12 Mar', '6 months', 'lapsed'],
+    ['A. Silva', '28 Feb', '7 months', 'lapsed'],
+    ['J. Okafor', '09 Jan', '8 months', 'lapsed'],
+    ['R. Haugen', '17 Apr', '5 months', 'lapsed'],
+  ];
+  rows.forEach((row, index) => {
+    const show = easeOut(progress(local, 0.55 + index * 0.38, 0.58));
+    const yy = top + 80 + index * 54;
+    ctx.save();
+    ctx.globalAlpha *= show;
+    text(row[0], cols[0], yy, { size: 15, weight: 650 });
+    text(row[1], cols[1], yy, { size: 14, color: C.muted });
+    text(row[2], cols[2], yy, { size: 14, color: C.muted });
+    pill(row[3], cols[3], yy - 21, { bg: C.goldSoft, color: C.gold, height: 28, baseline: 19, size: 12 });
+    if (index < rows.length - 1) line(bounds.x + 22, yy + 22, bounds.x + bounds.w - 22, yy + 22, C.lineSoft);
+    ctx.restore();
+  });
+  subtitle('Find the gap', 'It finds who stopped coming', 'and how long they have been away.', a);
+  ctx.restore();
+}
+
+function drawValue(t, start, end) {
+  const a = sceneAlpha(t, start, end);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  const bounds = workspaceChrome('Offer', progress(local, 0, end - start));
+  sectionHeader(bounds, '03 / Value', 'Use the prices you already charge', 'Each return is valued against its own membership or class pack.', easeOut(progress(local, 0.05, 0.65)));
+  const cards = [
+    ['Monthly membership', 'Your monthly price', 'M. Reed'],
+    ['Annual membership', 'Your annual price', 'A. Silva'],
+    ['10-class pack', 'Your pack price', 'J. Okafor'],
+  ];
+  cards.forEach((card, index) => {
+    const show = easeOut(progress(local, 0.45 + index * 0.35, 0.65));
+    const x = bounds.x + index * 278;
+    const y = bounds.y + 135 + 12 * (1 - show);
+    ctx.save();
+    ctx.globalAlpha *= show;
+    fillRounded(x, y, 252, 255, 16, C.panel2);
+    strokeRounded(x, y, 252, 255, 16, index === 0 ? C.gold : C.line, index === 0 ? 1.5 : 1);
+    text(card[0], x + 22, y + 36, { size: 15, weight: 700 });
+    text(card[1], x + 22, y + 67, { size: 13, color: C.muted });
+    fillRounded(x + 22, y + 98, 208, 62, 11, '#141518');
+    text('Set in Services', x + 38, y + 136, { size: 15, weight: 650, color: C.gold });
+    line(x + 22, y + 185, x + 230, y + 185, C.lineSoft);
+    text('Matched member', x + 22, y + 210, { size: 11, color: C.dim });
+    text(card[2], x + 22, y + 235, { size: 14, weight: 650 });
+    ctx.restore();
+  });
+  subtitle('Value it honestly', 'Your own prices show', 'what each return is worth.', a);
+  ctx.restore();
+}
+
+function drawMessage(t, start, end) {
+  const a = sceneAlpha(t, start, end);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  const bounds = workspaceChrome('Campaigns', progress(local, 0, end - start));
+  sectionHeader(bounds, '04 / Write', 'One member, one message', 'The approved campaign becomes personal to each person.', easeOut(progress(local, 0.05, 0.65)));
+  const left = bounds.x;
+  const top = bounds.y + 112;
+  fillRounded(left, top, 520, 307, 16, C.panel2);
+  strokeRounded(left, top, 520, 307, 16, C.line);
+  text('Message preview', left + 24, top + 34, { size: 13, weight: 700, color: C.gold });
+  const typed = 'Hi Maya, it has been a while since we saw you at Northline. If getting back into a routine has been on your mind, I can help you find a session that fits.';
+  const chars = Math.floor(typed.length * easeOut(progress(local, 0.6, 2.7)));
+  wrap(typed.slice(0, chars), left + 28, top + 82, 454, 26, { size: 17, weight: 500, color: C.ink });
+  text('Davide at Northline Gym', left + 28, top + 272, { size: 13, color: C.muted });
+
+  const right = left + 548;
+  fillRounded(right, top, 277, 307, 16, '#141518');
+  strokeRounded(right, top, 277, 307, 16, C.line);
+  text('Built from', right + 22, top + 35, { size: 12, weight: 700, color: C.dim });
+  const sources = [
+    ['Maya', 'member name'],
+    ['6 months away', 'last visit'],
+    ['Northline', 'gym identity'],
+    ['Return session', 'approved offer'],
+  ];
+  sources.forEach((item, index) => {
+    const show = easeOut(progress(local, 1.0 + index * 0.34, 0.5));
+    const yy = top + 75 + index * 52;
+    ctx.save(); ctx.globalAlpha *= show;
+    ctx.fillStyle = C.gold;
+    ctx.beginPath(); ctx.arc(right + 27, yy - 4, 3.5, 0, Math.PI * 2); ctx.fill();
+    text(item[0], right + 42, yy, { size: 14, weight: 650 });
+    text(item[1], right + 42, yy + 18, { size: 11, color: C.dim });
+    ctx.restore();
+  });
+  subtitle('Write individually', 'Each member gets a message', 'written around their own history.', a);
+  ctx.restore();
+}
+
+function drawFollowUp(t, start, end) {
+  const a = sceneAlpha(t, start, end);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  const bounds = workspaceChrome('Campaigns', progress(local, 0, end - start));
+  sectionHeader(bounds, '05 / Follow up', 'Persistent, with a clear end', 'Every sequence stops after the final message or the moment someone books.', easeOut(progress(local, 0.05, 0.65)));
+  const items = [
+    ['First message', 'Sent', 'Today'],
+    ['One follow-up', 'Scheduled', 'In 3 days'],
+    ['Last message', 'Scheduled', 'In 7 days'],
+  ];
+  const top = bounds.y + 128;
+  items.forEach((item, index) => {
+    const show = easeOut(progress(local, 0.55 + index * 0.5, 0.6));
+    const y = top + index * 88;
+    ctx.save();
+    ctx.globalAlpha *= show;
+    fillRounded(bounds.x, y, bounds.w, 69, 14, C.panel2);
+    strokeRounded(bounds.x, y, bounds.w, 69, 14, index === 0 ? C.gold : C.line, index === 0 ? 1.4 : 1);
+    ctx.fillStyle = index === 0 ? C.gold : C.line;
+    ctx.beginPath(); ctx.arc(bounds.x + 35, y + 34, 12, 0, Math.PI * 2); ctx.fill();
+    if (index === 0) iconCheck(bounds.x + 35, y + 34, C.ground);
+    text(item[0], bounds.x + 65, y + 30, { size: 16, weight: 700 });
+    text(item[2], bounds.x + 65, y + 51, { size: 12, color: C.dim });
+    pill(item[1], bounds.x + bounds.w - 125, y + 20, { bg: index === 0 ? C.goldSoft : '#25262a', color: index === 0 ? C.gold : C.muted, height: 29, baseline: 20, size: 12 });
+    if (index < items.length - 1) line(bounds.x + 35, y + 47, bounds.x + 35, y + 108, C.line, 2);
+    ctx.restore();
+  });
+  const stop = easeOut(progress(local, 2.7, 0.7));
+  text('A reply or booking cancels everything still scheduled.', bounds.x, bounds.y + 411, { size: 13, color: C.muted, alpha: stop });
+  subtitle('Keep the timing', 'If they go quiet, casdey follows up.', 'Then it stops.', a);
+  ctx.restore();
+}
+
+function drawReply(t, start, end) {
+  const a = sceneAlpha(t, start, end);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  const bounds = workspaceChrome('Members', progress(local, 0, end - start));
+  sectionHeader(bounds, '06 / Reply', 'The conversation stays with the member', 'casdey answers using the gym context you approved.', easeOut(progress(local, 0.05, 0.65)));
+  const top = bounds.y + 105;
+  fillRounded(bounds.x + 85, top, 650, 318, 18, '#141518');
+  strokeRounded(bounds.x + 85, top, 650, 318, 18, C.line);
+  text('Maya Reed', bounds.x + 112, top + 37, { size: 16, weight: 700 });
+  text('Email conversation', bounds.x + 112, top + 58, { size: 11, color: C.dim });
+  line(bounds.x + 105, top + 74, bounds.x + 715, top + 74, C.lineSoft);
+  const incoming = easeOut(progress(local, 0.75, 0.6));
+  ctx.save(); ctx.globalAlpha *= incoming;
+  fillRounded(bounds.x + 112, top + 99, 330, 67, 15, C.panel2);
+  text('Tuesday evening could work.', bounds.x + 132, top + 126, { size: 15, weight: 600 });
+  text('Do you have anything after six?', bounds.x + 132, top + 149, { size: 14, color: C.muted });
+  ctx.restore();
+  const outgoing = easeOut(progress(local, 1.7, 0.65));
+  ctx.save(); ctx.globalAlpha *= outgoing;
+  fillRounded(bounds.x + 327, top + 190, 380, 86, 15, C.goldSoft);
+  text('Yes. There is a session at 18:30.', bounds.x + 347, top + 222, { size: 15, weight: 650 });
+  text('Would you like me to book it?', bounds.x + 347, top + 249, { size: 14, color: C.gold });
+  ctx.restore();
+  subtitle('Answer in context', 'When someone answers,', 'casdey replies in your gym\'s name.', a);
+  ctx.restore();
+}
+
+function drawBooking(t, start, end) {
+  const a = sceneAlpha(t, start, end);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  const bounds = workspaceChrome('Overview', progress(local, 0, end - start));
+  sectionHeader(bounds, '07 / Book', 'A real slot, in your calendar', 'Availability is checked before the booking is created.', easeOut(progress(local, 0.05, 0.65)));
+  const x = bounds.x + 60;
+  const y = bounds.y + 112;
+  const w = 705;
+  fillRounded(x, y, w, 305, 17, C.panel2);
+  strokeRounded(x, y, w, 305, 17, C.line);
+  text('Tuesday', x + 24, y + 37, { size: 18, weight: 700 });
+  text('Your Google Calendar', x + w - 24, y + 37, { size: 12, color: C.dim, align: 'right' });
+  const slots = [
+    ['09:00', 'Open gym'],
+    ['12:30', 'Kettlebell class'],
+    ['18:30', 'Available'],
+    ['20:00', 'Open gym'],
+  ];
+  slots.forEach((slot, index) => {
+    const yy = y + 72 + index * 52;
+    const booked = index === 2 && local > 1.5;
+    if (booked) fillRounded(x + 18, yy - 25, w - 36, 42, 9, C.goldSoft);
+    text(slot[0], x + 35, yy, { size: 13, weight: 650, color: booked ? C.gold : C.muted });
+    text(booked ? 'Maya Reed · Return session' : slot[1], x + 135, yy, { size: 14, weight: booked ? 700 : 500, color: booked ? C.ink : C.muted });
+    if (booked) {
+      pill('booked by casdey', x + w - 178, yy - 22, { bg: '#2d2817', color: C.gold, height: 29, baseline: 20, size: 11 });
+    }
+    if (index < slots.length - 1) line(x + 25, yy + 22, x + w - 25, yy + 22, C.lineSoft);
+  });
+  const pop = easeOut(progress(local, 1.45, 0.7));
+  ctx.save(); ctx.globalAlpha *= pop;
+  fillRounded(bounds.x + 640, bounds.y + 84, 186, 70, 14, C.gold);
+  iconCheck(bounds.x + 675, bounds.y + 119, C.ground);
+  text('Booked', bounds.x + 703, bounds.y + 125, { size: 17, weight: 750, color: C.ground });
+  ctx.restore();
+  subtitle('Close the loop', 'A free slot is found', 'and booked in your calendar.', a);
+  ctx.restore();
+}
+
+function drawLoop(t, start, end) {
+  const a = sceneAlpha(t, start, end);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  text('One connected loop', 640, 90, { size: 38, weight: 700, family: 'Outfit', align: 'center' });
+  text('No dashboard asking your staff to chase people by hand.', 640, 124, { size: 16, color: C.muted, align: 'center' });
+  const nodes = [
+    ['Import', 180],
+    ['Find', 365],
+    ['Write', 550],
+    ['Reply', 735],
+    ['Book', 920],
+    ['Return', 1105],
+  ];
+  nodes.forEach((node, index) => {
+    const show = easeOut(progress(local, 0.25 + index * 0.32, 0.55));
+    const x = node[1];
+    if (index < nodes.length - 1) {
+      const path = easeOut(progress(local, 0.55 + index * 0.32, 0.55));
+      line(x + 59, 320, mix(x + 59, nodes[index + 1][1] - 59, path), 320, C.gold, 2);
+    }
+    ctx.save(); ctx.globalAlpha *= show;
+    fillRounded(x - 58, 262, 116, 116, 24, C.panel);
+    strokeRounded(x - 58, 262, 116, 116, 24, index === nodes.length - 1 ? C.gold : C.line, index === nodes.length - 1 ? 1.5 : 1);
+    ctx.fillStyle = index === nodes.length - 1 ? C.gold : C.goldSoft;
+    ctx.beginPath(); ctx.arc(x, 310, 14, 0, Math.PI * 2); ctx.fill();
+    if (index === nodes.length - 1) iconCheck(x, 310, C.ground);
+    text(node[0], x, 352, { size: 14, weight: 700, align: 'center', color: index === nodes.length - 1 ? C.gold : C.ink });
+    ctx.restore();
+  });
+  const sweep = easeOut(progress(local, 1.6, 1.4));
+  fillRounded(170, 430, 940 * sweep, 4, 2, C.gold);
+  subtitle('The system', 'From member list to booked return.', 'One connected loop.', a);
+  ctx.restore();
+}
+
+function drawOutro(t, start, end) {
+  const a = sceneAlpha(t, start, end, 0.6);
+  if (a <= 0) return;
+  const local = t - start;
+  ctx.save();
+  ctx.globalAlpha *= a;
+  const glow = ctx.createRadialGradient(640, 300, 30, 640, 300, 430);
+  glow.addColorStop(0, 'rgba(226,185,63,0.15)');
+  glow.addColorStop(1, 'rgba(226,185,63,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, BASE_W, BASE_H);
+  const reveal = easeOut(progress(local, 0.1, 0.8));
+  mark(640, 194, 88, reveal);
+  text('You import your list.', 640, 330, { size: 48, weight: 700, family: 'Outfit', align: 'center', alpha: reveal });
+  text('casdey does the rest.', 640, 389, { size: 48, weight: 700, family: 'Outfit', align: 'center', color: C.gold, alpha: easeOut(progress(local, 0.45, 0.8)) });
+  const cta = easeOut(progress(local, 1.05, 0.7));
+  fillRounded(504, 452, 272, 54, 27, C.gold);
+  text('See it with your own list', 640, 486, { size: 16, weight: 750, color: C.ground, align: 'center', alpha: cta });
+  text('casdey.com', 640, 554, { size: 17, weight: 650, color: C.muted, align: 'center', alpha: cta });
+  ctx.restore();
+}
+
+function renderFrame(t) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = C.ground;
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  dotGrid(0.13);
+  drawIntro(t, 0, 5.2);
+  drawImport(t, 4.7, 12.0);
+  drawMembers(t, 11.5, 20.8);
+  drawValue(t, 20.3, 29.0);
+  drawMessage(t, 28.5, 40.0);
+  drawFollowUp(t, 39.5, 49.2);
+  drawReply(t, 48.7, 58.0);
+  drawBooking(t, 57.5, 66.0);
+  drawLoop(t, 65.5, 71.0);
+  drawOutro(t, 70.5, 74.0);
+}
+
+function audioEnvelope(gain, when, attack, hold, release, peak) {
+  gain.setValueAtTime(0.0001, when);
+  gain.exponentialRampToValueAtTime(peak, when + attack);
+  gain.setValueAtTime(peak, when + attack + hold);
+  gain.exponentialRampToValueAtTime(0.0001, when + attack + hold + release);
+}
+
+async function soundtrack(duration) {
+  const sampleRate = 48000;
+  const ac = new OfflineAudioContext(2, Math.ceil(duration * sampleRate), sampleRate);
+  const master = ac.createGain();
+  master.gain.setValueAtTime(0.0001, 0);
+  master.gain.exponentialRampToValueAtTime(0.82, 0.32);
+  master.gain.setValueAtTime(0.82, duration - 1.2);
+  master.gain.exponentialRampToValueAtTime(0.0001, duration - 0.03);
+  const compressor = ac.createDynamicsCompressor();
+  compressor.threshold.value = -16;
+  compressor.knee.value = 8;
+  compressor.ratio.value = 4;
+  compressor.attack.value = 0.004;
+  compressor.release.value = 0.18;
+  master.connect(compressor);
+  compressor.connect(ac.destination);
+
+  let seed = 1739;
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const noiseBuffer = ac.createBuffer(1, sampleRate * 2, sampleRate);
+  const noise = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < noise.length; i++) noise[i] = random() * 2 - 1;
+
+  const connectPan = (node, pan = 0) => {
+    const panner = ac.createStereoPanner();
+    panner.pan.value = pan;
+    node.connect(panner);
+    panner.connect(master);
+  };
+
+  const kick = (when, level = 0.6) => {
+    const osc = ac.createOscillator();
+    const gain = ac.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(132, when);
+    osc.frequency.exponentialRampToValueAtTime(46, when + 0.14);
+    audioEnvelope(gain.gain, when, 0.004, 0.015, 0.23, level);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(when);
+    osc.stop(when + 0.28);
+  };
+
+  const hat = (when, pan, level = 0.1, length = 0.055) => {
+    const src = ac.createBufferSource();
+    const filter = ac.createBiquadFilter();
+    const gain = ac.createGain();
+    src.buffer = noiseBuffer;
+    filter.type = 'highpass';
+    filter.frequency.value = 7200;
+    audioEnvelope(gain.gain, when, 0.002, 0.005, length, level);
+    src.connect(filter);
+    filter.connect(gain);
+    connectPan(gain, pan);
+    src.start(when, 0, length + 0.02);
+  };
+
+  const clap = (when, level = 0.15) => {
+    const src = ac.createBufferSource();
+    const filter = ac.createBiquadFilter();
+    const gain = ac.createGain();
+    src.buffer = noiseBuffer;
+    filter.type = 'bandpass';
+    filter.frequency.value = 1800;
+    filter.Q.value = 0.8;
+    audioEnvelope(gain.gain, when, 0.002, 0.02, 0.16, level);
+    src.connect(filter);
+    filter.connect(gain);
+    connectPan(gain, 0.1);
+    src.start(when, 0.35, 0.22);
+  };
+
+  const bass = (when, frequency, length = 0.38, level = 0.12) => {
+    const osc = ac.createOscillator();
+    const filter = ac.createBiquadFilter();
+    const gain = ac.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = frequency;
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(380, when);
+    filter.frequency.exponentialRampToValueAtTime(110, when + length);
+    audioEnvelope(gain.gain, when, 0.012, Math.max(0.01, length - 0.18), 0.16, level);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(master);
+    osc.start(when);
+    osc.stop(when + length + 0.12);
+  };
+
+  const pluck = (when, frequency, pan = 0, level = 0.075, length = 0.55) => {
+    const osc = ac.createOscillator();
+    const filter = ac.createBiquadFilter();
+    const gain = ac.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = frequency;
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(4800, when);
+    filter.frequency.exponentialRampToValueAtTime(900, when + length);
+    audioEnvelope(gain.gain, when, 0.006, 0.025, length, level);
+    osc.connect(filter);
+    filter.connect(gain);
+    connectPan(gain, pan);
+    osc.start(when);
+    osc.stop(when + length + 0.1);
+  };
+
+  const pad = (when, frequency, length, level = 0.028) => {
+    [-7, 7].forEach((detune, index) => {
+      const osc = ac.createOscillator();
+      const filter = ac.createBiquadFilter();
+      const gain = ac.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = frequency;
+      osc.detune.value = detune;
+      filter.type = 'lowpass';
+      filter.frequency.value = 1100;
+      audioEnvelope(gain.gain, when, 0.8, Math.max(0.1, length - 1.8), 1.0, level);
+      osc.connect(filter);
+      filter.connect(gain);
+      connectPan(gain, index ? 0.35 : -0.35);
+      osc.start(when);
+      osc.stop(when + length + 0.1);
+    });
+  };
+
+  const riser = (when, length = 0.75, level = 0.08) => {
+    const src = ac.createBufferSource();
+    const filter = ac.createBiquadFilter();
+    const gain = ac.createGain();
+    src.buffer = noiseBuffer;
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(500, when);
+    filter.frequency.exponentialRampToValueAtTime(6000, when + length);
+    gain.gain.setValueAtTime(0.0001, when);
+    gain.gain.exponentialRampToValueAtTime(level, when + length * 0.85);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + length);
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(master);
+    src.start(when, 0.1, length);
+  };
+
+  const bpm = 122;
+  const beat = 60 / bpm;
+  const bassNotes = [55, 65.41, 73.42, 49];
+  const pluckNotes = [440, 523.25, 659.25, 587.33, 392, 523.25, 659.25, 783.99];
+  pad(0, 110, 28, 0.024);
+  pad(27.5, 98, 22, 0.025);
+  pad(48, 110, 24, 0.027);
+  for (let i = 0, when = 4.7; when < 70.4; i += 1, when += beat) {
+    const inBreak = (when > 28.4 && when < 31.2) || (when > 48.5 && when < 50.2) || (when > 65.5 && when < 67.0);
+    if (!inBreak) kick(when, i % 4 === 0 ? 0.66 : 0.48);
+    if (i % 2 === 1 && !inBreak) clap(when, 0.12);
+    hat(when + beat / 2, i % 2 ? 0.38 : -0.38, inBreak ? 0.055 : 0.085, i % 4 === 3 ? 0.1 : 0.045);
+    if (i % 2 === 0 && !inBreak) bass(when + 0.015, bassNotes[Math.floor(i / 4) % bassNotes.length], beat * 0.78, 0.105);
+  }
+  for (let i = 0, when = 8.0; when < 70.0; i += 1, when += beat / 2) {
+    const sparse = when > 28 && when < 31;
+    if (!sparse && i % 2 === 0) pluck(when, pluckNotes[i % pluckNotes.length], i % 4 === 0 ? -0.35 : 0.35, 0.06, 0.38);
+  }
+  [4.7, 11.5, 20.3, 28.5, 39.5, 48.7, 57.5, 65.5, 70.5].forEach((time, index) => {
+    riser(Math.max(0, time - 0.75), 0.72, 0.065);
+    pluck(time, [880, 783.99, 987.77][index % 3], index % 2 ? 0.5 : -0.5, 0.11, 0.8);
+  });
+  pluck(1.0, 440, -0.25, 0.07, 1.1);
+  pluck(1.45, 659.25, 0.25, 0.065, 1.1);
+  pluck(70.9, 523.25, -0.2, 0.09, 1.5);
+  pluck(71.4, 783.99, 0.2, 0.085, 1.8);
+  return ac.startRendering();
+}
+
+function bytesToBase64(bytes) {
+  let value = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    value += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(value);
+}
+
+window.renderPromo = async (spec) => {
+  WIDTH = spec.width;
+  HEIGHT = spec.height;
+  FPS = spec.fps || 30;
+  SCALE = WIDTH / BASE_W;
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
+  canvas.style.width = `${WIDTH}px`;
+  canvas.style.height = `${HEIGHT}px`;
+  await Promise.all([
+    document.fonts.load('700 80px "Outfit"'),
+    document.fonts.load('600 80px "Outfit"'),
+    document.fonts.load('500 40px "Manrope"'),
+    document.fonts.load('700 40px "Manrope"'),
+  ]);
+
+  const duration = spec.duration || 74;
+  const audio = await soundtrack(duration);
+  const { Muxer, ArrayBufferTarget } = Mp4Muxer;
+  const muxer = new Muxer({
+    target: new ArrayBufferTarget(),
+    video: { codec: 'avc', width: WIDTH, height: HEIGHT, frameRate: FPS },
+    audio: { codec: 'aac', numberOfChannels: 2, sampleRate: 48000 },
+    fastStart: 'in-memory',
+  });
+  let failure = null;
+  const videoEncoder = new VideoEncoder({
+    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+    error: (error) => { failure = error; },
+  });
+  videoEncoder.configure({
+    codec: spec.codec,
+    width: WIDTH,
+    height: HEIGHT,
+    bitrate: spec.bitrate,
+    bitrateMode: 'constant',
+    framerate: FPS,
+    avc: { format: 'avc' },
+  });
+
+  const totalFrames = Math.round(duration * FPS);
+  const frameDuration = 1e6 / FPS;
+  let poster = null;
+  for (let index = 0; index < totalFrames; index += 1) {
+    const time = index / FPS;
+    renderFrame(time);
+    if (!poster && time >= (spec.posterTime || 2.2)) poster = canvas.toDataURL('image/webp', 0.9);
+    const frame = new VideoFrame(canvas, {
+      timestamp: Math.round(index * frameDuration),
+      duration: Math.round(frameDuration),
+    });
+    videoEncoder.encode(frame, { keyFrame: index % (FPS * 2) === 0 });
+    frame.close();
+    while (videoEncoder.encodeQueueSize > 7) await new Promise((resolve) => setTimeout(resolve, 2));
+    if (failure) throw failure;
+  }
+  await videoEncoder.flush();
+
+  const audioEncoder = new AudioEncoder({
+    output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+    error: (error) => { failure = error; },
+  });
+  audioEncoder.configure({ codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 2, bitrate: 160000 });
+  const left = audio.getChannelData(0);
+  const right = audio.getChannelData(1);
+  const audioStep = 4800;
+  for (let offset = 0; offset < left.length; offset += audioStep) {
+    const frames = Math.min(audioStep, left.length - offset);
+    const data = new Float32Array(frames * 2);
+    data.set(left.subarray(offset, offset + frames), 0);
+    data.set(right.subarray(offset, offset + frames), frames);
+    const packet = new AudioData({
+      format: 'f32-planar',
+      sampleRate: 48000,
+      numberOfFrames: frames,
+      numberOfChannels: 2,
+      timestamp: Math.round((offset * 1e6) / 48000),
+      data,
+    });
+    audioEncoder.encode(packet);
+    packet.close();
+  }
+  await audioEncoder.flush();
+  if (failure) throw failure;
+  muxer.finalize();
+  const bytes = new Uint8Array(muxer.target.buffer);
+  for (let offset = 0; offset < bytes.length; offset += 4_000_000) {
+    await window.__chunk(bytesToBase64(bytes.subarray(offset, offset + 4_000_000)));
+  }
+  return { frames: totalFrames, bytes: bytes.length, poster };
+};
+</script>
+</body>
+</html>

@@ -35,3 +35,7 @@ content/instagram/footage/
 # Licensed music tracks mixed into the reels (Meta Sound Collection or Pixabay),
 # named in each post's `music` field.
 content/instagram/music/
+
+# Rebuilt 1080p master for the hidden /see film. The 720p delivery copy lives
+# in web/public/video/ and is committed; this larger local master is reproducible.
+web/.promo-render/

@@ -28,7 +28,7 @@ export default async function SeePage() {
   const paidTrial = paidTrialEnabled();
 
   return (
-    <>
+    <div className="marketing-surface">
       <SiteHeader
         currency={currency}
         sections={false}
@@ -85,6 +85,6 @@ export default async function SeePage() {
         </section>
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }
