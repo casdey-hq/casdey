@@ -64,17 +64,19 @@ function ProcessIntro() {
 export function WhatItDoes() {
   const [active, setActive] = useState(0);
   const [progress, setProgress] = useState(0);
-  const stageRef = useRef<HTMLDivElement>(null);
+  const mobileStageRef = useRef<HTMLDivElement>(null);
+  const desktopStageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let frame = 0;
     const update = () => {
       frame = 0;
-      const stage = stageRef.current;
-      if (!stage || window.innerWidth < 1024) return;
+      const desktop = window.innerWidth >= 1024;
+      const stage = desktop ? desktopStageRef.current : mobileStageRef.current;
+      if (!stage) return;
 
       const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      const stickyTop = rootFontSize * 11;
+      const stickyTop = rootFontSize * (desktop ? 11 : 6);
       const range = Math.max(stage.offsetHeight - window.innerHeight, 1);
       const nextProgress = Math.min(0.9999, Math.max(0, (stickyTop - stage.getBoundingClientRect().top) / range));
       const next = Math.floor(nextProgress * STEPS.length);
@@ -99,41 +101,32 @@ export function WhatItDoes() {
     <section id="what-it-does" className="scroll-mt-24 py-24 sm:py-32">
       <Container>
         <div className="lg:hidden">
-        <Reveal>
-          <ProcessIntro />
-        </Reveal>
+          <Reveal>
+            <ProcessIntro />
+          </Reveal>
 
-        <div className="mt-12">
-          <ol className="list-none">
-            {STEPS.map((step, i) => {
-              const on = i === active;
-              return (
-                <li key={step.view}>
-                  <button
-                    type="button"
-                    onClick={() => setActive(i)}
-                    aria-current={on ? "true" : undefined}
-                    className={
-                      "w-full border-l-2 py-4 pl-5 text-left transition-colors duration-200 " +
-                      (on ? "border-teal" : "border-ash hover:border-stone")
-                    }
-                  >
-                    <span className={"block text-[1.0625rem] font-medium " + (on ? "text-ink" : "text-stone")}>
-                      {step.title}
-                    </span>
-                    {on && <span className="mt-2 block text-[0.9375rem] leading-relaxed text-graphite">{step.body}</span>}
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-          <div key={active} className="view-fade mt-8">
-            <AppShot view={STEPS[active].view} />
+          <div ref={mobileStageRef} className="relative mt-10 min-h-[280vh]">
+            <div className="sticky top-24">
+              <div className="h-px overflow-hidden bg-ash">
+                <span
+                  aria-hidden="true"
+                  className="block h-full bg-teal transition-[width] duration-200 ease-out"
+                  style={{ width: `${progress * 100}%` }}
+                />
+              </div>
+              <article key={active} className="view-fade pt-5">
+                <p className="label text-teal">{String(active + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}</p>
+                <h3 className="mt-2 text-[1.0625rem] font-medium text-ink">{STEPS[active].title}</h3>
+                <p className="mt-2 text-[0.9375rem] leading-relaxed text-graphite">{STEPS[active].body}</p>
+              </article>
+              <div key={STEPS[active].view} className="view-fade mt-6">
+                <AppShot view={STEPS[active].view} />
+              </div>
+            </div>
           </div>
         </div>
-        </div>
 
-        <div ref={stageRef} className="relative hidden min-h-[360vh] lg:block">
+        <div ref={desktopStageRef} className="relative hidden min-h-[360vh] lg:block">
           <div className="sticky top-44">
             <Reveal>
               <ProcessIntro />
