@@ -72,11 +72,11 @@ lets a whole palette swap land without touching component code:
   signed-in product (`/app`) and casdey HQ (`/admin`) default to the v5 dark
   "Charcoal Product System" (ground `#09090A`, one raised `#191A1D` card
   plane), set by the `data-theme` cookie, and use Manrope for the interface
-  (rules in `src/styles/product.css`). The homepage `/` is dark too, through a
-  `.marketing-surface` wrapper in `globals.css`. The other public pages, such
-  as `/pricing`, are still the light Chalk of v4, so as of
-  2026-09-21 the site mixes a dark homepage with light inner pages. The
-  authoritative reference is the v5 brand guide.
+  (rules in `src/styles/product.css`). The homepage `/` and `/pricing` are dark
+  too (V1.2), through a `.marketing-surface` wrapper in `globals.css`. The other
+  public pages (`/waitlist`, `/contact`, `/privacy`, the terms, `/see`) do not
+  use that wrapper, so they are still the light Chalk of v4. The authoritative
+  reference is the v5 brand guide.
 
 Copy rules, which apply to every string on the site: "casdey" is always
 lowercase, and em dashes are never used as punctuation. No invented statistics;
