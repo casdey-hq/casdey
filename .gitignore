@@ -35,3 +35,6 @@ content/instagram/footage/
 # Licensed music tracks mixed into the reels (Meta Sound Collection or Pixabay),
 # named in each post's `music` field.
 content/instagram/music/
+
+# Local review output for the frame-accurate /see film regrade.
+web/.promo-regrade/

@@ -15,7 +15,7 @@ export function SeeVideo({ src, poster }: { src: string; poster: string }) {
   const finished = useRef(false);
 
   const capture = (event: string) => {
-    if (posthog.__loaded) posthog.capture(event, { video: "promo-v1" });
+    if (posthog.__loaded) posthog.capture(event, { video: "promo-v1.2" });
   };
 
   return (

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>casdey promo regrade</title>
+  <style>
+    html, body { margin: 0; background: #09090a; }
+    canvas, video { display: block; }
+    video { position: fixed; left: -10000px; width: 1280px; height: 720px; }
+  </style>
+</head>
+<body>
+  <video id="source" src="/source.mp4" preload="auto" muted playsinline></video>
+  <canvas id="frame" width="1280" height="720"></canvas>
+  <script src="/muxer.js"></script>
+  <script>
+    const video = document.querySelector('#source');
+    const canvas = document.querySelector('#frame');
+    const ctx = canvas.getContext('2d', { alpha: false });
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    function bytesToBase64(bytes) {
+      let binary = '';
+      const stride = 0x8000;
+      for (let offset = 0; offset < bytes.length; offset += stride) {
+        binary += String.fromCharCode(...bytes.subarray(offset, offset + stride));
+      }
+      return btoa(binary);
+    }
+
+    async function ready() {
+      if (video.readyState >= 2) return;
+      await new Promise((resolve, reject) => {
+        video.addEventListener('loadeddata', resolve, { once: true });
+        video.addEventListener('error', () => reject(video.error), { once: true });
+      });
+    }
+
+    async function seek(time) {
+      if (Math.abs(video.currentTime - time) < 0.0001 && video.readyState >= 2) return;
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        try {
+          await new Promise((resolve, reject) => {
+            const onSeeked = () => {
+              video.removeEventListener('error', onError);
+              resolve();
+            };
+            const onError = () => {
+              video.removeEventListener('seeked', onSeeked);
+              reject(video.error);
+            };
+            video.addEventListener('seeked', onSeeked, { once: true });
+            video.addEventListener('error', onError, { once: true });
+            video.currentTime = time;
+          });
+          return;
+        } catch (error) {
+          if (attempt === 2) throw error;
+          video.load();
+          await ready();
+        }
+      }
+    }
+
+    function drawRegradedFrame() {
+      ctx.save();
+      ctx.fillStyle = '#09090a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Inversion followed by a half-turn preserves hue while reversing the
+      // old lightness scale: Chalk becomes charcoal, Ink becomes warm white,
+      // and the existing gold remains gold. No geometry or timing changes.
+      ctx.filter = 'invert(0.94) hue-rotate(180deg) saturate(0.95) brightness(0.92) contrast(1.05)';
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    }
+
+    async function decodedAudio() {
+      const encoded = await fetch('/source.mp4').then((response) => response.arrayBuffer());
+      const audioContext = new AudioContext();
+      try {
+        return await audioContext.decodeAudioData(encoded);
+      } finally {
+        await audioContext.close();
+      }
+    }
+
+    window.renderRegrade = async function renderRegrade(spec) {
+      await ready();
+      canvas.width = spec.width;
+      canvas.height = spec.height;
+      const duration = video.duration;
+      const audio = await decodedAudio();
+      const { Muxer, ArrayBufferTarget } = Mp4Muxer;
+      const muxer = new Muxer({
+        target: new ArrayBufferTarget(),
+        video: { codec: 'avc', width: spec.width, height: spec.height, frameRate: spec.fps },
+        audio: {
+          codec: 'aac',
+          numberOfChannels: audio.numberOfChannels,
+          sampleRate: audio.sampleRate,
+        },
+        fastStart: 'in-memory',
+      });
+
+      let failure = null;
+      const videoEncoder = new VideoEncoder({
+        output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+        error: (error) => { failure = error; },
+      });
+      videoEncoder.configure({
+        codec: spec.codec,
+        width: spec.width,
+        height: spec.height,
+        bitrate: spec.videoBitrate,
+        bitrateMode: 'constant',
+        framerate: spec.fps,
+        avc: { format: 'avc' },
+      });
+
+      const totalFrames = Math.round(duration * spec.fps);
+      const frameDuration = 1e6 / spec.fps;
+      let poster = null;
+      for (let index = 0; index < totalFrames; index += 1) {
+        // Chromium's media pipeline can exhaust its seek buffer after many
+        // hundreds of frame-accurate seeks. Reloading between long sections
+        // clears the decoder without changing the source or timestamps.
+        if (index > 0 && index % 600 === 0) {
+          video.load();
+          await ready();
+        }
+        // Sampling each original frame at its midpoint avoids boundary
+        // ambiguity while retaining every cut and motion beat exactly.
+        const time = Math.min((index + 0.5) / spec.fps, duration - 0.001);
+        await seek(time);
+        drawRegradedFrame();
+        if (!poster && time >= spec.posterTime) poster = canvas.toDataURL('image/webp', 0.9);
+        const frame = new VideoFrame(canvas, {
+          timestamp: Math.round(index * frameDuration),
+          duration: Math.round(frameDuration),
+        });
+        videoEncoder.encode(frame, { keyFrame: index % (spec.fps * 2) === 0 });
+        frame.close();
+        while (videoEncoder.encodeQueueSize > 7) await sleep(2);
+        if (index % 150 === 0) await window.__progress(index, totalFrames);
+        if (failure) throw failure;
+      }
+      await videoEncoder.flush();
+
+      const audioEncoder = new AudioEncoder({
+        output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
+        error: (error) => { failure = error; },
+      });
+      audioEncoder.configure({
+        codec: 'mp4a.40.2',
+        sampleRate: audio.sampleRate,
+        numberOfChannels: audio.numberOfChannels,
+        bitrate: spec.audioBitrate,
+      });
+
+      const channels = Array.from(
+        { length: audio.numberOfChannels },
+        (_, channel) => audio.getChannelData(channel),
+      );
+      const audioStep = Math.round(audio.sampleRate / 10);
+      const fadeSamples = Math.round(spec.closingFadeSeconds * audio.sampleRate);
+      const closingSample = Math.round(spec.closingStartsAt * audio.sampleRate);
+      for (let offset = 0; offset < audio.length; offset += audioStep) {
+        const frames = Math.min(audioStep, audio.length - offset);
+        const data = new Float32Array(frames * audio.numberOfChannels);
+        for (let channel = 0; channel < audio.numberOfChannels; channel += 1) {
+          const source = channels[channel];
+          const targetOffset = channel * frames;
+          for (let index = 0; index < frames; index += 1) {
+            const sample = offset + index;
+            const fade = Math.max(0, Math.min(1, (sample - closingSample) / fadeSamples));
+            const gain = 1 - fade * (1 - spec.closingGain);
+            data[targetOffset + index] = source[sample] * gain;
+          }
+        }
+        const packet = new AudioData({
+          format: 'f32-planar',
+          sampleRate: audio.sampleRate,
+          numberOfFrames: frames,
+          numberOfChannels: audio.numberOfChannels,
+          timestamp: Math.round((offset * 1e6) / audio.sampleRate),
+          data,
+        });
+        audioEncoder.encode(packet);
+        packet.close();
+      }
+      await audioEncoder.flush();
+      if (failure) throw failure;
+
+      muxer.finalize();
+      const bytes = new Uint8Array(muxer.target.buffer);
+      for (let offset = 0; offset < bytes.length; offset += 4_000_000) {
+        await window.__chunk(bytesToBase64(bytes.subarray(offset, offset + 4_000_000)));
+      }
+      return {
+        duration,
+        frames: totalFrames,
+        bytes: bytes.length,
+        poster,
+        sampleRate: audio.sampleRate,
+        channels: audio.numberOfChannels,
+      };
+    };
+  </script>
+</body>
+</html>

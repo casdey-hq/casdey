@@ -18,6 +18,7 @@
     "checkup:marketing": "node scripts/check-up-marketing.mjs",
     "checkup:numbers": "node scripts/check-up-numbers.mjs",
     "testlog:update": "node scripts/test-log-update.mjs",
+    "promo:regrade": "node scripts/promo-regrade.mjs",
     "ig:render": "node scripts/instagram-render.mjs",
     "ig:sync": "node scripts/instagram-sheet-sync.mjs",
     "ig:drive": "node scripts/instagram-drive-upload.mjs",
