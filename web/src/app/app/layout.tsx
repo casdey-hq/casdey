@@ -66,7 +66,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
       // it kept the light theme's near-black and rendered black on black in
       // dark mode. Re-stating it here resolves the token inside the themed
       // scope, so every descendant inherits the right one.
-      className={`${productFont.variable} product-workspace flex min-h-full flex-1 flex-col text-ink md:flex-row`}
+      className={`${productFont.variable} product-workspace flex min-h-[100dvh] flex-1 flex-col text-ink md:flex-row`}
     >
       {/* Sticky and exactly one viewport tall on desktop, with its own scroll.
           As a plain flex child it stretched to the height of whatever page it

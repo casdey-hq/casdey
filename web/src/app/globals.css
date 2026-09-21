@@ -220,6 +220,10 @@
 
 @layer base {
   html {
+    /* The root canvas stays charcoal even when a scoped surface is shorter
+       than iOS's elastic scroll. Without this, a pull past a dark page shows
+       the browser's light default behind it. */
+    background-color: #09090a;
     scroll-behavior: smooth;
   }
 
@@ -312,8 +316,42 @@
     --teal-hover: #f0cd7d;
     --teal-bright: #d4af37;
     --shallow: color-mix(in srgb, var(--teal-bright) 12%, var(--paper));
-    min-height: 100vh;
+    min-height: 100dvh;
     background-color: var(--paper);
+  }
+
+  /* Pricing is the decision page, not a separate visual product. It carries
+     the landing's dot field across its whole reading surface, while the plan
+     comparison itself stays a quiet raised plane. */
+  .pricing-surface {
+    background-image:
+      linear-gradient(to bottom, color-mix(in srgb, var(--paper) 34%, transparent), var(--paper) 34rem),
+      radial-gradient(circle, color-mix(in srgb, var(--ash) 38%, transparent) 0.75px, transparent 0.9px);
+    background-size: 10px 10px;
+  }
+
+  .pricing-surface .grain::after {
+    opacity: 0.02;
+  }
+
+  .pricing-switch {
+    background: color-mix(in srgb, var(--white) 76%, var(--paper));
+  }
+
+  .pricing-switch button {
+    transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms ease, color 180ms ease;
+  }
+
+  .pricing-switch button:hover {
+    transform: translateY(-1px);
+  }
+
+  .pricing-table {
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2), 0 20px 48px rgba(0, 0, 0, 0.14);
+  }
+
+  .pricing-tier-pro {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--teal-bright) 10%, var(--white)), var(--white) 60%);
   }
 
   .marketing-hero-grid {
