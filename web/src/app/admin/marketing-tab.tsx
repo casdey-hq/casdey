@@ -51,7 +51,7 @@ export async function MarketingTab({ period }: { period: AdminPeriod }) {
         <>
           <Section
             title="This week's cohort"
-            sub="Gyms first contacted in the last seven days. The weekly goal is measured on these, not all time."
+            sub="Gyms first contacted since Monday. The weekly goal is measured on these, not all time."
           >
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <Stat label="First contacted" value={marketing.weekCohort.contacted} />
@@ -106,24 +106,11 @@ export async function MarketingTab({ period }: { period: AdminPeriod }) {
             ) : null}
           </Section>
 
-          <Section title="Instagram" sub="Cold DMs are sent by hand; posts go out automatically once approved.">
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <Stat
-                label="DMs sent, 7 days"
-                value={marketing.igOutreach?.sentThisWeek ?? "—"}
-                hint={marketing.igOutreach ? `${marketing.igOutreach.unsentDrafts} drafts waiting` : undefined}
-              />
-              <Stat
-                label="Posts out"
-                value={marketing.igContent?.postedTotal ?? "—"}
-                hint={
-                  marketing.igContent
-                    ? marketing.igContent.behindBy > 0
-                      ? `${marketing.igContent.behindBy} behind the one-a-day plan`
-                      : `Day ${marketing.igContent.day ?? 0} of 100, on schedule`
-                    : undefined
-                }
-              />
+          <Section
+            title="Instagram (paused)"
+            sub="Retired 2026-09-20: DMs cost an hour each for a rate email beats at automated volume, and there was no real gym story yet to post about. Cold email is the only active channel; two pinned posts (the demo reel and a plain what-casdey-does image) stay up for a gym owner who checks the profile after a cold email."
+          >
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-2">
               <Stat
                 label="Followers"
                 value={marketing.igWeekly?.followers ?? "—"}
@@ -134,7 +121,7 @@ export async function MarketingTab({ period }: { period: AdminPeriod }) {
                 }
               />
               <Stat
-                label="Asked for the video"
+                label="Asked for the video, via a profile visit"
                 value={marketing.inboundDms?.total ?? "—"}
                 hint={
                   marketing.inboundDms
@@ -143,18 +130,12 @@ export async function MarketingTab({ period }: { period: AdminPeriod }) {
                 }
               />
             </div>
-            {marketing.igContent && marketing.igContent.feedbackOpen.length > 0 ? (
-              <Card className="mt-4">
-                <CardTitle>Your feedback waiting on Claude</CardTitle>
-                <ul className="mt-2 space-y-1.5 text-[0.875rem] text-graphite">
-                  {marketing.igContent.feedbackOpen.map((item) => (
-                    <li key={item.post}>
-                      <span className="font-semibold text-ink">{item.post}</span>: {item.feedback}
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ) : null}
+            <p className="mt-4 text-[0.8125rem] text-stone">
+              Restarting the cadence needs a believable presence or cold email saturating first (
+              <code className="literal">IG_CADENCE_RETIRED</code> /{" "}
+              <code className="literal">IG_DMS_PAUSED</code> in{" "}
+              <code className="literal">src/lib/hq-signals.ts</code>), see CLAUDE.md.
+            </p>
           </Section>
         </>
       )}

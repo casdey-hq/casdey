@@ -181,14 +181,25 @@ const armKey = (text: string | undefined): string | null =>
 
 const ARM_LETTERS = ["A", "B", "C"];
 
+/** Monday 00:00 UTC of the week containing this moment — the goal ("1%
+ *  engaged leads for the week") is judged against the calendar week, not a
+ *  rolling 7 days back from whenever the page happens to load. */
+function mondayOf(at: number): number {
+  const d = new Date(at);
+  const day = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const offset = (day.getUTCDay() + 6) % 7;
+  day.setUTCDate(day.getUTCDate() - offset);
+  return day.getTime();
+}
+
 export function summariseMarketing(
   tabs: MarketingTabs,
   now: number = Date.now(),
 ): MarketingSummary {
-  const weekAgo = now - 7 * DAY;
+  const weekStart = mondayOf(now);
   const recent = (text: string | undefined) => {
     const t = parseSheetDate(text);
-    return t !== null && t >= weekAgo;
+    return t !== null && t >= weekStart;
   };
   const today = new Date(now).toISOString().slice(0, 10);
 

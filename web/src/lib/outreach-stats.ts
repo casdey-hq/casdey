@@ -22,10 +22,11 @@ export function outreachConfigured(): boolean {
 }
 
 export async function outreachSummary(
-  days: number,
+  from: Date,
+  to: Date,
 ): Promise<OutreachSummary | null> {
   const tabs = await readSheetRanges(["Leads!A2:U6000", "Send Log!A2:D10000"]);
   if (!tabs) return null;
   const [leads, sends] = tabs;
-  return summariseOutreach(leads, sends, days);
+  return summariseOutreach(leads, sends, from, to);
 }

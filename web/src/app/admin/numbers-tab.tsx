@@ -55,15 +55,17 @@ import { RankedList, Section, type AdminPeriod } from "./parts";
  * bottom is the deliberate exception — it reports exactly those gyms, so it is
  * obvious whether test data is leaking into the business numbers.
  *
- * The period is a whole number of days (see src/app/admin/parts.tsx for the
- * URL → days mapping); the trend charts group by day for short windows and by
- * week beyond ~3 weeks. The waitlist was dropped from this page on 2026-09-08:
+ * The period is a concrete { from, to } window, Stripe/Shopify-style — "this
+ * month" means the calendar month to date (see src/app/admin/parts.tsx for
+ * the URL → window mapping); the trend charts group by day for short windows
+ * and by week beyond ~5 weeks. The waitlist was dropped from this page on
+ * 2026-09-08:
  * casdey.com is published, so the waitlist is no longer a live acquisition
  * channel. The waitlist_signups table still exists and the /waitlist form
  * still writes to it; it just is not a founder metric any more.
  */
 export async function NumbersTab({ period }: { period: AdminPeriod }) {
-  const { days, bucket } = period;
+  const { from, to, bucket } = period;
   const periodSentence = period.sentence;
 
   const gymIds = await nonInternalGymIds();
@@ -90,21 +92,21 @@ export async function NumbersTab({ period }: { period: AdminPeriod }) {
   ] = await Promise.all([
     planBreakdown(),
     mrr(),
-    revenueCollected(gymIds, days),
-    gymSignupTrend(days, bucket),
-    churnSummary(days),
+    revenueCollected(gymIds, from, to),
+    gymSignupTrend(from, to, bucket),
+    churnSummary(from, to),
     guaranteeSummary(),
     subscriptionHealth(),
     activationFunnel(gymIds),
-    productReach(gymIds, days),
-    feedbackSummary(gymIds, days),
+    productReach(gymIds, from, to),
+    feedbackSummary(gymIds, from, to),
     testAndDev(),
-    visitorTrend(days, bucket),
-    checkoutFunnel(days),
-    topPages(days),
-    topReferrers(days),
-    topCountries(days),
-    deviceMix(days),
+    visitorTrend(from, to, bucket),
+    checkoutFunnel(from, to),
+    topPages(from, to),
+    topReferrers(from, to),
+    topCountries(from, to),
+    deviceMix(from, to),
     trialSummary(gymIds),
   ]);
 

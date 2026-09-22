@@ -24,6 +24,8 @@ function send(dateSent: string): string[] {
 }
 
 const now = new Date("2026-09-13T10:00:00Z");
+const DAY_MS = 86_400_000;
+const from = (days: number) => new Date(now.getTime() - days * DAY_MS);
 
 describe("summariseOutreach", () => {
   const leads = [
@@ -36,7 +38,7 @@ describe("summariseOutreach", () => {
   ];
 
   it("keeps engaged leads apart from replies", () => {
-    const summary = summariseOutreach(leads, [], 7, now);
+    const summary = summariseOutreach(leads, [], from(7), now);
     expect(summary.contacted).toBe(4);
     expect(summary.genuineReplies).toBe(2);
     expect(summary.optOuts).toBe(1);
@@ -50,7 +52,7 @@ describe("summariseOutreach", () => {
     const summary = summariseOutreach(
       [lead("4", "Opted Out Gym", "Dead", "2026-08-24", "Unsubscribed")],
       [],
-      7,
+      from(7),
       now,
     );
     expect(summary.genuineReplies).toBe(0);
@@ -61,7 +63,7 @@ describe("summariseOutreach", () => {
     const summary = summariseOutreach(
       leads,
       [send("2026-09-12"), send("2026-09-07"), send("2026-09-01"), send("")],
-      7,
+      from(7),
       now,
     );
     expect(summary.contactedInPeriod).toBe(1);
@@ -71,7 +73,7 @@ describe("summariseOutreach", () => {
   });
 
   it("has no rate when nobody has been contacted", () => {
-    const summary = summariseOutreach([], [], 7, now);
+    const summary = summariseOutreach([], [], from(7), now);
     expect(summary.replyRate).toBeNull();
     expect(summary.engagedRate).toBeNull();
   });

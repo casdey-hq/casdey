@@ -162,7 +162,8 @@ describe("summariseMarketing", () => {
     expect(summary.inboundDms!.videoNotSentYet.map((d) => d.handle)).toEqual(["@a"]);
   });
 
-  it("measures the weekly cohort on gyms first contacted in the last seven days", () => {
+  it("measures the weekly cohort since Monday, not a rolling seven days", () => {
+    // NOW is Saturday 2026-09-19; the calendar week started Monday 2026-09-14.
     const summary = summariseMarketing(
       tabs({
         leads: [
@@ -181,6 +182,17 @@ describe("summariseMarketing", () => {
       engagedRatePct: 33.33,
       replyRatePct: 66.67,
     });
+  });
+
+  it("excludes a lead contacted the Sunday before this Monday, even though it is within a rolling seven days", () => {
+    // 2026-09-13 is a Sunday, inside the calendar week before, but only six
+    // days back from NOW (2026-09-19) — a rolling window would wrongly
+    // count it towards this week's goal.
+    const summary = summariseMarketing(
+      tabs({ leads: [lead("1", "Last Week's Gym", "Contacted", "", "2026-09-13")] }),
+      NOW,
+    );
+    expect(summary.weekCohort.contacted).toBe(0);
   });
 
   it("reads missing tabs as null rather than zero", () => {

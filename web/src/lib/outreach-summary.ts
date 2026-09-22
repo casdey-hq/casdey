@@ -29,7 +29,6 @@ export const LEADS_COLUMNS = {
 export const SEND_LOG_COLUMNS = { dateSent: 3 } as const;
 
 const ENGAGED_STATUSES = new Set(["interested", "committed"]);
-const DAY_MS = 86_400_000;
 
 export type OutreachSummary = {
   contacted: number;
@@ -57,12 +56,12 @@ function percent(part: number, whole: number): number | null {
 export function summariseOutreach(
   leads: string[][],
   sends: string[][],
-  days: number,
-  now: Date = new Date(),
+  from: Date,
+  to: Date,
 ): OutreachSummary {
-  const end = now.getTime();
-  const start = end - days * DAY_MS;
-  const previousStart = start - days * DAY_MS;
+  const start = from.getTime();
+  const end = to.getTime();
+  const previousStart = start - (end - start);
 
   const window = (dateText: string): "current" | "previous" | null => {
     const at = Date.parse(dateText);

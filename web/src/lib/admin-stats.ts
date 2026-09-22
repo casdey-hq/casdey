@@ -4,7 +4,7 @@ import { supabaseAdmin } from "./supabase";
 import { stripeClient } from "./stripe";
 import { effectivePlan, type Plan } from "./plan";
 import { change } from "./dashboard";
-import { bucketKeyFor, periodBuckets, type PeriodPoint } from "./admin-period";
+import { bucketKeyFor, periodBuckets, priorWindowStart, type PeriodPoint } from "./admin-period";
 import { isCurrency, type Currency } from "./countries";
 import { gymCurrency } from "./money";
 import type { Gym } from "./types";
@@ -49,10 +49,9 @@ export type MrrByCurrency = MoneyByCurrency;
 
 const ZERO_MONEY: MoneyByCurrency = { eur: 0, gbp: 0, usd: 0 };
 
-/** Whole days back from now, with the trend charts grouping by day or week.
- *  The URL → these values mapping lives in src/app/admin/parts.tsx. */
+/** The reporting window, grouping the trend charts by day or week. The
+ *  URL → { from, to } mapping lives in src/app/admin/parts.tsx. */
 type Bucket = "day" | "week";
-const DEFAULT_DAYS = 84;
 
 /** The ids of every gym that is a real (non-internal) customer. Passed into
  *  the cross-table counts below so an `in("gym_id", …)` filter does the
@@ -103,12 +102,12 @@ export type SignupTrend = {
 /** Gym signups over the period, against the same length before it, grouped by
  *  `bucket`. Mirrors activityWithComparison() in dashboard.ts. */
 export async function gymSignupTrend(
-  days = DEFAULT_DAYS,
-  bucket: Bucket = "week",
-  now: Date = new Date(),
+  from: Date,
+  to: Date,
+  bucket: Bucket,
 ): Promise<SignupTrend> {
   const supabase = supabaseAdmin();
-  const { all, perSide } = periodBuckets(days, bucket, now);
+  const { all, perSide } = periodBuckets(from, to, bucket);
 
   const { data, error } = await supabase
     .from("gyms")
@@ -318,8 +317,8 @@ export type RevenueCollected = {
  */
 export async function revenueCollected(
   gymIds: string[],
-  days = DEFAULT_DAYS,
-  now: Date = new Date(),
+  from: Date,
+  to: Date,
 ): Promise<RevenueCollected> {
   const empty: RevenueCollected = {
     windowGross: { ...ZERO_MONEY },
@@ -342,10 +341,8 @@ export async function revenueCollected(
     return empty;
   }
 
-  const windowFrom = new Date(now);
-  windowFrom.setUTCDate(windowFrom.getUTCDate() - days);
-  const previousFrom = new Date(windowFrom);
-  previousFrom.setUTCDate(previousFrom.getUTCDate() - days);
+  const windowFrom = from;
+  const previousFrom = priorWindowStart(from, to);
 
   const result: RevenueCollected = {
     windowGross: { ...ZERO_MONEY },
@@ -368,11 +365,11 @@ export async function revenueCollected(
     result.allTimeGross[currency] += gross;
     result.allTimeNet[currency] += net;
 
-    if (paidAt >= windowFrom) {
+    if (paidAt >= windowFrom && paidAt < to) {
       result.windowGross[currency] += gross;
       result.windowRefunded[currency] += refunded;
       result.windowNet[currency] += net;
-    } else if (paidAt >= previousFrom) {
+    } else if (paidAt >= previousFrom && paidAt < windowFrom) {
       result.previousNet[currency] += net;
     }
   }
@@ -511,26 +508,21 @@ export async function subscriptionHealth(
 
 export type ChurnSummary = { current: number; previous: number };
 
-/** How many gyms went to `canceled` in the last `days` days, against the
- *  `days` before. Uses updated_at as the moment of cancellation: the
- *  gyms_touch trigger bumps it on every write, and the webhook is the only
- *  thing that flips subscription_status, so it is a fair proxy without a
- *  dedicated events table. */
-export async function churnSummary(
-  days = DEFAULT_DAYS,
-  now: Date = new Date(),
-): Promise<ChurnSummary> {
-  const currentFrom = new Date(now);
-  currentFrom.setUTCDate(currentFrom.getUTCDate() - days);
-  const previousFrom = new Date(currentFrom);
-  previousFrom.setUTCDate(previousFrom.getUTCDate() - days);
+/** How many gyms went to `canceled` in the period, against the same length
+ *  before it. Uses updated_at as the moment of cancellation: the gyms_touch
+ *  trigger bumps it on every write, and the webhook is the only thing that
+ *  flips subscription_status, so it is a fair proxy without a dedicated
+ *  events table. */
+export async function churnSummary(from: Date, to: Date): Promise<ChurnSummary> {
+  const previousFrom = priorWindowStart(from, to);
 
   const { data, error } = await supabaseAdmin()
     .from("gyms")
     .select("updated_at")
     .eq("is_internal", false)
     .eq("subscription_status", "canceled")
-    .gte("updated_at", previousFrom.toISOString());
+    .gte("updated_at", previousFrom.toISOString())
+    .lt("updated_at", to.toISOString());
 
   if (error) {
     console.error("[admin-stats] churn lookup failed", error.message);
@@ -541,7 +533,7 @@ export async function churnSummary(
   let previous = 0;
   for (const row of data ?? []) {
     const at = new Date(row.updated_at as string).getTime();
-    if (at >= currentFrom.getTime()) current += 1;
+    if (at >= from.getTime()) current += 1;
     else previous += 1;
   }
   return { current, previous };
@@ -654,8 +646,8 @@ export type ProductReach = {
 
 export async function productReach(
   gymIds: string[],
-  days = DEFAULT_DAYS,
-  now: Date = new Date(),
+  from: Date,
+  to: Date,
 ): Promise<ProductReach> {
   const zero: ProductReach = {
     membersManaged: 0,
@@ -671,12 +663,10 @@ export async function productReach(
   if (gymIds.length === 0) return zero;
 
   const supabase = supabaseAdmin();
-  const windowFrom = new Date(now);
-  windowFrom.setUTCDate(windowFrom.getUTCDate() - days);
-  const previousFrom = new Date(windowFrom);
-  previousFrom.setUTCDate(previousFrom.getUTCDate() - days);
-  const wIso = windowFrom.toISOString();
+  const previousFrom = priorWindowStart(from, to);
+  const wIso = from.toISOString();
   const pIso = previousFrom.toISOString();
+  const tIso = to.toISOString();
 
   const num = (
     res: { count: number | null; error: { message: string } | null },
@@ -690,17 +680,16 @@ export async function productReach(
   };
 
   const recoveredIn = async (
-    from: string,
-    to: string | null,
+    fromIso: string,
+    toIso: string,
   ): Promise<MoneyByCurrency> => {
-    let q = supabase
+    const { data, error } = await supabase
       .from("bookings")
       .select("value_minor, gyms!inner(plan_currency, country)")
       .in("gym_id", gymIds)
       .in("status", ["booked", "completed"])
-      .gte("created_at", from);
-    if (to) q = q.lt("created_at", to);
-    const { data, error } = await q;
+      .gte("created_at", fromIso)
+      .lt("created_at", toIso);
     if (error) {
       console.error("[admin-stats] recovered revenue lookup failed", error.message);
       return { ...ZERO_MONEY };
@@ -741,7 +730,8 @@ export async function productReach(
       .in("gym_id", gymIds)
       .eq("is_test", false)
       .eq("status", "returned")
-      .gte("returned_at", wIso),
+      .gte("returned_at", wIso)
+      .lt("returned_at", tIso),
     supabase
       .from("members")
       .select("id", { count: "exact", head: true })
@@ -755,7 +745,8 @@ export async function productReach(
       .select("id", { count: "exact", head: true })
       .in("gym_id", gymIds)
       .not("approved_at", "is", null)
-      .gte("approved_at", wIso),
+      .gte("approved_at", wIso)
+      .lt("approved_at", tIso),
     supabase
       .from("campaigns")
       .select("id", { count: "exact", head: true })
@@ -768,7 +759,8 @@ export async function productReach(
       .select("id", { count: "exact", head: true })
       .in("gym_id", gymIds)
       .eq("status", "sent")
-      .gte("sent_at", wIso),
+      .gte("sent_at", wIso)
+      .lt("sent_at", tIso),
     supabase
       .from("campaign_messages")
       .select("id", { count: "exact", head: true })
@@ -781,7 +773,8 @@ export async function productReach(
       .select("id", { count: "exact", head: true })
       .in("gym_id", gymIds)
       .in("status", ["booked", "completed"])
-      .gte("created_at", wIso),
+      .gte("created_at", wIso)
+      .lt("created_at", tIso),
     supabase
       .from("bookings")
       .select("id", { count: "exact", head: true })
@@ -789,7 +782,7 @@ export async function productReach(
       .in("status", ["booked", "completed"])
       .gte("created_at", pIso)
       .lt("created_at", wIso),
-    recoveredIn(wIso, null),
+    recoveredIn(wIso, tIso),
     recoveredIn(pIso, wIso),
   ]);
 
@@ -874,8 +867,8 @@ export type FeedbackSummary = {
 
 export async function feedbackSummary(
   gymIds: string[],
-  days = DEFAULT_DAYS,
-  now: Date = new Date(),
+  from: Date,
+  to: Date,
   limit = 6,
 ): Promise<FeedbackSummary> {
   if (gymIds.length === 0) {
@@ -883,8 +876,6 @@ export async function feedbackSummary(
   }
 
   const supabase = supabaseAdmin();
-  const from = new Date(now);
-  from.setUTCDate(from.getUTCDate() - days);
 
   const [{ count: total }, recent, latest] = await Promise.all([
     supabase
@@ -895,7 +886,8 @@ export async function feedbackSummary(
       .from("feedback")
       .select("id", { count: "exact", head: true })
       .in("gym_id", gymIds)
-      .gte("created_at", from.toISOString()),
+      .gte("created_at", from.toISOString())
+      .lt("created_at", to.toISOString()),
     supabase
       .from("feedback")
       .select("message, path, created_at, gyms!inner(name)")

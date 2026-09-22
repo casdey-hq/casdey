@@ -1,7 +1,7 @@
 import "server-only";
 
 import { change } from "./dashboard";
-import { periodBuckets } from "./admin-period";
+import { periodBuckets, priorWindowStart } from "./admin-period";
 import { countryFromTimezone, regionName } from "./timezone-country";
 
 /**
@@ -79,7 +79,9 @@ export function posthogConfigured(): boolean {
 }
 
 type Bucket = "day" | "week";
-const DEFAULT_DAYS = 84;
+
+/** A HogQL-safe timestamp literal for a Date we constructed ourselves. */
+const sqlTime = (d: Date) => `toDateTime('${d.toISOString().slice(0, 19).replace("T", " ")}')`;
 
 /* ------------------------------------------------------------------ */
 /* Visitors and pageviews, over the period                            */
@@ -105,8 +107,8 @@ export type VisitorTrend = {
 
 /**
  * Unique visitors (by PostHog's cookieless hash, not a real person, but the
- * closest honest proxy) and raw pageviews per bucket, the last `days` days
- * against the `days` before — the same shape gymSignupTrend() in
+ * closest honest proxy) and raw pageviews per bucket, over `[from, to)`
+ * against the same length before it — the same shape gymSignupTrend() in
  * admin-stats.ts returns, so the two can sit side by side and mean the same
  * bucket.
  *
@@ -117,18 +119,20 @@ export type VisitorTrend = {
  * bucket must read as zero, not fall out of the axis.
  */
 export async function visitorTrend(
-  days = DEFAULT_DAYS,
-  bucket: Bucket = "week",
-  now: Date = new Date(),
+  from: Date,
+  to: Date,
+  bucket: Bucket,
 ): Promise<VisitorTrend | null> {
   const groupExpr =
     bucket === "day" ? "toStartOfDay(timestamp)" : "toMonday(timestamp)";
+  const previousFrom = priorWindowStart(from, to);
   const rows = await hogql(`
     SELECT ${groupExpr} AS b,
            count(DISTINCT distinct_id) AS visitors,
            count() AS views
     FROM events
-    WHERE event = '$pageview' AND timestamp >= now() - INTERVAL ${days * 2} DAY
+    WHERE event = '$pageview'
+      AND timestamp >= ${sqlTime(previousFrom)} AND timestamp < ${sqlTime(to)}
     GROUP BY b
     ORDER BY b
   `);
@@ -141,7 +145,7 @@ export async function visitorTrend(
     ]),
   );
 
-  const { all: anchors, perSide } = periodBuckets(days, bucket, now);
+  const { all: anchors, perSide } = periodBuckets(from, to, bucket);
   const all: VisitorWeek[] = anchors.map((a) => {
     const hit = byBucket.get(a.key);
     return {
@@ -204,13 +208,13 @@ async function ranked(
     .filter((row) => Number.isFinite(row.value) && row.value > 0);
 }
 
-/** Most-viewed paths, last `days` days. */
-export function topPages(days = 84, limit = 12): Promise<RankedRow[] | null> {
+/** Most-viewed paths in `[from, to)`. */
+export function topPages(from: Date, to: Date, limit = 12): Promise<RankedRow[] | null> {
   return ranked(
     `
     SELECT ${PAGE_EXPR} AS page, count() AS views
     FROM events
-    WHERE event = '$pageview' AND timestamp >= now() - INTERVAL ${days} DAY
+    WHERE event = '$pageview' AND timestamp >= ${sqlTime(from)} AND timestamp < ${sqlTime(to)}
     GROUP BY page
     ORDER BY views DESC
     LIMIT ${limit}
@@ -222,7 +226,8 @@ export function topPages(days = 84, limit = 12): Promise<RankedRow[] | null> {
 /** Where visitors came from, by referring domain. $direct (typed the URL or a
  *  bookmark) is folded into one honest bucket rather than dropped. */
 export function topReferrers(
-  days = 84,
+  from: Date,
+  to: Date,
   limit = 12,
 ): Promise<RankedRow[] | null> {
   return ranked(
@@ -230,7 +235,7 @@ export function topReferrers(
     SELECT properties.$referring_domain AS ref,
            count(DISTINCT distinct_id) AS visitors
     FROM events
-    WHERE event = '$pageview' AND timestamp >= now() - INTERVAL ${days} DAY
+    WHERE event = '$pageview' AND timestamp >= ${sqlTime(from)} AND timestamp < ${sqlTime(to)}
     GROUP BY ref
     ORDER BY visitors DESC
     LIMIT ${limit}
@@ -252,7 +257,8 @@ export function topReferrers(
  * a rounding error, not a bias.
  */
 export async function topCountries(
-  days = 84,
+  from: Date,
+  to: Date,
   limit = 12,
 ): Promise<RankedRow[] | null> {
   const rows = await hogql(`
@@ -260,7 +266,7 @@ export async function topCountries(
            properties.$timezone AS zone,
            count(DISTINCT distinct_id) AS visitors
     FROM events
-    WHERE event = '$pageview' AND timestamp >= now() - INTERVAL ${days} DAY
+    WHERE event = '$pageview' AND timestamp >= ${sqlTime(from)} AND timestamp < ${sqlTime(to)}
     GROUP BY code, zone
   `);
   if (rows === null) return null;
@@ -283,13 +289,13 @@ export async function topCountries(
 }
 
 /** Desktop / Mobile / Tablet split. */
-export function deviceMix(days = 84): Promise<RankedRow[] | null> {
+export function deviceMix(from: Date, to: Date): Promise<RankedRow[] | null> {
   return ranked(
     `
     SELECT properties.$device_type AS device,
            count(DISTINCT distinct_id) AS visitors
     FROM events
-    WHERE event = '$pageview' AND timestamp >= now() - INTERVAL ${days} DAY
+    WHERE event = '$pageview' AND timestamp >= ${sqlTime(from)} AND timestamp < ${sqlTime(to)}
     GROUP BY device
     ORDER BY visitors DESC
     `,
@@ -309,28 +315,29 @@ export type CheckoutFunnel = {
 };
 
 /**
- * How many gyms started a Stripe Checkout versus actually completed one, the
- * last `days` days. Both events are captured server-side keyed on gym.id
- * (see checkout/route.ts and stripe/webhook/route.ts), so — unlike a website
+ * How many gyms started a Stripe Checkout versus actually completed one, over
+ * `[from, to)`. Both events are captured server-side keyed on gym.id (see
+ * checkout/route.ts and stripe/webhook/route.ts), so — unlike a website
  * visitor, who is anonymous — this pair genuinely is the same gym on both
  * rows, not two numbers assumed to relate.
  */
 export async function checkoutFunnel(
-  days = 84,
+  from: Date,
+  to: Date,
 ): Promise<CheckoutFunnel | null> {
   const [totals, byTier] = await Promise.all([
     hogql(`
       SELECT event, count(DISTINCT distinct_id) AS gyms
       FROM events
       WHERE event IN ('checkout_started', 'checkout_completed')
-        AND timestamp >= now() - INTERVAL ${days} DAY
+        AND timestamp >= ${sqlTime(from)} AND timestamp < ${sqlTime(to)}
       GROUP BY event
     `),
     hogql(`
       SELECT properties.tier AS tier, count(DISTINCT distinct_id) AS gyms
       FROM events
       WHERE event = 'checkout_started'
-        AND timestamp >= now() - INTERVAL ${days} DAY
+        AND timestamp >= ${sqlTime(from)} AND timestamp < ${sqlTime(to)}
       GROUP BY tier
       ORDER BY gyms DESC
     `),

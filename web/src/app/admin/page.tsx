@@ -57,7 +57,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
     ? (requested as TabId)
     : "today";
   const period = periodFrom({
-    range: one(sp.range),
+    r: one(sp.r),
     count: one(sp.count),
     unit: one(sp.unit),
   });

@@ -15,7 +15,7 @@ const LEADS_SHEET_URL =
  * is a gym actually interested in casdey.
  */
 export async function OutreachSection({ period }: { period: AdminPeriod }) {
-  const summary = await outreachSummary(period.days);
+  const summary = await outreachSummary(period.from, period.to);
 
   const rate = (value: number | null): string =>
     value === null

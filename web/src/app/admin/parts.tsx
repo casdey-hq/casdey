@@ -2,6 +2,15 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { Card, CardTitle } from "@/components/app/ui";
+import {
+  addDaysUTC,
+  addMonthsUTC,
+  startOfDayUTC,
+  startOfMonthUTC,
+  startOfQuarterUTC,
+  startOfYearUTC,
+  weekStartOf,
+} from "@/lib/admin-period";
 import type { RankedRow } from "@/lib/posthog-query";
 
 /**
@@ -16,128 +25,182 @@ import type { RankedRow } from "@/lib/posthog-query";
 /* ------------------------------------------------------------------ */
 
 /**
- * A reporting window, held as a whole number of days back from now (the
- * comparison is always the same length again, immediately before it).
+ * A reporting window: a concrete `{ from, to }` range, Stripe/Shopify-style —
+ * "This month" means the calendar month to date, not a rolling 30 days.
  *
- *   - `days` drives every date-bounded query in admin-stats / posthog-query.
+ *   - `from`/`to` drive every date-bounded query in admin-stats /
+ *     posthog-query; the comparison window (always the same length,
+ *     immediately before `from`) is computed on demand from the two of them
+ *     via `priorWindowStart()` in src/lib/admin-period.ts, so it never has to
+ *     be threaded through as a third date.
  *   - `bucket` is how the trend charts group their points: by day for short
- *     windows (≤ 21 days), by week beyond that — a daily chart of a year is
+ *     windows (≤ 35 days), by week beyond that — a daily chart of a year is
  *     365 hair-thin bars, a weekly chart of a fortnight is two.
- *   - `label` is the noun phrase ("30 days", "twelve weeks", "3 months") for
- *     "Last …" captions; `sentence` is the full comparison line.
+ *   - `label` is the noun phrase ("this month", "last quarter", "45 days")
+ *     for "Last …" captions; `sentence` is the full comparison line.
+ *   - `param` is the URL value this period serializes to, so the nav can mark
+ *     the active option without recomputing dates.
  */
 export type PeriodBucket = "day" | "week";
 
 export type AdminPeriod = {
-  days: number;
+  from: Date;
+  to: Date;
   bucket: PeriodBucket;
-  short: string;
   label: string;
   sentence: string;
+  param: string;
 };
 
 /** ~2 years. Past this the "vs the period before" comparison reaches back
- *  further than casdey has existed, and the PostHog scan (INTERVAL days*2
- *  DAY) stops being cheap. */
+ *  further than casdey has existed, and the PostHog scan stops being cheap. */
 export const MAX_PERIOD_DAYS = 730;
 
 type Unit = "d" | "w" | "m";
 const UNIT_DAYS: Record<Unit, number> = { d: 1, w: 7, m: 30 };
 const UNIT_NAME: Record<Unit, string> = { d: "days", w: "weeks", m: "months" };
+const UNIT_NAME_SINGULAR: Record<Unit, string> = { d: "day", w: "week", m: "month" };
 
-const PRESETS: { param: string; short: string; days: number }[] = [
-  { param: "today", short: "Today", days: 1 },
-  { param: "7d", short: "7d", days: 7 },
-  { param: "30d", short: "30d", days: 30 },
-  { param: "12w", short: "12w", days: 84 },
-  { param: "6m", short: "6m", days: 180 },
-  { param: "1y", short: "1y", days: 365 },
-];
+/** The calendar-to-date presets, in display order. */
+const PRESETS = [
+  { param: "today", short: "Today" },
+  { param: "week", short: "This week" },
+  { param: "month", short: "This month" },
+  { param: "quarter", short: "This quarter" },
+  { param: "year", short: "This year" },
+] as const;
+
+/** The completed-prior-period options, offered under "Custom". */
+const PREVIOUS = [
+  { param: "prev-day", short: "Previous day" },
+  { param: "prev-week", short: "Previous week" },
+  { param: "prev-month", short: "Previous month" },
+  { param: "prev-quarter", short: "Previous quarter" },
+  { param: "prev-year", short: "Previous year" },
+] as const;
+
 /** The one the bare /admin URL means. */
-const DEFAULT_PARAM = "12w";
+const DEFAULT_PARAM = "month";
 
-function bucketFor(days: number): PeriodBucket {
-  return days <= 21 ? "day" : "week";
+type Window = { from: Date; to: Date; label: string; sentence: string };
+
+/** The calendar-anchored window for every non-custom preset param, or null
+ *  for anything else (a custom "last N unit" period). */
+function windowForParam(param: string, now: Date): Window | null {
+  switch (param) {
+    case "today":
+      return { from: startOfDayUTC(now), to: now, label: "today", sentence: "Today so far, against yesterday." };
+    case "week":
+      return { from: weekStartOf(now), to: now, label: "this week", sentence: "This week so far (from Monday), against last week." };
+    case "month":
+      return { from: startOfMonthUTC(now), to: now, label: "this month", sentence: "This month so far, against last month." };
+    case "quarter":
+      return { from: startOfQuarterUTC(now), to: now, label: "this quarter", sentence: "This quarter so far, against last quarter." };
+    case "year":
+      return { from: startOfYearUTC(now), to: now, label: "this year", sentence: "This year so far, against last year." };
+    case "prev-day": {
+      const to = startOfDayUTC(now);
+      return { from: addDaysUTC(to, -1), to, label: "yesterday", sentence: "Yesterday, against the day before." };
+    }
+    case "prev-week": {
+      const to = weekStartOf(now);
+      return { from: addDaysUTC(to, -7), to, label: "last week", sentence: "Last week (Monday to Sunday), against the week before." };
+    }
+    case "prev-month": {
+      const to = startOfMonthUTC(now);
+      return { from: addMonthsUTC(to, -1), to, label: "last month", sentence: "Last month, against the month before." };
+    }
+    case "prev-quarter": {
+      const to = startOfQuarterUTC(now);
+      return { from: addMonthsUTC(to, -3), to, label: "last quarter", sentence: "Last quarter, against the quarter before." };
+    }
+    case "prev-year": {
+      const to = startOfYearUTC(now);
+      return { from: addMonthsUTC(to, -12), to, label: "last year", sentence: "Last year, against the year before." };
+    }
+    default:
+      return null;
+  }
 }
 
-function labelForDays(days: number): string {
-  if (days === 1) return "24 hours";
-  if (days % 365 === 0) {
-    const y = days / 365;
-    return y === 1 ? "year" : `${y} years`;
-  }
-  if (days % 30 === 0 && days / 30 >= 2) return `${days / 30} months`;
-  if (days % 7 === 0) {
-    const w = days / 7;
-    return w === 1 ? "week" : `${w} weeks`;
-  }
-  return `${days} days`;
-}
-
-function makePeriod(days: number, short: string): AdminPeriod {
-  const clamped = Math.min(Math.max(Math.round(days), 1), MAX_PERIOD_DAYS);
-  const label = labelForDays(clamped);
+function finish(window: Window, param: string): AdminPeriod {
+  const spanDays = Math.max(1, Math.round((window.to.getTime() - window.from.getTime()) / 86_400_000));
   return {
-    days: clamped,
-    bucket: bucketFor(clamped),
-    short,
-    label,
-    sentence:
-      clamped === 1
-        ? "Today so far, against the same window yesterday."
-        : `The last ${label}, against the ${label} before.`,
+    from: window.from,
+    to: window.to,
+    bucket: spanDays <= 35 ? "day" : "week",
+    label: window.label,
+    sentence: window.sentence,
+    param,
   };
 }
 
 /**
  * Resolve the URL into a period. Accepts, in order of precedence:
- *   - a preset key: today | 7d | 30d | 12w | 6m | 1y
- *   - `range=<n><unit>` where unit is d/w/m (e.g. 45d, 3m, 8w)
- *   - `count=<n>` + `unit=<d|w|m>` (what the custom form submits)
- *   - a bare `range=<n>` — legacy, read as weeks
- * Anything unparseable falls back to the 12-week default.
+ *   - a preset key: today | week | month | quarter | year
+ *   - a completed-prior-period key: prev-day | prev-week | prev-month |
+ *     prev-quarter | prev-year
+ *   - `r=last-<n><unit>` where unit is d/w/m — a rolling "last N" window
+ *     ending now
+ *   - `count=<n>` + `unit=<d|w|m>` (what the custom "last N" form submits)
+ * Anything unparseable falls back to the default (this month).
  */
 export function periodFrom(params: {
-  range?: string;
+  r?: string;
   count?: string;
   unit?: string;
 }): AdminPeriod {
-  const { range, count, unit } = params;
+  const { r, count, unit } = params;
+  const now = new Date();
 
-  const preset = PRESETS.find((p) => p.param === range);
-  if (preset) return makePeriod(preset.days, preset.short);
+  const preset = r ? windowForParam(r, now) : null;
+  if (preset) return finish(preset, r!);
 
-  const combined =
-    range ??
-    (count && unit ? `${count}${unit}` : count ? `${count}w` : undefined);
+  const combined = r?.startsWith("last-")
+    ? r.slice("last-".length)
+    : count
+      ? `${count}${unit ?? "d"}`
+      : undefined;
 
   if (combined) {
     const m = /^(\d{1,4})\s*(d|w|m)?$/i.exec(combined.trim());
     if (m) {
-      const n = Number(m[1]);
-      const u = (m[2]?.toLowerCase() as Unit | undefined) ?? "w";
-      if (n >= 1) return makePeriod(n * UNIT_DAYS[u], `${n}${u}`);
+      const n = Math.min(Math.max(Number(m[1]), 1), MAX_PERIOD_DAYS);
+      const u = (m[2]?.toLowerCase() as Unit | undefined) ?? "d";
+      const days = Math.min(n * UNIT_DAYS[u], MAX_PERIOD_DAYS);
+      const noun = n === 1 ? UNIT_NAME_SINGULAR[u] : `${n} ${UNIT_NAME[u]}`;
+      return finish(
+        {
+          from: addDaysUTC(now, -days),
+          to: now,
+          label: noun,
+          sentence: `The last ${noun}, against the ${noun} before.`,
+        },
+        `last-${n}${u}`,
+      );
     }
   }
 
-  return makePeriod(84, "12w");
+  return finish(windowForParam(DEFAULT_PARAM, now)!, DEFAULT_PARAM);
 }
 
-/** Best-fit {count, unit} for showing a period back in the custom form. */
+/** Best-fit {count, unit} for pre-filling the custom "last N" form from
+ *  whatever period is currently active — only meaningful when it already is
+ *  one (an active preset falls back to a plain day count, unseen while a
+ *  preset is selected). */
 function asCustom(period: AdminPeriod): { count: number; unit: Unit } {
-  if (period.days % 30 === 0 && period.days >= 30) {
-    return { count: period.days / 30, unit: "m" };
-  }
-  if (period.days % 7 === 0) return { count: period.days / 7, unit: "w" };
-  return { count: period.days, unit: "d" };
+  const days = Math.max(1, Math.round((period.to.getTime() - period.from.getTime()) / 86_400_000));
+  if (days % 30 === 0 && days >= 30) return { count: days / 30, unit: "m" };
+  if (days % 7 === 0 && days >= 7) return { count: days / 7, unit: "w" };
+  return { count: days, unit: "d" };
 }
 
 /**
- * The presets are links (each period is a URL, so it can be linked to and
- * survives a reload) and the custom control is a plain GET form to the same
- * URL, so the whole thing needs no client JS and the page stays one server
- * render. Mirrors the per-gym dashboard's own period nav, plus a free
- * "last N days / weeks / months" box.
+ * The presets and the "previous period" options are links (each period is a
+ * URL, so it can be linked to and survives a reload) and the custom control is
+ * a plain GET form to the same URL, so the whole thing needs no client JS and
+ * the page stays one server render — Stripe/Shopify's own date-range picker,
+ * minus the JS.
  */
 export function PeriodNav({
   current,
@@ -147,81 +210,107 @@ export function PeriodNav({
   /** The tab the period belongs to, kept when the period changes. */
   tab: string;
 }) {
-  const activeParam =
-    PRESETS.find((p) => p.days === current.days)?.param ??
-    (current.days === 84 ? DEFAULT_PARAM : null);
-  const onPreset = activeParam !== null;
+  const isPreset = PRESETS.some((p) => p.param === current.param);
+  const previousOption = PREVIOUS.find((p) => p.param === current.param);
+  const isPrevious = previousOption !== undefined;
+  const isCustom = !isPreset && !isPrevious;
   const custom = asCustom(current);
+  const summaryLabel = isCustom ? `Last ${current.label}` : previousOption?.short ?? "Custom";
+
+  const linkTo = (param: string) =>
+    param === DEFAULT_PARAM ? `/admin?tab=${tab}` : `/admin?tab=${tab}&r=${param}`;
+
+  const linkClass = (active: boolean) =>
+    `rounded-md border px-3 py-1.5 text-[0.8125rem] font-medium transition-colors duration-150 ${
+      active
+        ? "border-teal bg-shallow text-teal"
+        : "border-ash text-graphite hover:border-stone hover:text-ink"
+    }`;
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <nav aria-label="Reporting period" className="flex flex-wrap gap-1">
-        {PRESETS.map((option) => {
-          const active = option.param === activeParam;
-          return (
-            <Link
-              key={option.param}
-              href={
-                option.param === DEFAULT_PARAM
-                  ? `/admin?tab=${tab}`
-                  : `/admin?tab=${tab}&range=${option.param}`
-              }
-              aria-current={active ? "page" : undefined}
-              className={`rounded-md border px-3 py-1.5 text-[0.8125rem] font-medium transition-colors duration-150 ${
-                active
-                  ? "border-teal bg-shallow text-teal"
-                  : "border-ash text-graphite hover:border-stone hover:text-ink"
-              }`}
-            >
-              {option.short}
-            </Link>
-          );
-        })}
+        {PRESETS.map((option) => (
+          <Link
+            key={option.param}
+            href={linkTo(option.param)}
+            aria-current={option.param === current.param ? "page" : undefined}
+            className={linkClass(option.param === current.param)}
+          >
+            {option.short}
+          </Link>
+        ))}
       </nav>
 
-      <form action="/admin" method="get" className="flex items-center gap-1">
-        <input type="hidden" name="tab" value={tab} />
-        <label htmlFor="admin-count" className="text-[0.8125rem] text-stone">
-          or last
-        </label>
-        <input
-          id="admin-count"
-          name="count"
-          type="number"
-          inputMode="numeric"
-          min={1}
-          max={MAX_PERIOD_DAYS}
-          defaultValue={onPreset ? "" : custom.count}
-          placeholder={onPreset ? "N" : undefined}
-          aria-label="Custom reporting period"
-          className={`w-16 rounded-md border px-2 py-1.5 text-[0.8125rem] font-medium transition-colors duration-150 ${
-            onPreset
-              ? "border-ash text-graphite"
-              : "border-teal bg-shallow text-teal"
+      <details open={!isPreset} className="relative">
+        <summary
+          className={`cursor-pointer list-none rounded-md border px-3 py-1.5 text-[0.8125rem] font-medium transition-colors duration-150 ${
+            !isPreset
+              ? "border-teal bg-shallow text-teal"
+              : "border-ash text-graphite hover:border-stone hover:text-ink"
           }`}
-        />
-        <label htmlFor="admin-unit" className="sr-only">
-          Unit
-        </label>
-        <select
-          id="admin-unit"
-          name="unit"
-          defaultValue={onPreset ? "d" : custom.unit}
-          className="rounded-md border border-ash bg-white px-2 py-1.5 text-[0.8125rem] font-medium text-graphite"
         >
-          {(Object.keys(UNIT_NAME) as Unit[]).map((u) => (
-            <option key={u} value={u}>
-              {UNIT_NAME[u]}
-            </option>
-          ))}
-        </select>
-        <button
-          type="submit"
-          className="rounded-md border border-ash px-2.5 py-1.5 text-[0.8125rem] font-medium text-graphite transition-colors duration-150 hover:border-stone hover:text-ink"
-        >
-          Go
-        </button>
-      </form>
+          {summaryLabel}
+        </summary>
+
+        <div className="absolute right-0 z-10 mt-2 w-72 space-y-3 rounded-md border border-ash bg-white p-3 shadow-lg">
+          <form action="/admin" method="get" className="flex items-center gap-1.5">
+            <input type="hidden" name="tab" value={tab} />
+            <label htmlFor="admin-count" className="text-[0.8125rem] text-stone">
+              Last
+            </label>
+            <input
+              id="admin-count"
+              name="count"
+              type="number"
+              inputMode="numeric"
+              min={1}
+              max={MAX_PERIOD_DAYS}
+              defaultValue={isCustom ? custom.count : undefined}
+              placeholder="N"
+              aria-label="Custom reporting period, a number of…"
+              className="w-16 rounded-md border border-ash px-2 py-1.5 text-[0.8125rem] font-medium text-graphite"
+            />
+            <label htmlFor="admin-unit" className="sr-only">
+              Unit
+            </label>
+            <select
+              id="admin-unit"
+              name="unit"
+              defaultValue={isCustom ? custom.unit : "d"}
+              className="rounded-md border border-ash bg-white px-2 py-1.5 text-[0.8125rem] font-medium text-graphite"
+            >
+              {(Object.keys(UNIT_NAME) as Unit[]).map((u) => (
+                <option key={u} value={u}>
+                  {UNIT_NAME[u]}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              className="rounded-md border border-ash px-2.5 py-1.5 text-[0.8125rem] font-medium text-graphite transition-colors duration-150 hover:border-stone hover:text-ink"
+            >
+              Go
+            </button>
+          </form>
+
+          <div className="border-t border-ash pt-3">
+            <p className="mb-1.5 text-[0.75rem] text-stone">Or a completed period</p>
+            <div className="flex flex-wrap gap-1">
+              {PREVIOUS.map((option) => (
+                <Link
+                  key={option.param}
+                  href={linkTo(option.param)}
+                  aria-current={option.param === current.param ? "page" : undefined}
+                  className={linkClass(option.param === current.param)}
+                >
+                  {option.short}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </details>
     </div>
   );
 }

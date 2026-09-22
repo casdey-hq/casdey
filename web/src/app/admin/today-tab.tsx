@@ -216,9 +216,9 @@ function GoalCard({
 
   const cohortLine =
     goal.metric === "engaged_rate_week" && marketing
-      ? `${marketing.weekCohort.engaged} of ${marketing.weekCohort.contacted} gyms first contacted in the last 7 days`
+      ? `${marketing.weekCohort.engaged} of ${marketing.weekCohort.contacted} gyms first contacted since Monday`
       : goal.metric === "reply_rate_week" && marketing
-        ? `${marketing.weekCohort.replied} of ${marketing.weekCohort.contacted} gyms first contacted in the last 7 days`
+        ? `${marketing.weekCohort.replied} of ${marketing.weekCohort.contacted} gyms first contacted since Monday`
         : goal.metric === "paying_gyms"
           ? "Live from Stripe, test gyms excluded"
           : null;
