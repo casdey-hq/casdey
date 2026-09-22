@@ -234,6 +234,7 @@ export function PeriodNav({
           <Link
             key={option.param}
             href={linkTo(option.param)}
+            prefetch={false}
             aria-current={option.param === current.param ? "page" : undefined}
             className={linkClass(option.param === current.param)}
           >
@@ -301,6 +302,7 @@ export function PeriodNav({
                 <Link
                   key={option.param}
                   href={linkTo(option.param)}
+                  prefetch={false}
                   aria-current={option.param === current.param ? "page" : undefined}
                   className={linkClass(option.param === current.param)}
                 >

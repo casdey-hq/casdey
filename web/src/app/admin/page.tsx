@@ -82,6 +82,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
             <Link
               key={t.id}
               href={`/admin?tab=${t.id}`}
+              prefetch={false}
               aria-current={active ? "page" : undefined}
               className={`-mb-px shrink-0 border-b-2 px-3.5 py-2.5 text-[0.9375rem] font-medium transition-colors duration-150 ${
                 active
