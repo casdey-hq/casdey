@@ -7,10 +7,18 @@ import { MIN_REPLIES_TO_CALL, type RunningTest } from "@/lib/marketing-summary";
 import { NoteEditor } from "./hq-client";
 import { MarkdownLite } from "./markdown-lite";
 import { OutreachSection } from "./outreach-section";
-import { Section, type AdminPeriod } from "./parts";
+import { Section } from "./parts";
 
 /**
  * Marketing: cold outreach, the weekly test review, Instagram, and the plan.
+ *
+ * All time, deliberately — there is no reporting-period selector on this tab.
+ * The one figure that is genuinely period-scoped, the weekly cohort the "1%
+ * engaged leads" goal is judged on, has its own fixed Monday-based window
+ * (src/lib/marketing-summary.ts), independent of whatever /admin's period nav
+ * would otherwise be set to; a page-level selector here would either not
+ * change anything (misleading) or disagree with the goal's own number
+ * (worse), so it was removed rather than wired up to do either.
  *
  * The test review is the same calculation the Sunday check-up makes
  * (src/lib/marketing-summary.ts), live. It proposes; the call is Davide's, in
@@ -20,7 +28,7 @@ import { Section, type AdminPeriod } from "./parts";
 const LEADS_SHEET =
   "https://docs.google.com/spreadsheets/d/1WOAIA1gvK6S1kWe_Vf4-d4XmjhnDLQZLtyU_ezvOu3w/edit";
 
-export async function MarketingTab({ period }: { period: AdminPeriod }) {
+export async function MarketingTab() {
   const [marketing, hq] = await Promise.all([marketingSummary(), readHq()]);
   const plan = hq.notes.marketing_plan;
 
@@ -35,7 +43,7 @@ export async function MarketingTab({ period }: { period: AdminPeriod }) {
       </p>
 
       <Suspense fallback={<Section title="Outreach" sub="Reading the leads sheet…"><div className="h-28" /></Section>}>
-        <OutreachSection period={period} />
+        <OutreachSection />
       </Suspense>
 
       {marketing === null ? (

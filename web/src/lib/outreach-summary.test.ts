@@ -23,10 +23,6 @@ function send(dateSent: string): string[] {
   return ["1", "Gym", "a@b.c", dateSent];
 }
 
-const now = new Date("2026-09-13T10:00:00Z");
-const DAY_MS = 86_400_000;
-const from = (days: number) => new Date(now.getTime() - days * DAY_MS);
-
 describe("summariseOutreach", () => {
   const leads = [
     lead("1", "Iron Box", "Contacted", "2026-09-10"),
@@ -37,8 +33,8 @@ describe("summariseOutreach", () => {
     lead("6", "", "", ""),
   ];
 
-  it("keeps engaged leads apart from replies", () => {
-    const summary = summariseOutreach(leads, [], from(7), now);
+  it("keeps engaged leads apart from replies, all time", () => {
+    const summary = summariseOutreach(leads, []);
     expect(summary.contacted).toBe(4);
     expect(summary.genuineReplies).toBe(2);
     expect(summary.optOuts).toBe(1);
@@ -52,28 +48,23 @@ describe("summariseOutreach", () => {
     const summary = summariseOutreach(
       [lead("4", "Opted Out Gym", "Dead", "2026-08-24", "Unsubscribed")],
       [],
-      from(7),
-      now,
     );
     expect(summary.genuineReplies).toBe(0);
     expect(summary.replyRate).toBe(0);
   });
 
-  it("splits contacts and sends into the period and the one before", () => {
-    const summary = summariseOutreach(
-      leads,
-      [send("2026-09-12"), send("2026-09-07"), send("2026-09-01"), send("")],
-      from(7),
-      now,
-    );
-    expect(summary.contactedInPeriod).toBe(1);
-    expect(summary.contactedPrevious).toBe(0);
-    expect(summary.emailsSentInPeriod).toBe(2);
-    expect(summary.emailsSentPrevious).toBe(1);
+  it("counts every logged send, all time", () => {
+    const summary = summariseOutreach(leads, [
+      send("2026-09-12"),
+      send("2026-09-07"),
+      send("2026-09-01"),
+      send(""),
+    ]);
+    expect(summary.emailsSent).toBe(3);
   });
 
   it("has no rate when nobody has been contacted", () => {
-    const summary = summariseOutreach([], [], from(7), now);
+    const summary = summariseOutreach([], []);
     expect(summary.replyRate).toBeNull();
     expect(summary.engagedRate).toBeNull();
   });

@@ -4,6 +4,12 @@
  * lives in outreach-stats.ts. scripts/check-up-marketing.mjs reads the same
  * columns the same way for /check-up, and the two must stay in step.
  *
+ * All time, deliberately — the weekly goal has its own Monday-based cohort in
+ * marketing-summary.ts, and a rolling "vs the period before" split here would
+ * either duplicate that or disagree with it. This is the standing "how has
+ * outreach done overall" picture, not something a reporting-period selector
+ * has anything to change.
+ *
  * Two rates, deliberately distinct (Davide, 2026-09-13):
  *
  *   - Reply rate: gyms that sent a genuine reply, whatever it said. Most say
@@ -39,10 +45,9 @@ export type OutreachSummary = {
   /** Percent to two decimals, null with nobody contacted. */
   replyRate: number | null;
   engagedRate: number | null;
-  contactedInPeriod: number;
-  contactedPrevious: number;
-  emailsSentInPeriod: number;
-  emailsSentPrevious: number;
+  /** Every logged send, all time — one row per actual email (first touch or
+   *  follow-up), not per lead. */
+  emailsSent: number;
 };
 
 const cell = (row: string[], index: number): string =>
@@ -56,21 +61,7 @@ function percent(part: number, whole: number): number | null {
 export function summariseOutreach(
   leads: string[][],
   sends: string[][],
-  from: Date,
-  to: Date,
 ): OutreachSummary {
-  const start = from.getTime();
-  const end = to.getTime();
-  const previousStart = start - (end - start);
-
-  const window = (dateText: string): "current" | "previous" | null => {
-    const at = Date.parse(dateText);
-    if (Number.isNaN(at)) return null;
-    if (at > start && at <= end) return "current";
-    if (at > previousStart && at <= start) return "previous";
-    return null;
-  };
-
   const summary: OutreachSummary = {
     contacted: 0,
     genuineReplies: 0,
@@ -79,10 +70,7 @@ export function summariseOutreach(
     engagedGyms: [],
     replyRate: null,
     engagedRate: null,
-    contactedInPeriod: 0,
-    contactedPrevious: 0,
-    emailsSentInPeriod: 0,
-    emailsSentPrevious: 0,
+    emailsSent: 0,
   };
 
   for (const row of leads) {
@@ -98,16 +86,10 @@ export function summariseOutreach(
       summary.engaged += 1;
       summary.engagedGyms.push(cell(row, LEADS_COLUMNS.gym));
     }
-
-    const when = window(cell(row, LEADS_COLUMNS.dateContacted));
-    if (when === "current") summary.contactedInPeriod += 1;
-    if (when === "previous") summary.contactedPrevious += 1;
   }
 
   for (const row of sends) {
-    const when = window(cell(row, SEND_LOG_COLUMNS.dateSent));
-    if (when === "current") summary.emailsSentInPeriod += 1;
-    if (when === "previous") summary.emailsSentPrevious += 1;
+    if (cell(row, SEND_LOG_COLUMNS.dateSent)) summary.emailsSent += 1;
   }
 
   summary.replyRate = percent(summary.genuineReplies, summary.contacted);

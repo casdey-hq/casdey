@@ -61,7 +61,6 @@ export default async function AdminPage(props: PageProps<"/admin">) {
     count: one(sp.count),
     unit: one(sp.unit),
   });
-  const periodMatters = tab === "numbers" || tab === "marketing";
 
   return (
     <>
@@ -69,7 +68,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
         eyebrow="casdey HQ"
         title="How casdey is doing"
         lede="Live, all of it. Numbers are read straight from Stripe, casdey's own tables, PostHog and the leads sheet; everything written (the plan, goals, to-dos, costs) is saved here and shows the moment it changes."
-        actions={periodMatters ? <PeriodNav current={period} tab={tab} /> : undefined}
+        actions={tab === "numbers" ? <PeriodNav current={period} tab={tab} /> : undefined}
       />
 
       <nav
@@ -106,7 +105,7 @@ export default async function AdminPage(props: PageProps<"/admin">) {
       >
         {tab === "today" ? <TodayTab /> : null}
         {tab === "numbers" ? <NumbersTab period={period} /> : null}
-        {tab === "marketing" ? <MarketingTab period={period} /> : null}
+        {tab === "marketing" ? <MarketingTab /> : null}
         {tab === "business" ? <BusinessTab /> : null}
         {tab === "checkup" ? <CheckupTab /> : null}
         {tab === "support" ? <SupportTab /> : null}

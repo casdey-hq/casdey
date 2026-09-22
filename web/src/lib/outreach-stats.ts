@@ -21,12 +21,9 @@ export function outreachConfigured(): boolean {
   return sheetsConfigured();
 }
 
-export async function outreachSummary(
-  from: Date,
-  to: Date,
-): Promise<OutreachSummary | null> {
+export async function outreachSummary(): Promise<OutreachSummary | null> {
   const tabs = await readSheetRanges(["Leads!A2:U6000", "Send Log!A2:D10000"]);
   if (!tabs) return null;
   const [leads, sends] = tabs;
-  return summariseOutreach(leads, sends, from, to);
+  return summariseOutreach(leads, sends);
 }
