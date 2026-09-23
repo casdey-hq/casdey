@@ -42,7 +42,7 @@ const MEMBERS = [
   ["R. Haugen", "this week", "back", "74", "€1,068", "returned"],
 ];
 
-function Chrome({ children }: { children: React.ReactNode }) {
+function Chrome({ children, compact }: { children: React.ReactNode; compact?: boolean }) {
   return (
     <div className="overflow-hidden rounded-[14px] border border-ash bg-white shadow-float">
       <div className="flex h-9 items-center gap-2 border-b border-ash bg-mist px-4">
@@ -54,7 +54,7 @@ function Chrome({ children }: { children: React.ReactNode }) {
         </span>
       </div>
 
-      <div className="grid min-h-[366px] grid-cols-1 sm:grid-cols-[168px_1fr]">
+      <div className={`grid grid-cols-1 sm:grid-cols-[168px_1fr] ${compact ? "min-h-[300px] sm:min-h-[366px]" : "min-h-[366px]"}`}>
         {children}
       </div>
     </div>
@@ -100,9 +100,9 @@ function Pill({ kind }: { kind: string }) {
   );
 }
 
-function Members() {
+function Members({ compact }: { compact?: boolean }) {
   return (
-    <div className="p-4 sm:p-6">
+    <div className={compact ? "p-3 sm:p-6" : "p-4 sm:p-6"}>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h3 className="display text-[1.15rem] text-ink">Members</h3>
         <p className="text-[12px] text-stone">
@@ -116,12 +116,12 @@ function Members() {
         </p>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-lg border border-ash">
+      <div className={`${compact ? "mt-3" : "mt-4"} overflow-hidden rounded-lg border border-ash`}>
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="bg-paper/80 text-[11px] text-stone">
-              <th className="px-3 py-2 font-medium">Member</th>
-              <th className="px-3 py-2 font-medium">Last visit</th>
+              <th className={`px-3 font-medium ${compact ? "py-1 sm:py-2" : "py-2"}`}>Member</th>
+              <th className={`px-3 font-medium ${compact ? "py-1 sm:py-2" : "py-2"}`}>Last visit</th>
               <th className="hidden px-3 py-2 font-medium sm:table-cell">
                 Away
               </th>
@@ -129,14 +129,14 @@ function Members() {
                 Visits
               </th>
               <th className="hidden px-3 py-2 font-medium sm:table-cell">Worth</th>
-              <th className="px-3 py-2 font-medium">Status</th>
+              <th className={`px-3 font-medium ${compact ? "py-1 sm:py-2" : "py-2"}`}>Status</th>
             </tr>
           </thead>
           <tbody className="text-[12px] sm:text-[13px]">
             {MEMBERS.map(([name, last, away, visits, worth, status]) => (
               <tr key={name} className="border-t border-ash">
-                <td className="px-3 py-2.5 font-medium text-ink">{name}</td>
-                <td className="px-3 py-2.5 text-graphite">{last}</td>
+                <td className={`px-3 font-medium text-ink ${compact ? "py-1 sm:py-2.5" : "py-2.5"}`}>{name}</td>
+                <td className={`px-3 text-graphite ${compact ? "py-1 sm:py-2.5" : "py-2.5"}`}>{last}</td>
                 <td className="hidden px-3 py-2.5 text-graphite tabular-nums sm:table-cell">
                   {away}
                 </td>
@@ -144,7 +144,7 @@ function Members() {
                   {visits}
                 </td>
                 <td className="hidden px-3 py-2.5 text-ink tabular-nums sm:table-cell">{worth}</td>
-                <td className="px-3 py-2.5">
+                <td className={`px-3 ${compact ? "py-1 sm:py-2.5" : "py-2.5"}`}>
                   <Pill kind={status} />
                 </td>
               </tr>
@@ -195,9 +195,9 @@ function Offer() {
   );
 }
 
-function Campaign() {
+function Campaign({ compact }: { compact?: boolean }) {
   return (
-    <div className="p-4 sm:p-6">
+    <div className={compact ? "p-3 sm:p-6" : "p-4 sm:p-6"}>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h3 className="display text-[1.15rem] text-ink">Win-back, September</h3>
         <span className="rounded-full bg-shallow px-2 py-0.5 text-[11px] font-medium text-teal">
@@ -205,8 +205,8 @@ function Campaign() {
         </span>
       </div>
 
-      <div className="mt-4 rounded-lg border border-ash">
-        <div className="flex flex-wrap gap-x-6 gap-y-1 border-b border-ash px-3 py-2.5 text-[12px]">
+      <div className={`${compact ? "mt-3 sm:mt-4" : "mt-4"} rounded-lg border border-ash`}>
+        <div className={`flex flex-wrap gap-x-6 gap-y-1 border-b border-ash px-3 text-[12px] ${compact ? "py-2 sm:py-2.5" : "py-2.5"}`}>
           <span className="text-stone">
             To <span className="text-ink">168 lapsed members</span>
           </span>
@@ -217,7 +217,7 @@ function Campaign() {
             </span>
           </span>
         </div>
-        <div className="px-3 py-3 text-[12px] leading-relaxed text-graphite sm:text-[13px]">
+        <div className={`px-3 text-[12px] leading-relaxed text-graphite sm:text-[13px] ${compact ? "py-2 sm:py-3" : "py-3"}`}>
           <p className="font-medium text-ink">
             Hi <span className="font-semibold text-teal">Joseph</span>,
           </p>
@@ -228,7 +228,7 @@ function Campaign() {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2">
+      <div className={`${compact ? "mt-3 sm:mt-4" : "mt-4"} flex items-center gap-2`}>
         <span className="rounded-[8px] bg-teal-bright px-3 py-1.5 text-[12px] font-semibold text-deep">
           Approve and send
         </span>
@@ -248,7 +248,7 @@ function Campaign() {
  * the booking. Without it the site describes a tool, and the product is a
  * member of staff.
  */
-function Sequence() {
+function Sequence({ compact }: { compact?: boolean }) {
   const thread = [
     ["Day 0", "First message", "Hi Joseph, it has been a while since your last visit."],
     ["Day 4", "No reply, so casdey nudges", "I know how easily these get buried, so just a nudge."],
@@ -256,7 +256,7 @@ function Sequence() {
   ] as const;
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className={compact ? "p-2.5 sm:p-6" : "p-4 sm:p-6"}>
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h3 className="display text-[1.15rem] text-ink">J. Okafor</h3>
         <span className="text-[12px] text-stone">
@@ -264,14 +264,14 @@ function Sequence() {
         </span>
       </div>
 
-      <ol className="mt-4 list-none">
-        {thread.map(([day, what, line], i) => (
+      <ol className={`${compact ? "mt-1 sm:mt-4" : "mt-4"} list-none`}>
+        {thread.map(([day, what, line]) => (
           <li key={day} className="flex gap-3">
             <div className="flex flex-col items-center">
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-ash" />
               <span className="w-px flex-1 bg-ash" />
             </div>
-            <div className={"pb-4 " + (i === 0 ? "" : "")}>
+            <div className={compact ? "pb-0.5 sm:pb-4" : "pb-4"}>
               <p className="text-[12px] text-stone">
                 {day} · <span className="text-ink">{what}</span>
               </p>
@@ -298,7 +298,7 @@ function Sequence() {
         </li>
       </ol>
 
-      <p className="mt-2 rounded-lg bg-mist px-3 py-2 text-[12px] text-graphite">
+      <p className={`rounded-lg bg-mist px-3 text-[12px] text-graphite ${compact ? "mt-1 py-1.5 sm:mt-2 sm:py-2" : "mt-2 py-2"}`}>
         Nobody at the gym touched any of this.
       </p>
     </div>
@@ -353,7 +353,7 @@ function Booking() {
   );
 }
 
-const VIEWS: Record<View, () => React.ReactElement> = {
+const VIEWS: Record<View, (props: { compact?: boolean }) => React.ReactElement> = {
   members: Members,
   offer: Offer,
   campaign: Campaign,
@@ -361,12 +361,12 @@ const VIEWS: Record<View, () => React.ReactElement> = {
   booking: Booking,
 };
 
-export function AppShot({ view }: { view: View }) {
+export function AppShot({ view, compact = false }: { view: View; compact?: boolean }) {
   const Body = VIEWS[view];
   return (
-    <Chrome>
+    <Chrome compact={compact}>
       <Sidebar active={ACTIVE_NAV[view]} />
-      <Body />
+      <Body compact={compact} />
     </Chrome>
   );
 }

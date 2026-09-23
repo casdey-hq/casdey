@@ -171,7 +171,7 @@ export function WhatItDoes() {
           </Reveal>
 
           <div ref={mobileStageRef} className="story-stage-mobile relative mt-10 min-h-[280vh]">
-            <div className="sticky top-32 h-[calc(100dvh-11rem)]">
+            <div className="sticky top-32 h-[calc(100dvh-9.5rem)]">
               <div className="relative flex h-full flex-col pl-5">
                 <span aria-hidden="true" className="absolute inset-y-0 left-0 w-px bg-ash" />
                 <span
@@ -182,13 +182,13 @@ export function WhatItDoes() {
                 />
                 <article key={active} className="view-fade shrink-0">
                   <p className="label text-teal">{String(active + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}</p>
-                  <h3 className="mt-2 text-[1.0625rem] font-medium text-ink">{STEPS[active].title}</h3>
-                  <p className="mt-2 text-[0.9375rem] leading-relaxed text-graphite">{STEPS[active].body}</p>
+                  <h3 className="mt-1.5 text-[1.0625rem] font-medium text-ink">{STEPS[active].title}</h3>
+                  <p className="mt-1.5 text-[0.9rem] leading-[1.5] text-graphite">{STEPS[active].body}</p>
                 </article>
-                <div key={STEPS[active].view} className="story-preview view-fade mt-3 min-h-0 flex-1 overflow-hidden rounded-[14px]">
-                  <AppShot view={STEPS[active].view} />
+                <div key={STEPS[active].view} className="story-preview view-fade mt-2 min-h-0 flex-1 overflow-hidden rounded-[14px]">
+                  <AppShot view={STEPS[active].view} compact />
                 </div>
-                {showCue ? <div className="mt-3 shrink-0"><ScrollCue /></div> : null}
+                {showCue ? <div className="mt-2 shrink-0"><ScrollCue /></div> : null}
               </div>
             </div>
           </div>
