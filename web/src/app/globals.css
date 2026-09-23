@@ -506,6 +506,13 @@
   animation-delay: 180ms;
 }
 
+@media (max-width: 1023px) and (max-height: 740px) {
+  .story-preview {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5rem), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5rem), transparent);
+  }
+}
+
 @keyframes view-fade {
   from {
     opacity: 0;

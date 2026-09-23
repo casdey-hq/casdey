@@ -79,9 +79,11 @@ function ScrollCue() {
 
 export function WhatItDoes() {
   const [active, setActive] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [showCue, setShowCue] = useState(true);
   const mobileStageRef = useRef<HTMLDivElement>(null);
   const desktopStageRef = useRef<HTMLDivElement>(null);
+  const mobileProgressRef = useRef<HTMLSpanElement>(null);
+  const desktopProgressRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     let frame = 0;
@@ -96,7 +98,11 @@ export function WhatItDoes() {
       const range = Math.max(stage.offsetHeight - window.innerHeight, 1);
       const nextProgress = Math.min(0.9999, Math.max(0, (stickyTop - stage.getBoundingClientRect().top) / range));
       const next = Math.floor(nextProgress * STEPS.length);
-      setProgress(nextProgress);
+      const nextShowCue = nextProgress < 0.995;
+      const scale = `scaleY(${nextProgress})`;
+      if (mobileProgressRef.current) mobileProgressRef.current.style.transform = scale;
+      if (desktopProgressRef.current) desktopProgressRef.current.style.transform = scale;
+      setShowCue((current) => current === nextShowCue ? current : nextShowCue);
       setActive((current) => (current === next ? current : next));
     };
     const onScroll = () => {
@@ -122,23 +128,24 @@ export function WhatItDoes() {
           </Reveal>
 
           <div ref={mobileStageRef} className="relative mt-10 min-h-[280vh]">
-            <div className="sticky top-32">
-              <div className="relative pl-5">
+            <div className="sticky top-32 h-[calc(100svh-14rem)]">
+              <div className="relative flex h-full flex-col pl-5">
                 <span aria-hidden="true" className="absolute inset-y-0 left-0 w-px bg-ash" />
                 <span
+                  ref={mobileProgressRef}
                   aria-hidden="true"
-                  className="absolute left-0 top-0 w-px bg-teal transition-[height] duration-200 ease-out"
-                  style={{ height: `${progress * 100}%` }}
+                  className="absolute inset-y-0 left-0 w-px origin-top bg-teal"
+                  style={{ transform: "scaleY(0)" }}
                 />
-                <article key={active} className="view-fade">
+                <article key={active} className="view-fade shrink-0">
                   <p className="label text-teal">{String(active + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}</p>
                   <h3 className="mt-2 text-[1.0625rem] font-medium text-ink">{STEPS[active].title}</h3>
                   <p className="mt-2 text-[0.9375rem] leading-relaxed text-graphite">{STEPS[active].body}</p>
                 </article>
-                <div key={STEPS[active].view} className="view-fade mt-6">
+                <div key={STEPS[active].view} className="story-preview view-fade mt-3 min-h-0 flex-1 overflow-hidden rounded-[14px]">
                   <AppShot view={STEPS[active].view} />
                 </div>
-                {progress < 0.995 ? <div className="mt-6"><ScrollCue /></div> : null}
+                {showCue ? <div className="mt-3 shrink-0"><ScrollCue /></div> : null}
               </div>
             </div>
           </div>
@@ -154,9 +161,10 @@ export function WhatItDoes() {
             <div className="relative h-[405px] overflow-hidden pl-5">
               <span aria-hidden="true" className="absolute inset-y-0 left-0 w-px bg-ash" />
               <span
+                ref={desktopProgressRef}
                 aria-hidden="true"
-                className="absolute left-0 top-0 w-px bg-teal"
-                style={{ height: `${progress * 100}%` }}
+                className="absolute inset-y-0 left-0 w-px origin-top bg-teal"
+                style={{ transform: "scaleY(0)" }}
               />
               <div
                 className="will-change-transform transition-transform duration-200 ease-[cubic-bezier(.22,1,.36,1)] motion-reduce:transition-none"
@@ -177,7 +185,7 @@ export function WhatItDoes() {
             </div>
             </div>
 
-            {progress < 0.995 ? (
+            {showCue ? (
               <div className="mt-7"><ScrollCue /></div>
             ) : null}
           </div>
