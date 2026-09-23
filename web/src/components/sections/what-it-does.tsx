@@ -87,6 +87,14 @@ export function WhatItDoes() {
 
   useEffect(() => {
     let frame = 0;
+    let nativeProgress = false;
+    try {
+      nativeProgress = CSS.supports("animation-timeline: view()") &&
+        CSS.supports("animation-range: contain") &&
+        CSS.supports("view-timeline-inset: 8rem -8rem");
+    } catch {
+      // Older Safari versions still use the scroll-event fallback.
+    }
     const update = () => {
       frame = 0;
       const desktop = window.innerWidth >= 1024;
@@ -99,11 +107,13 @@ export function WhatItDoes() {
       const nextProgress = Math.min(0.9999, Math.max(0, (stickyTop - stage.getBoundingClientRect().top) / range));
       const next = Math.floor(nextProgress * STEPS.length);
       const nextShowCue = nextProgress < 0.995;
-      const scale = `scaleY(${nextProgress})`;
-      if (mobileProgressRef.current) mobileProgressRef.current.style.transform = scale;
-      if (desktopProgressRef.current) desktopProgressRef.current.style.transform = scale;
+      if (!nativeProgress) {
+        const scale = `scaleY(${nextProgress})`;
+        if (mobileProgressRef.current) mobileProgressRef.current.style.transform = scale;
+        if (desktopProgressRef.current) desktopProgressRef.current.style.transform = scale;
+      }
       setShowCue((current) => current === nextShowCue ? current : nextShowCue);
-      setActive((current) => (current === next ? current : next));
+      setActive((current) => current === next ? current : next);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -111,11 +121,44 @@ export function WhatItDoes() {
 
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("touchmove", onScroll, { passive: true });
+    window.addEventListener("touchend", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    window.visualViewport?.addEventListener("scroll", onScroll, { passive: true });
+    window.visualViewport?.addEventListener("resize", onScroll);
+
+    // iOS can advance the CSS rail while delaying document scroll events.
+    // Check the active story briefly while it is visible on a touch device.
+    let touchPoll = 0;
+    const visibleStages = new Set<Element>();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visibleStages.add(entry.target);
+        else visibleStages.delete(entry.target);
+      }
+      if (visibleStages.size && !touchPoll) {
+        onScroll();
+        touchPoll = window.setInterval(onScroll, 80);
+      } else if (!visibleStages.size && touchPoll) {
+        window.clearInterval(touchPoll);
+        touchPoll = 0;
+      }
+    });
+    if (window.matchMedia("(pointer: coarse)").matches) {
+      if (mobileStageRef.current) observer.observe(mobileStageRef.current);
+      if (desktopStageRef.current) observer.observe(desktopStageRef.current);
+    }
+
     return () => {
       if (frame) cancelAnimationFrame(frame);
+      if (touchPoll) window.clearInterval(touchPoll);
+      observer.disconnect();
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("touchmove", onScroll);
+      window.removeEventListener("touchend", onScroll);
       window.removeEventListener("resize", onScroll);
+      window.visualViewport?.removeEventListener("scroll", onScroll);
+      window.visualViewport?.removeEventListener("resize", onScroll);
     };
   }, []);
 
@@ -127,14 +170,14 @@ export function WhatItDoes() {
             <ProcessIntro />
           </Reveal>
 
-          <div ref={mobileStageRef} className="relative mt-10 min-h-[280vh]">
-            <div className="sticky top-32 h-[calc(100svh-14rem)]">
+          <div ref={mobileStageRef} className="story-stage-mobile relative mt-10 min-h-[280vh]">
+            <div className="sticky top-32 h-[calc(100dvh-11rem)]">
               <div className="relative flex h-full flex-col pl-5">
                 <span aria-hidden="true" className="absolute inset-y-0 left-0 w-px bg-ash" />
                 <span
                   ref={mobileProgressRef}
                   aria-hidden="true"
-                  className="absolute inset-y-0 left-0 w-px origin-top bg-teal"
+                  className="story-progress-mobile absolute inset-y-0 left-0 w-px origin-top bg-teal"
                   style={{ transform: "scaleY(0)" }}
                 />
                 <article key={active} className="view-fade shrink-0">
@@ -151,7 +194,7 @@ export function WhatItDoes() {
           </div>
         </div>
 
-        <div ref={desktopStageRef} className="relative hidden min-h-[360vh] lg:block">
+        <div ref={desktopStageRef} className="story-stage-desktop relative hidden min-h-[360vh] lg:block">
           <div className="sticky top-44">
             <Reveal>
               <ProcessIntro />
@@ -163,7 +206,7 @@ export function WhatItDoes() {
               <span
                 ref={desktopProgressRef}
                 aria-hidden="true"
-                className="absolute inset-y-0 left-0 w-px origin-top bg-teal"
+                className="story-progress-desktop absolute inset-y-0 left-0 w-px origin-top bg-teal"
                 style={{ transform: "scaleY(0)" }}
               />
               <div

@@ -506,6 +506,41 @@
   animation-delay: 180ms;
 }
 
+/* Shift the timeline to the sticky top so its contain range matches the
+   distance used to change story steps. The browser paints the rail with scroll. */
+@supports (animation-timeline: view()) and (animation-range: contain) and (view-timeline-inset: 8rem -8rem) {
+  .story-stage-mobile {
+    view-timeline-name: --story-mobile;
+    view-timeline-axis: block;
+    view-timeline-inset: 8rem -8rem;
+  }
+
+  .story-stage-desktop {
+    view-timeline-name: --story-desktop;
+    view-timeline-axis: block;
+    view-timeline-inset: 11rem -11rem;
+  }
+
+  .story-progress-mobile,
+  .story-progress-desktop {
+    animation: story-progress 1s linear both;
+    animation-range: contain;
+  }
+
+  .story-progress-mobile {
+    animation-timeline: --story-mobile;
+  }
+
+  .story-progress-desktop {
+    animation-timeline: --story-desktop;
+  }
+}
+
+@keyframes story-progress {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
 @media (max-width: 1023px) and (max-height: 740px) {
   .story-preview {
     -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5rem), transparent);
