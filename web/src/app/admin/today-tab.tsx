@@ -6,7 +6,7 @@ import { marketingSummary } from "@/lib/marketing-stats";
 import type { MarketingSummary } from "@/lib/marketing-summary";
 import Link from "next/link";
 
-import { AddTodoForm, TodoList, type TodoItem } from "./hq-client";
+import { AddTodoForm, RecentlyClosedList, TodoList, type TodoItem } from "./hq-client";
 import { Section } from "./parts";
 
 /**
@@ -60,10 +60,13 @@ export async function TodayTab() {
 
   const open = hq.todos.filter((todo) => todo.status === "open" && !todo.signal_key);
   const proposed = hq.todos.filter((todo) => todo.status === "proposed");
-  const recentlyDone = hq.todos
-    .filter((todo) => todo.status === "done" && todo.closed_at)
+  // Done or dismissed in the last 7 days: shown with an Undo, for a misclick.
+  const recentlyClosed = hq.todos
+    .filter((todo) => (todo.status === "done" || todo.status === "dismissed") && todo.closed_at)
     .filter((todo) => now.getTime() - Date.parse(todo.closed_at!) < 7 * 86_400_000)
-    .slice(0, 8);
+    .sort((a, b) => Date.parse(b.closed_at!) - Date.parse(a.closed_at!))
+    .slice(0, 8)
+    .map((todo) => ({ id: todo.id, title: todo.title, status: todo.status as "done" | "dismissed" }));
 
   const toItem = (todo: HqTodo): TodoItem => ({
     ref: todo.id,
@@ -74,6 +77,7 @@ export async function TodayTab() {
     origin: ORIGIN[todo.source],
     added: shortDate(todo.created_at),
     due: todo.due ? shortDate(todo.due) : null,
+    dueRaw: todo.due,
     proposed: todo.status === "proposed",
   });
 
@@ -89,6 +93,7 @@ export async function TodayTab() {
       origin: "Live",
       added: states.get(signal.key) ? shortDate(states.get(signal.key)!.firstSeen) : null,
       due: signal.due ? shortDate(signal.due) : null,
+      dueRaw: signal.due,
       proposed: false,
     })),
     ...open
@@ -162,15 +167,9 @@ export async function TodayTab() {
         </div>
       </Section>
 
-      {recentlyDone.length > 0 ? (
-        <Section title="Done this week">
-          <ul className="space-y-1.5 text-[0.875rem] text-stone">
-            {recentlyDone.map((todo) => (
-              <li key={todo.id}>
-                <span className="text-teal">✓</span> {todo.title}
-              </li>
-            ))}
-          </ul>
+      {recentlyClosed.length > 0 ? (
+        <Section title="Done this week" sub="Ticked or dismissed by mistake? Undo puts it back on the list above.">
+          <RecentlyClosedList items={recentlyClosed} />
         </Section>
       ) : null}
     </>

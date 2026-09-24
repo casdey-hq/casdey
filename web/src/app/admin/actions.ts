@@ -37,6 +37,51 @@ export async function setTodoStatus(id: string, status: string): Promise<HqActio
   return { error: null };
 }
 
+const EditTodo = z.object({
+  id: z.uuid(),
+  title: z.string().trim().min(1, "Write what needs doing.").max(300, "Keep the title under 300 characters."),
+  detail: z.string().trim().max(2000).optional(),
+  due: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional()
+    .or(z.literal("")),
+});
+
+/**
+ * Edits a to-do's own text (title, detail, due date), not its status. Only a
+ * real `hq_todos` row can be edited this way, never a live signal: a signal's
+ * title comes fresh from src/lib/hq-signals.ts on every load, so a stored edit
+ * to it would just be silently ignored.
+ */
+export async function updateTodo(
+  _previous: HqActionState,
+  form: FormData,
+): Promise<HqActionState> {
+  await requireAdmin();
+  const parsed = EditTodo.safeParse({
+    id: form.get("id"),
+    title: form.get("title") ?? "",
+    detail: form.get("detail") ?? undefined,
+    due: form.get("due") ?? undefined,
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Check the to-do." };
+  }
+  const { error } = await supabaseAdmin()
+    .from("hq_todos")
+    .update({
+      title: parsed.data.title,
+      detail: parsed.data.detail || null,
+      due: parsed.data.due || null,
+    })
+    .eq("id", parsed.data.id)
+    .is("signal_key", null);
+  if (error) return { error: `The database refused the change: ${error.message}` };
+  revalidatePath("/admin");
+  return { error: null };
+}
+
 /**
  * Ticking or dismissing a live signal stores its key, so the same situation
  * stays ticked on every later load. Upsert on the key: ticking twice, or from

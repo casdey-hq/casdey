@@ -45,6 +45,7 @@ export async function CheckupTab() {
       origin: "Sunday check-up",
       added: shortDate(todo.created_at),
       due: todo.due ? shortDate(todo.due) : null,
+      dueRaw: todo.due,
       proposed: true,
     }));
 
