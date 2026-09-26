@@ -61,16 +61,9 @@ framework plus a casdey-specific section. They are notes, not the books.
 
 4. **Apply it to casdey with real inputs.** Use casdey's actual numbers and
    state, not hypotheticals. Sources on hand:
-   - `CLAUDE.md` — pricing, costs, unit economics, outreach status, decisions
-   - `web/SAAS_V1_PLAN.md` §F0 — the tier/price/cost basis
-   - casdey HQ, `/admin` — the offer, prices, per-gym economics, break-even,
-     goals and to-dos, live; `npm run hq -- summary` from `web/` prints the
-     written half
-   - the "Marketing plan (Hormozi)" section of `CLAUDE.md` — current outreach
-     volume and the weekly test loop
-   - the live leads sheet (`Casdey-Gym-Leads`) for outreach performance
-   - `.claude/skills/gym-outreach/SKILL.md` (on branch `gym-outreach-automation`)
-     for how outreach actually runs
+   - `CLAUDE.md` — what casdey is right now and the standing rules
+   - `memory.md` — decisions, research, prices and numbers as they are
+     recorded, plus part 1's history and lessons
    If a number you need isn't written down, say so rather than inventing it.
 
 5. **Check the ledger.** Read `references/casdey-ledger.md`. It records how
@@ -94,7 +87,7 @@ framework plus a casdey-specific section. They are notes, not the books.
 
 Hormozi is guidelines, not scripture. The clearest example is already live:
 he teaches starting with warm outreach to people who know you, and casdey
-went straight to cold, because Davide has no warm list in the gym world and
+went straight to cold (part 1, gyms), because Davide had no warm list in the gym world and
 cold fit casdey's and his own situation better. That was the right call. The
 frameworks are a way to reason, a checklist of what matters and in what order.
 When casdey's facts genuinely differ from the book's assumptions, follow the
@@ -108,7 +101,7 @@ Hormozi move is harder or less comfortable, that's not a reason.
 
 The reference files are summaries. When a decision needs more than a summary:
 
-- **The books.** In `Alex Hormozi/` at the repo root: the PDFs
+- **The books.** In `references/books/` (inside this skill): the PDFs
   (`100M-Offers.pdf`, `100M-Leads.pdf`, `100M-Money-Models.pdf`, plus two
   `...-Outreach-pack.pdf` companion files) and, alongside them, OCR'd
   `100M-*.txt` versions with page markers (`===== [100M-Offers pg-042] =====`)

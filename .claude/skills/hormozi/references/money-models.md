@@ -1,7 +1,7 @@
 # $100M Money Models — distilled for casdey
 
 Framework notes in my own words, built from a full read of the book
-(`Alex Hormozi/100M-Money-Models.pdf`, 2025). Read the specific pages when a
+(`books/100M-Money-Models.pdf`, 2025). Read the specific pages when a
 decision needs the exact scripting or a worked example — this book is
 heavily tactical and each offer chapter has scripts.
 
@@ -215,80 +215,7 @@ problem.
 
 ## casdey application
 
-Confirm specifics against the book before betting on them. Keep in sync with
-`web/SAAS_V1_PLAN.md` §F0, casdey HQ (`/admin`), and the ledger.
-
-- **Current model shape** — basically **attraction + continuity**, no active
-  upsell, no downsell:
-  - Attraction: first week of Pro for €1, card at signup, then Pro continues
-    unless cancelled (cancel → Free). Live since 2026-09-12; gyms that signed
-    up before then keep the old free week (no card → Free).
-  - Continuity: Standard €99/mo or Pro €289/mo.
-  - Upsell: only the passive Free→Standard→Pro path and Standard→Pro. No
-    point-of-sale upsell.
-  - Downsell: none. A gym that won't pay for Pro isn't offered a structured
-    smaller step beyond "stay on Free".
-- **CFA / 30-day read** — continuity price is high (good for payback), COGS
-  per gym is low (email + a little AI + infra), so gross margin is strong.
-  CAC is currently founder time only, so the 30-day math isn't a live
-  constraint *yet*. It becomes **the** question the moment paid acquisition or
-  paid Lead Getters are considered: does a new gym's month-one gross profit
-  cover CAC + serve, ~2×? At €99–289/mo with low COGS, plausibly yes — which
-  would make paid acquisition viable earlier than for a cheap SaaS. Compute it
-  with real numbers before spending.
-- **Update 2026-09-12: the fee below was dropped before it ever ran, and a paid
-  first week is LIVE instead.** €1 and a card buy seven days of Pro, with the
-  commitment ask, checklist and nudges kept, and at day 7 Stripe starts Pro
-  unless the gym cancelled. There is no per-step fee, cap, waiver or make-good.
-  This is a deliberate divergence; see the ledger entry of 2026-09-12. The
-  paragraph below is the original 2026-09-10 decision, kept for its reasoning.
-- **The free week is now a Trial With Penalty — DECIDED 2026-09-10.** It used to
-  take no card and require nothing, exactly the no-stakes trial Hormozi is
-  lukewarm on, and casdey has a live proof of the failure mode (BodyActive
-  signed up, imported nothing, sat out the week). The new shape: **€1 charged at
-  signup** (pg 129's "first month for $1" hedge, which justifies the card ask and
-  proves the card), card saved, a "will you stay if it works?" commitment step
-  (pg 125), and three activation criteria (import list → set prices → approve
-  first campaign) doubling as onboarding and as guarantee proof. Day 7:
-  criteria met → auto-converts to **Pro** with the 20% coupon; cancelled → Free,
-  **no fee**; criteria unmet → **€20 per unfinished step, €60 cap** (per-step per
-  pg 124), then Free. Waivable, and auto-refunded on late completion (pg 128).
-  Called a "free trial" in all copy (pg 129). The Free tier keeps its lead-magnet
-  job for anyone who never starts a trial; it stops being the default
-  destination. Full spec: `web/SAAS_V1_1_PLAN.md` Track H. Adaptation to note:
-  Hormozi takes the card by hand and explains the fee *after* (pg 126); casdey is
-  self-serve, so terms are shown up front and the design leans on nudge emails
-  and a waive-on-a-call hatch instead.
-- **Missing downsell — the clearest gap.** Book-shaped options that fit:
-  - *Payment-plan / prepay:* annual prepay at a steeper discount (pulls cash
-    forward, CFA-friendly) — this is really a Buy-X-Get-Y or prepay upsell,
-    not a downsell, but same cash effect.
-  - *Feature downsell:* a lower-priced Standard-minus (email only, smaller
-    member cap, no at-risk detection) for gyms that balk at €99; or a
-    single-campaign / seasonal "win-back one list" one-off for gyms that
-    won't commit monthly.
-  - *Feature-downsell the guarantee:* the guarantee is Pro-only, so "drop it
-    and pay Standard price / keep it and pay Pro" is already implicitly the
-    Standard↔Pro choice — casdey could make that framing explicit at the
-    point of a price objection.
-- **Missing upsell.** WhatsApp is already a Pro-tier lever (a Classic
-  "you can't really win back gym members on email alone" upsell). A clean
-  point-of-sale upsell: paid **done-for-you onboarding / first-campaign
-  build** offered at the moment a gym upgrades (hyper-buying window), which
-  also fixes activation. An **Anchor**: show an enterprise/multi-site price
-  first so €289 Pro reads as the reasonable middle.
-- **Rollover / winback** — directly applicable to casdey's *own* future
-  churned gyms, and (per the book) to competitors' unhappy customers: credit
-  what a gym paid a competitor toward a casdey annual plan. Also: the product
-  *is* a rollover-upsell engine for the gym's members — worth noting casdey
-  sells the gym the exact mechanic Hormozi describes (winback campaign,
-  personalised, credit toward return).
-- **The guarantee as a Money Models object** — casdey's Pro
-  profit-or-nothing guarantee is close to **Win Your Money Back** (refund
-  tied to a tracked outcome) with an implied-performance flavour. It already
-  filters for serious gyms. Two book ideas to weigh: tie it to **required
-  actions** (imported, priced, approved first campaign) not just the revenue
-  outcome — casdey partly does this via `needs_review`; and consider offering
-  the refund as **store credit / months of service** rather than cash (same
-  take-rate in Hormozi's testing, keeps the gym a customer). Re-read the Win
-  Your Money Back chapter before changing the guarantee.
+Part 1 (the gym win-back SaaS, stopped 2026-09-26) had its own application
+notes here; they are in git history at the `casdey-pt1` tag. Part 2 (the
+glow-up app, see `memory.md`) gets new notes once there is a real offer and
+real numbers to apply this framework to.

@@ -1,40 +1,18 @@
+# Secrets. .env holds the older Zoho/Google CLI keys, .env.local the full part 1
+# service set (Supabase, Stripe, Resend, PostHog, Anthropic...). Never commit.
 .env
 .env.*
 !.env.example
 
+# Google service-account keys are private keys, never commit one.
+*-service-account*.json
+casdey-gws-cli-*.json
+
 node_modules/
+.next/
+.vercel
 .DS_Store
 
-# design review screenshots, local only
-temporary screenshots/
-
-# casdey business knowledge base (Obsidian vault), local only, see wiki/CLAUDE.md
-wiki/
-
-.vercel
-
-# Google service-account keys. These are private keys, not config: the outreach
-# routine's `casdey-routine@casdey-gws-cli.iam.gserviceaccount.com` credential
-# lands here as a downloaded JSON file. Never commit one.
-casdey-gws-cli-*.json
-*-service-account*.json
-
-# Next.js build output. The real app builds in web/, so anything at the repo
-# root is a stray from running next outside it.
-.next/
-
-# Alex Hormozi book PDFs — copyrighted, local reference only. The distilled
-# framework notes live in .claude/skills/hormozi/references/ and ARE committed.
-Alex Hormozi/
-
-# Rendered Instagram post images, regenerated from content/instagram/*.json
-content/instagram/out/
-# Stock clips behind the reels. Each is named after its Pexels id, and the batch
-# JSON names the clip, so it can always be downloaded again.
-content/instagram/footage/
-# Licensed music tracks mixed into the reels (Meta Sound Collection or Pixabay),
-# named in each post's `music` field.
-content/instagram/music/
-
-# Local review output for the frame-accurate /see film regrade.
-web/.promo-regrade/
+# Alex Hormozi book PDFs and their OCR text: copyrighted, local reference only.
+# The distilled notes beside them in references/ ARE committed.
+.claude/skills/hormozi/references/books/

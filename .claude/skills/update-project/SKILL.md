@@ -1,6 +1,6 @@
 ---
 name: update-project
-description: Update the project's own persistent documentation (CLAUDE.md primarily, plus related docs like README/HANDOFF/ROADMAP files) with durable facts, decisions, status changes, and corrections that came out of this session. Use when the user says "update project files", "update the project folder", "update-project", "sync CLAUDE.md", or asks to persist what happened this session into the repo's own docs rather than chat-only memory.
+description: Update the project's own persistent documentation (`CLAUDE.md` and `memory.md`, plus any other docs the project adds) with durable facts, decisions, status changes, and corrections that came out of this session. Use when the user says "update project files", "update the project folder", "update-project", "sync CLAUDE.md", or asks to persist what happened this session into the repo's own docs rather than chat-only memory.
 ---
 
 # Update Project
@@ -17,7 +17,7 @@ This is a **repo-durability pass**, not a status report and not a handoff. The a
 
 ## When to invoke
 
-Run it when Davide asks: "update project files", "update-project", "update the project docs", or together with a session handoff. Do not run it on your own guess that the session is ending: an agent cannot see when a session ends, and Davide asks at the end of every session that changed something real. Business data stored in `/admin` (costs, to-dos, goals, notes) is updated with `npm run hq` from `web/` and needs no duplicate doc edit.
+Run it when Davide asks: "update project files", "update-project", "update the project docs", or together with a session handoff. Do not run it on your own guess that the session is ending: an agent cannot see when a session ends, and Davide asks at the end of every session that changed something real.
 
 ## How to do it
 
@@ -34,13 +34,13 @@ Run it when Davide asks: "update project files", "update-project", "update the p
 
 3. **Edit in place, don't append a log entry.** If the target doc is written as current-state narrative (most `CLAUDE.md` files are), update the relevant bullet or section directly — rewrite the stale claim, extend the sentence with what changed, add a dated clause inline (`corrected 2026-08-15: ...`) where the history is worth keeping visible. Only use a running-log format if the doc already uses one. Match the existing tone, structure, and level of detail of the section you're touching — don't turn a terse bullet list into paragraphs, don't turn narrative prose into a table.
 
-4. **Don't duplicate detail that belongs in a more specific doc.** If the project splits implementation detail into its own file (a handoff doc, a roadmap, a README), put the *implementation* detail there and leave `CLAUDE.md` with a short pointer plus the outcome. `CLAUDE.md` should stay skimmable.
+4. **Keep `CLAUDE.md` short; the detail goes in `memory.md`.** Davide's rule (2026-09-26): `CLAUDE.md` is loaded into every session, so it holds only what casdey is right now, the standing rules and where things live, in about a page. Decisions with their reasoning, research, numbers, account details, history and gotchas go in `memory.md` at the repo root, which agents read on demand. When a `CLAUDE.md` section starts growing into a story, move the story to `memory.md` and leave one line.
 
 5. **Sweep for stale claims the session disproved, not just add new ones.** If something discovered this session contradicts an existing claim anywhere in the project's docs (not only the file you're focused on), search for other mentions of the same wrong fact and fix those too. A correction that's fixed in one file and still wrong in three others is worse than not fixing it at all — grep for the specific stale value before considering this done.
 
 6. **Use absolute dates, never relative ones.** "2026-08-15", not "today" or "this session" — these files get read long after the session ends.
 
-7. **Keep every agent's entrypoint in sync.** casdey is worked on by more than one AI agent (Claude Code, Codex, possibly others), and Davide wants all of them equally informed. Facts go in `CLAUDE.md` only, which every agent reads. Then check the pointers: every skill in `.claude/skills/` has a matching `.agents/skills/<name>/SKILL.md` pointing at it (add, rename or remove to match); root `AGENTS.md` names every authoritative doc and every standing rule Davide stated this session; and nothing in `AGENTS.md` duplicates a business fact that could drift. Never hand-edit `web/AGENTS.md`, which `next dev` generates.
+7. **Keep every agent's entrypoint in sync.** casdey is worked on by more than one AI agent (Claude Code, Codex, possibly others), and Davide wants all of them equally informed. Facts go in `CLAUDE.md` only, which every agent reads. Then check the pointers: every skill in `.claude/skills/` has a matching `.agents/skills/<name>/SKILL.md` pointing at it (add, rename or remove to match); root `AGENTS.md` names every authoritative doc and every standing rule Davide stated this session; and nothing in `AGENTS.md` duplicates a business fact that could drift.
 
 8. **Verify internal consistency before finishing.** Re-read the sections you touched end to end. A common failure mode is editing one bullet to reflect a new status while an earlier bullet in the same doc still asserts the old one — check for that specifically, not just that your own edit reads correctly in isolation.
 
@@ -48,7 +48,7 @@ Run it when Davide asks: "update project files", "update-project", "update the p
 
 ## Hard rules
 
-1. **Commit the doc changes, but do not push without fresh, explicit user confirmation.** `main` auto-deploys production through Vercel. A commit is not approval to deploy.
+1. **Commit the doc changes, but do not push without fresh, explicit user confirmation.** A commit is not approval to push.
 2. **Never invent or infer facts not established this session.** If something is unclear or you're not confident it happened, ask rather than writing a guess into a document other people will treat as ground truth.
 3. **Never write credentials, secrets, or API keys into project docs**, even ones already in `.env` files. Reference that a credential was set and where (`RESEND_API_KEY` in `.env.local`), never the value.
 4. **Don't touch files outside the project's own documentation.** This skill edits docs (`.md` files, doc comments in config), not application code, even if fixing a stale claim would technically also mean changing a code comment — flag those separately rather than folding them in silently.

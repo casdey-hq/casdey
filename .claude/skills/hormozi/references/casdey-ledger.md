@@ -14,6 +14,11 @@ Follows or diverges: <follows | diverges | partial>
 Reason: <why casdey's situation justifies it>
 ```
 
+**Entries dated before 2026-09-26 belong to casdey part 1** (the gym win-back
+SaaS, B2B, now stopped). They stay because the lessons carry over, but their
+specifics (gyms, tiers, outreach routines) no longer describe anything live.
+Part 2 entries start at "Part 2 begins" at the bottom.
+
 ---
 
 ## 2026-08 — Cold outreach instead of warm outreach
@@ -546,3 +551,24 @@ gyms, then do paid ads properly rather than content badly.
 going into content, where do they go? Cold outreach is automated and needs
 about an hour a week. That question is the direct successor to the
 2026-09-13 "idle week" entry and should be answered rather than left to drift.
+
+---
+
+## 2026-09-26 — Part 1 stopped; part 2 begins: a B2C glow-up app in a proven market
+Framework: $100M Offers / Starving Crowd (market > offer > persuasion), Value
+Equation, niching the same product to an avatar; $100M Leads / Core Four, sell
+before build.
+Decision: casdey part 1 (gym win-back, B2B) is stopped after about 5,000 cold
+emails to 1,946 gyms bought 27 replies, 3 interested gyms (all silent after
+follow-ups), 0 imports and 0 paying. Read against Starving Crowd, the pain was
+small per gym and the one real ask (hand over a member list) was high effort,
+so no pricing change could fix it. Part 2 enters a **proven, crowded B2C
+market** (Davide's rule: copy what already works, then make it better) chosen
+from trustmrr revenue data and review mining: a glow-up / looksmaxxing app for
+men 18-28 (Umax ~$350-500k/mo). Normal subscription pricing like the
+competitors; a money-stakes / refund mechanic was considered and rejected as
+unproven for now. Sell before build: waitlist and short-form content first.
+Follows or diverges: **Follows.** Market first, proven demand, a niche wedge
+(the execution gap, no fake scores, trust, polish), sell before build.
+Reason: part 1's mistake was a blue ocean with a product built before the
+market was proven; see `memory.md` for the full research.

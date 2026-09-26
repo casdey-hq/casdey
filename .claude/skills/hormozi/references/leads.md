@@ -1,7 +1,7 @@
 # $100M Leads — distilled for casdey
 
 Framework notes in my own words, built from a full read of the book
-(`Alex Hormozi/100M-Leads.pdf`, 2023; plus the two `...-Outreach-pack.pdf`
+(`books/100M-Leads.pdf`, 2023; plus the two `...-Outreach-pack.pdf`
 companion files, which are mostly B2C fitness phone/setter scripts and only
 transfer structurally). Read the specific pages when a decision needs the
 exact wording or a worked example.
@@ -253,56 +253,7 @@ do: 5–10 years.
 
 ## casdey application
 
-Keep in sync with the "Marketing plan (Hormozi)" and "Stage 1" sections of
-`CLAUDE.md` and with `casdey-ledger.md`.
-
-- **Channel choice** — casdey runs **cold outreach** (email + IG DM) as
-  primary, deliberately skipping warm. Recorded, accepted divergence (Davide
-  has no warm gym-owner list; see the ledger). Don't re-suggest warm as an
-  oversight. Organic Instagram content became channel #2 on 2026-09-13 and
-  was **retired on 2026-09-20 after 4 posts**, which with the DM pause the
-  same day takes casdey off Instagram entirely and puts it back on one
-  channel, as Core Four asks. Two pinned posts remain, for the gym owner who
-  checks the profile after a cold email (pg 114). The content failed on
-  writing and evidence, not tooling: the format was copied but the insider's
-  line could not be, and casdey has no real result to post about. See the
-  ledger entries "The founder's idle week" and "Instagram content retired".
-- **Lead magnet** — the **Free tier** is casdey's lead magnet, and a
-  well-formed one: complete small win (the recovered-revenue number), reveals
-  the next problem (now actually win them back), which the paid tiers solve.
-  Something a gym would pay for. Matches the "sample of the service" +
-  "reveal the problem" types.
-- **Cold email message** — already close to the book: lapsed-member hook,
-  free-to-try framing, price/guarantee/link held for the reply (big fast
-  value up front, single CTA, don't overload touch one). The A/B CTA test
-  (permission vs. free-to-try) and the weekly subject-line test are "better"
-  work. Reading level: worth confirming scripts are near 3rd-grade (the ~50%
-  lift finding).
-- **Follow-up** — two follow-ups + a final walk-away, multi-channel (email
-  then a DM referencing the email). On-model.
-- **More / Better / New, as applied 2026-09-07** — the marketing plan is
-  built on this explicitly. **More** = fixed 100/day first-touch + uncapped
-  follow-ups (Rule-of-100 shaped). **Better** = one weekly A/B test on one
-  asset + a cumulative Test Log; 4 unbeaten weekly tests = established winner,
-  move to the next asset. **New** = explicitly deferred. Followed closely.
-  casdey is under $1M profit, so "more first" is the right ordering.
-- **Constraint (revised 2026-09-10 against live data)** — the reply rate
-  (~1.9%: 13 responses from ~730 first-touched) is producing responses. The
-  fatal drop is *reply → activation*: 8 of 11 replies went Dead, and the single
-  real signup (BodyActive) imported nothing and let the free week run down. So
-  the constraint is **volume first** (13 engaged leads is not a sample; the
-  100/day ramp of 2026-09-08 is the right move and should be held Open to Goal
-  to the first 3 paying gyms) and **activation second** (V1.1 Track H, Trial
-  With Penalty). The weekly "better" tests still belong at the front of the
-  funnel, but that is not where the business is currently breaking. Why 8
-  replies died is still unknown and worth answering before more tuning.
-- **LTGP:CAC** — not yet computable (no paying gym; CAC is founder time
-  only). Must be computed before any paid ads. The plan already gates ads on
-  "first customers prove where they come from" — on-model (paid ads last).
-- **Lead Getters** — none active. Referrals are the natural first one; the
-  go-to-market notes already flag a referral push at the point of converting a
-  gym to paid. Nothing built. Per the book, casdey should aim for 25%+ of
-  gyms from referral before scaling paid — but that's a post-first-customers
-  concern.
-- **Rule of 100** — first-touch at 100/day meets the volume bar; the routines
-  run daily for the 100-day-consistency part.
+Part 1 (the gym win-back SaaS, stopped 2026-09-26) had its own application
+notes here; they are in git history at the `casdey-pt1` tag. Part 2 (the
+glow-up app, see `memory.md`) gets new notes once there is a real offer and
+real numbers to apply this framework to.
