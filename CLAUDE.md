@@ -12,9 +12,10 @@ check-ins, one integrated plan, total pricing trust, Apple-grade polish, and
 real-world appearance instead of fake face scores. It uses a normal
 subscription, and a free first analysis as the hook.
 
-**Stage: pre-build.** Next comes a waitlist plus the first short-form videos,
-to test the promise and prices before building (sell before build). Then the
-new Apple-grade brand, and the choice of iOS app vs web app. **The waitlist is live at www.casdey.com since 2026-09-26.**
+**Stage: pre-build, selling first.** The brand is set (direction A, the
+"before and after" mark, see `memory.md`) and **the waitlist is live at
+www.casdey.com since 2026-09-26**. Next: the first short-form videos, to test
+the promise and prices before building. Then the choice of iOS app vs web app.
 
 ## Read `memory.md` when the task touches
 the research and reasoning behind part 2 · marketing and budget · accounts,
