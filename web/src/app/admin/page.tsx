@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Mark } from "@/components/mark";
 import { requireAdmin } from "@/lib/admin";
 import { RANGES, bucketOf, bucketsFor, countBy, inWindow, loadSignups, loadVisitors, parseRange, windowFor, type Visitors } from "@/lib/stats";
 import { dayPoint, hourPoint } from "@/lib/chart-points";
 import { BarChart } from "./bar-chart";
+import { PeriodBody, PeriodProvider, PeriodTabs } from "./period";
 
 export const metadata: Metadata = { title: "Admin · Casdey", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -75,22 +75,18 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   const noEarlier = isToday ? "No full yesterday to compare yet" : "No earlier period yet";
 
   return (
+    <PeriodProvider>
     <div className="admin">
       <header className="admin-bar">
         <div className="admin-brand"><Mark /><span>Casdey</span><em>Admin</em></div>
-        <nav className="ranges" aria-label="Period">
-          {RANGES.map((option) => (
-            <Link key={option.value} href={`/admin?range=${option.value}`} prefetch={false} aria-current={option.value === range ? "page" : undefined}>
-              {option.label}
-            </Link>
-          ))}
-        </nav>
+        <PeriodTabs options={RANGES} current={range} />
         <form action="/admin/signout" method="post" className="who">
           <span>{email}</span>
           <button type="submit">Sign out</button>
         </form>
       </header>
 
+      <PeriodBody>
       <main className="admin-main">
         <section className="kpis" aria-label="Summary">
           <div className="kpi">
@@ -193,6 +189,8 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
         </section>
         <p className="admin-foot">Visitors are counted without cookies, so one person on two days counts twice. Days run on Italian time.</p>
       </main>
+      </PeriodBody>
     </div>
+    </PeriodProvider>
   );
 }
