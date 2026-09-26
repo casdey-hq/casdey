@@ -113,8 +113,8 @@ Keys for all of these are in the root `.env.local` (the full part 1 set) and
 | **GitHub** `casdey-hq/casdey` | Org on info@casdey.com. Only `main`. Part 1 lives at tags `casdey-pt1`, `casdey-pt1-gym-outreach`, `archive/codex/*`. Account has a password + 2FA; recovery codes are the only fallback. |
 | **Vercel** project `casdey` (Hobby) | **Git disconnected and all deployments deleted on 2026-09-26: the site is down.** Project and env vars kept. Reconnect with `vercel git connect` **from the repo root**. |
 | **Supabase** project `casdey` | eu-west-1 (Ireland), free tier, holds part 1 data (internal test gyms only; the one real gym was deleted). Auth mail goes through Resend SMTP. Free projects pause after inactivity. |
-| **Stripe** `acct_1Tz17NDGwemFDmSP` | Live, EUR payouts to Revolut. Part 1 catalogue (Standard/Pro, 12 prices, 20% coupon). One internal test subscription ends 2026-10-07. The live webhook points at www.casdey.com, which is down, so deliveries fail until it is disabled or repointed. |
-| **Resend** team "casdey" | Domain `mail.casdey.com` verified. Was on Pro ($20/mo); Davide agreed to drop it to Free on 2026-09-26. |
+| **Stripe** `acct_1Tz17NDGwemFDmSP` | Live, EUR payouts to Revolut. Part 1 catalogue (Standard/Pro, 12 prices, 20% coupon). One internal test subscription ends 2026-10-07. The live webhook (www.casdey.com/api/stripe/webhook) was **disabled** on 2026-09-26 when the site went down; re-enable or repoint it in the dashboard if Stripe is used again. |
+| **Resend** team "casdey" | Domain `mail.casdey.com` verified. Pro subscription **cancelled** by Davide on 2026-09-26. |
 | **PostHog** EU Cloud | Cookieless analytics, part 1 project. |
 | **Anthropic API** | Org "casdey" on info@casdey.com (Google sign-in), prepaid. Not the personal "Davide's Individual Org", which holds no keys. |
 | **Twilio** | info@casdey.com (Google sign-in), upgraded, about $20 balance, no WhatsApp sender. |
