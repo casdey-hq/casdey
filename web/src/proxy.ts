@@ -14,6 +14,7 @@ export async function proxy(request: NextRequest) {
     callback.searchParams.set("next", "/admin");
     return NextResponse.redirect(callback);
   }
+  if (!request.nextUrl.pathname.startsWith("/admin")) return NextResponse.next();
   let response = NextResponse.next({ request });
   const supabase = createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
     cookies: {
