@@ -206,6 +206,10 @@ account deleted with a closing email, branches archived as tags.
   `service_role`, or the app silently sees nothing (hit twice in part 1).
 - Auth's Site URL and redirect allowlist must be set for production, or OAuth
   and email links go to localhost.
+- Part 2 hit a variant on 2026-09-26: `www.casdey.com/auth/callback` is not on
+  the allowlist, so Google sign-in landed on the homepage with an unused
+  `?code`. `web/src/proxy.ts` now forwards a code on `/` to `/auth/callback`.
+  The clean fix is adding `https://www.casdey.com/**` to Supabase Redirect URLs.
 - The default shared SMTP silently failed to deliver confirmation emails; use a
   custom SMTP (Resend).
 - A PKCE password-reset link only works in the browser that requested it;
