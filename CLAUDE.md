@@ -52,7 +52,6 @@ legal and tax. Don't load it for tasks that don't need it.
   `frontend-design` (read before any visual work), `grill-me`,
   `push-github`, `update-project` (keeps `CLAUDE.md` and `memory.md`
   current), `session-handoff`.
-- `brand assets/casdey Logo.png`: the old mark, kept for now; the brand will
-  very likely be redone.
+- `brand assets/`: the Casdey mark (`casdey-mark*.svg`, app icon) and the old v4 logo PNG (superseded); brand rules in `memory.md`, "Brand".
 - `.env` and `.env.local` (gitignored): keys for the accounts listed in
   `memory.md` §2.

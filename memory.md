@@ -79,6 +79,22 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
 - Rejected: the discipline-with-stakes app (modest revenue proof), nutrition
   (too crowded), mindset (hard to stand out), training alone (smaller ceiling).
 
+### Brand (decided 2026-09-26)
+- **Name: Casdey** (capital C in text). The App Store subtitle carries the meaning,
+  e.g. "Casdey: Glow Up Plan for Men".
+- **Direction A, Studio White** (Apple's product pages; Davide's references were
+  Apple, Revolut, PayPal, "the cleaner, the better"): Paper #FFFFFF, Mist #F5F5F7,
+  Ink #1D1D1F, Graphite #6E6E73, black pill buttons, **no accent colour** (colour
+  comes from people's progress photos). Type: SF Pro (system font on Apple
+  devices), Inter Tight as the web fallback. Rejected: B Midnight (black + amber),
+  C Glow (sunrise gradient). Board: https://claude.ai/artifact/5wkEcpBZizbC2AdD96ahbR
+- **The mark: "before and after"**, two overlapping Cs, day 1 at 45% opacity and
+  day 90 solid, one small step up and to the right (option 2b, 3 units apart on a
+  48 grid, r 15, stroke 7). Inspired by PayPal's overlapping Ps: one idea in the
+  letter. Files: `brand assets/casdey-mark.svg`, `casdey-mark-white.svg`,
+  `casdey-app-icon.svg` (1024 square, iOS rounds the corners). Options board:
+  https://claude.ai/artifact/BhkTsBgZepNLLSQg6wcDRs
+
 ### Marketing (B2C)
 - **Short-form video is the main channel** (TikTok, Reels, Shorts), daily, for
   months. Creators/UGC early to speed it up (€20-100 a video or affiliate %).
