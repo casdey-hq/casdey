@@ -127,7 +127,7 @@ Keys for all of these are in the root `.env.local` (the full part 1 set) and
 | **Domain** casdey.com | GoDaddy. DNS: A → Vercel, Zoho MX/SPF/DKIM, Resend on `send.` and `mail.` subdomains, DMARC `p=quarantine` with no reporting address. |
 | **Email** Zoho Mail (free) | davide@casdey.com, info@casdey.com (a Group, not a mailbox: API access goes through davide@ with send-as), abhi@ (dormant). |
 | **GitHub** `casdey-hq/casdey` | Org on info@casdey.com. Only `main`. Part 1 lives at tags `casdey-pt1`, `casdey-pt1-gym-outreach`, `archive/codex/*`. Account has a password + 2FA; recovery codes are the only fallback. |
-| **Vercel** project `casdey` (Hobby) | **Git disconnected and all deployments deleted on 2026-09-26: the site is down.** Project and env vars kept. Reconnect with `vercel git connect` **from the repo root**. |
+| **Vercel** project `casdey` (Hobby) | Root directory `web`. Part 1 deployments were deleted 2026-09-26; git reconnected the same day for the waitlist, so **every push to `main` deploys www.casdey.com**. Run the CLI from the repo root. |
 | **Supabase** project `casdey` | eu-west-1 (Ireland), free tier, holds part 1 data (internal test gyms only; the one real gym was deleted). Auth mail goes through Resend SMTP. Free projects pause after inactivity. |
 | **Stripe** `acct_1Tz17NDGwemFDmSP` | Live, EUR payouts to Revolut. Part 1 catalogue (Standard/Pro, 12 prices, 20% coupon). One internal test subscription ends 2026-10-07. The live webhook (www.casdey.com/api/stripe/webhook) was **disabled** on 2026-09-26 when the site went down; re-enable or repoint it in the dashboard if Stripe is used again. |
 | **Resend** team "casdey" | Domain `mail.casdey.com` verified. Pro subscription **cancelled** by Davide on 2026-09-26. |

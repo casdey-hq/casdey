@@ -14,8 +14,7 @@ subscription, and a free first analysis as the hook.
 
 **Stage: pre-build.** Next comes a waitlist plus the first short-form videos,
 to test the promise and prices before building (sell before build). Then the
-new Apple-grade brand, and the choice of iOS app vs web app. Nothing is
-deployed; casdey.com is down. **The waitlist page is built** in `web/` (not yet online).
+new Apple-grade brand, and the choice of iOS app vs web app. **The waitlist is live at www.casdey.com since 2026-09-26.**
 
 ## Read `memory.md` when the task touches
 the research and reasoning behind part 2 · marketing and budget · accounts,
@@ -36,8 +35,8 @@ legal and tax. Don't load it for tasks that don't need it.
 - **No em dashes** as punctuation in any Casdey copy or doc. Hyphens in
   compound words are fine.
 - Email sign-off: `Davide @casdey`. Money is framed in EUR first.
-- **Pushing to `main` needs a fresh, explicit yes every time**, even though
-  nothing is wired to deploy right now. Commits are fine anytime.
+- **Pushing to `main` needs a fresh, explicit yes every time**: Vercel
+  deploys www.casdey.com on every push to `main` (reconnected 2026-09-26). Commits are fine anytime.
 - **Never send anything external** (email, DM, post) without Davide's
   go-ahead for that specific send.
 - Never write credential values into any doc.
