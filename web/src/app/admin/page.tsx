@@ -56,16 +56,16 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   const period = windowFor(range);
   const isToday = range === "today";
 
-  const allSignups = await loadSignups();
+  // Supabase and PostHog are fetched side by side, not one after the other.
+  const [allSignups, visitors] = await Promise.all([
+    loadSignups(),
+    loadVisitors(period).catch((error): Visitors | null => {
+      console.error("admin: PostHog failed", error);
+      return null;
+    }),
+  ]);
   const signups = inWindow(allSignups, period.from, period.to);
   const previousSignups = period.previous ? inWindow(allSignups, period.previous.from, period.previous.to).length : null;
-
-  let visitors: Visitors | null = null;
-  try {
-    visitors = await loadVisitors(period);
-  } catch (error) {
-    console.error("admin: PostHog failed", error);
-  }
 
   const buckets = bucketsFor(period);
   const signupSeries = new Map(countBy(signups, (signup) => bucketOf(period, new Date(signup.created_at))).map((row) => [row.label, row.value]));
