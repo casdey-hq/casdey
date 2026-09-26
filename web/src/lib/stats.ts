@@ -1,36 +1,49 @@
 // Numbers for /admin. Signups come from the Supabase waitlist table, visitors
-// from PostHog (cookieless). Days are counted in Davide's time zone.
+// from PostHog (cookieless). Days and hours are counted in Davide's time zone.
 
 export const TIME_ZONE = "Europe/Rome";
 /** The waitlist went live 2026-09-26; PostHog holds part 1 events before it. */
 export const LAUNCH = new Date("2026-09-26T19:00:00Z");
 const HOSTS = ["www.casdey.com", "casdey.com"];
 
-export type Range = "7d" | "30d" | "all";
+export type Range = "today" | "7d" | "30d" | "all";
 export const RANGES: { value: Range; label: string }[] = [
+  { value: "today", label: "Today" },
   { value: "7d", label: "7 days" },
   { value: "30d", label: "30 days" },
   { value: "all", label: "Since launch" },
 ];
 
 export function parseRange(value: string | undefined): Range {
-  return value === "30d" || value === "all" ? value : "7d";
+  return value === "today" || value === "30d" || value === "all" ? value : "7d";
 }
 
-export type Window = { from: Date; to: Date; previousFrom: Date | null };
-
-export function windowFor(range: Range, now = new Date()): Window {
-  const days = range === "7d" ? 7 : range === "30d" ? 30 : null;
-  if (!days) return { from: LAUNCH, to: now, previousFrom: null };
-  const wanted = new Date(now.getTime() - days * 86_400_000);
-  const from = wanted < LAUNCH ? LAUNCH : wanted;
-  const previousFrom = new Date(from.getTime() - (now.getTime() - from.getTime()));
-  return { from, to: now, previousFrom: previousFrom >= LAUNCH ? previousFrom : null };
-}
+// ---------- time ----------
 
 /** YYYY-MM-DD of a date in Davide's time zone. */
 export function dayKey(date: Date): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+}
+
+/** Hour of the day (0-23) of an instant in Davide's time zone. */
+export function hourOf(at: Date): number {
+  return Number(new Intl.DateTimeFormat("en-GB", { timeZone: TIME_ZONE, hour: "2-digit", hourCycle: "h23" }).format(at));
+}
+
+/** Minutes the time zone is ahead of UTC at a given instant. */
+function offsetMinutes(at: Date): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIME_ZONE, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit",
+  }).formatToParts(at);
+  const get = (type: string) => Number(parts.find((part) => part.type === type)?.value);
+  const local = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+  return Math.round((local - at.getTime()) / 60_000);
+}
+
+/** The instant a YYYY-MM-DD day starts in Davide's time zone. */
+function startOfDay(key: string): Date {
+  const guess = new Date(`${key}T00:00:00Z`);
+  return new Date(guess.getTime() - offsetMinutes(guess) * 60_000);
 }
 
 /** Every day from `from` to `to`, inclusive, as YYYY-MM-DD keys. */
@@ -43,6 +56,38 @@ export function daysBetween(from: Date, to: Date): string[] {
     if (key >= last) break;
   }
   return keys;
+}
+
+/**
+ * The period on screen and the one it is compared with. Today is compared with
+ * yesterday up to the same time; 7 and 30 days with the same length just
+ * before. Nothing before the launch counts, so a comparison that would reach
+ * back past it is left out.
+ */
+export type Window = { range: Range; from: Date; to: Date; previous: { from: Date; to: Date } | null };
+
+export function windowFor(range: Range, now = new Date()): Window {
+  if (range === "all") return { range, from: LAUNCH, to: now, previous: null };
+  if (range === "today") {
+    const dayStart = startOfDay(dayKey(now));
+    const yesterdayFrom = startOfDay(dayKey(new Date(dayStart.getTime() - 12 * 3_600_000)));
+    const previous = { from: yesterdayFrom, to: new Date(yesterdayFrom.getTime() + (now.getTime() - dayStart.getTime())) };
+    return { range, from: dayStart < LAUNCH ? LAUNCH : dayStart, to: now, previous: yesterdayFrom >= LAUNCH ? previous : null };
+  }
+  const days = range === "7d" ? 7 : 30;
+  const wanted = new Date(now.getTime() - days * 86_400_000);
+  const from = wanted < LAUNCH ? LAUNCH : wanted;
+  const previousFrom = new Date(from.getTime() - (now.getTime() - from.getTime()));
+  return { range, from, to: now, previous: previousFrom >= LAUNCH ? { from: previousFrom, to: from } : null };
+}
+
+/** Chart buckets: hours of the day for Today, days otherwise. */
+export function bucketsFor(window: Window): string[] {
+  return window.range === "today" ? Array.from({ length: 24 }, (_, hour) => String(hour)) : daysBetween(window.from, window.to);
+}
+
+export function bucketOf(window: Window, at: Date): string {
+  return window.range === "today" ? String(hourOf(at)) : dayKey(at);
 }
 
 // ---------- signups ----------
@@ -103,9 +148,9 @@ function pageviews(from: Date, to: Date): string {
 
 export type Visitors = {
   total: number;
-  pageviews: number;
   previousTotal: number | null;
-  daily: Map<string, number>;
+  /** Visitors per chart bucket (hour for Today, day otherwise). */
+  series: Map<string, number>;
   referrers: { label: string; value: number }[];
   countries: { label: string; value: number }[];
   devices: { label: string; value: number }[];
@@ -113,92 +158,34 @@ export type Visitors = {
 
 export async function loadVisitors(window: Window): Promise<Visitors> {
   const where = pageviews(window.from, window.to);
+  const bucket = window.range === "today"
+    ? `toString(toHour(toTimeZone(timestamp, '${TIME_ZONE}')))`
+    : `toString(toDate(toTimeZone(timestamp, '${TIME_ZONE}')))`;
   const breakdown = (property: string) =>
     hogql<[string | null, number]>(
       `SELECT ${property} AS k, count(DISTINCT distinct_id) AS v FROM events WHERE ${where} GROUP BY k ORDER BY v DESC LIMIT 8`,
     );
-  const [totals, daily, previous, referrers, countries, devices] = await Promise.all([
-    hogql<[number, number]>(`SELECT count(DISTINCT distinct_id), count() FROM events WHERE ${where}`),
-    hogql<[string, number]>(
-      `SELECT toString(toDate(toTimeZone(timestamp, '${TIME_ZONE}'))) AS d, count(DISTINCT distinct_id) FROM events WHERE ${where} GROUP BY d ORDER BY d`,
-    ),
-    window.previousFrom
-      ? hogql<[number]>(`SELECT count(DISTINCT distinct_id) FROM events WHERE ${pageviews(window.previousFrom, window.from)}`)
+  const [totals, series, previous, referrers, countries, devices] = await Promise.all([
+    hogql<[number]>(`SELECT count(DISTINCT distinct_id) FROM events WHERE ${where}`),
+    hogql<[string, number]>(`SELECT ${bucket} AS b, count(DISTINCT distinct_id) FROM events WHERE ${where} GROUP BY b`),
+    window.previous
+      ? hogql<[number]>(`SELECT count(DISTINCT distinct_id) FROM events WHERE ${pageviews(window.previous.from, window.previous.to)}`)
       : Promise.resolve(null),
     breakdown("properties.$referring_domain"),
     breakdown("properties.visitor_country"),
     breakdown("properties.$device_type"),
   ]);
   const rows = (list: [string | null, number][], blank: string) =>
-    list.map(([label, value]) => ({ label: label && label !== "$direct" ? label : blank, value }));
+    list.map(([label, value]) => ({
+      label: !label || label === "$direct" ? blank : HOSTS.includes(label) ? "Within the site" : label,
+      value,
+    }));
   return {
     total: totals[0]?.[0] ?? 0,
-    pageviews: totals[0]?.[1] ?? 0,
     previousTotal: previous ? previous[0]?.[0] ?? 0 : null,
-    daily: new Map(daily.map(([day, value]) => [day, value])),
+    series: new Map(series.map(([key, value]) => [key, value])),
     referrers: rows(referrers, "Direct or unknown"),
     countries: rows(countries, "Unknown"),
     devices: rows(devices, "Unknown"),
-  };
-}
-
-// ---------- today ----------
-
-/** Minutes the time zone is ahead of UTC at a given instant. */
-function offsetMinutes(at: Date): number {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: TIME_ZONE, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit",
-  }).formatToParts(at);
-  const get = (type: string) => Number(parts.find((part) => part.type === type)?.value);
-  const local = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
-  return Math.round((local - at.getTime()) / 60_000);
-}
-
-/** The instant a YYYY-MM-DD day starts in Davide's time zone. */
-export function startOfDay(key: string): Date {
-  const guess = new Date(`${key}T00:00:00Z`);
-  return new Date(guess.getTime() - offsetMinutes(guess) * 60_000);
-}
-
-/** Hour of the day (0-23) of an instant in Davide's time zone. */
-export function hourOf(at: Date): number {
-  return Number(new Intl.DateTimeFormat("en-GB", { timeZone: TIME_ZONE, hour: "2-digit", hourCycle: "h23" }).format(at));
-}
-
-export type Today = {
-  from: Date;
-  yesterdayFrom: Date;
-  yesterdayTo: Date;
-  visitors: number;
-  /** Null until the waitlist has a full yesterday to compare against. */
-  visitorsYesterday: number | null;
-  hourly: Map<number, number>;
-};
-
-/** Today so far, and yesterday up to the same time, for a fair comparison. */
-export function todayWindow(now = new Date()): { from: Date; yesterdayFrom: Date; yesterdayTo: Date } {
-  const dayStart = startOfDay(dayKey(now));
-  const from = dayStart < LAUNCH ? LAUNCH : dayStart;
-  const yesterdayFrom = startOfDay(dayKey(new Date(dayStart.getTime() - 12 * 3_600_000)));
-  const yesterdayTo = new Date(yesterdayFrom.getTime() + (now.getTime() - dayStart.getTime()));
-  return { from, yesterdayFrom, yesterdayTo };
-}
-
-export async function loadTodayVisitors(now = new Date()): Promise<Today> {
-  const { from, yesterdayFrom, yesterdayTo } = todayWindow(now);
-  const [today, yesterday, hourly] = await Promise.all([
-    hogql<[number]>(`SELECT count(DISTINCT distinct_id) FROM events WHERE ${pageviews(from, now)}`),
-    yesterdayFrom >= LAUNCH
-      ? hogql<[number]>(`SELECT count(DISTINCT distinct_id) FROM events WHERE ${pageviews(yesterdayFrom, yesterdayTo)}`)
-      : Promise.resolve(null),
-    hogql<[number, number]>(
-      `SELECT toHour(toTimeZone(timestamp, '${TIME_ZONE}')) AS h, count(DISTINCT distinct_id) FROM events WHERE ${pageviews(from, now)} GROUP BY h ORDER BY h`,
-    ),
-  ]);
-  return {
-    from, yesterdayFrom, yesterdayTo,
-    visitors: today[0]?.[0] ?? 0,
-    visitorsYesterday: yesterday ? yesterday[0]?.[0] ?? 0 : null,
-    hourly: new Map(hourly.map(([hour, value]) => [Number(hour), value])),
   };
 }
