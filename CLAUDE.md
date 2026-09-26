@@ -1,9 +1,9 @@
 # Casdey
 
-Write the name as **Casdey** (capital C) in text and copy, since 2026-09-27 (Davide: cleaner; before that it was always lowercase). The logo wordmark may still be drawn lowercase if that looks better; that is a design choice.
+Write the name as **Casdey** (capital C) in text and copy, since 2026-09-26 (Davide: cleaner; before that it was always lowercase). The logo wordmark may still be drawn lowercase if that looks better; that is a design choice.
 
-## What casdey is now
-casdey is Davide's business: one founder, no team, no legal entity yet (see
+## What Casdey is now
+Casdey is Davide's business: one founder, no team, no legal entity yet (see
 `memory.md` §5). **Part 1**, a B2B win-back SaaS for gyms, was stopped on
 2026-09-26 and archived at the git tag `casdey-pt1`. **Part 2** is a **B2C
 glow-up app for men 18-28**, entering a proven market (Umax and peers) with
@@ -33,7 +33,7 @@ legal and tax. Don't load it for tasks that don't need it.
 - **Copy what already works, then make it better.** Prefer proven markets and
   proven mechanics over new inventions.
 - **Sell before build.** Validate demand before building for real.
-- **No em dashes** as punctuation in any casdey copy or doc. Hyphens in
+- **No em dashes** as punctuation in any Casdey copy or doc. Hyphens in
   compound words are fine.
 - Email sign-off: `Davide @casdey`. Money is framed in EUR first.
 - **Pushing to `main` needs a fresh, explicit yes every time**, even though

@@ -23,9 +23,9 @@ all agents work from the same knowledge.
   replace or duplicate them.
 
 ## Conventions
-- Write the name as **Casdey** (capital C) in text since 2026-09-27; see `CLAUDE.md`. Casdey has one founder, Davide; never write
+- Write the name as **Casdey** (capital C) in text since 2026-09-26; see `CLAUDE.md`. Casdey has one founder, Davide; never write
   copy implying a team.
-- No em dashes as punctuation in casdey copy. Hyphens in compound words are
+- No em dashes as punctuation in Casdey copy. Hyphens in compound words are
   fine.
 - Business calls are judged through Alex Hormozi's frameworks:
   `.claude/skills/hormozi/`.
