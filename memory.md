@@ -109,7 +109,7 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
 
 ### Next steps (in order)
 1. ~~Clean the project folder~~ (done 2026-09-26).
-2. **Waitlist plus the first TikTok videos**, to test the promise and prices
+2. **Waitlist plus the first TikTok videos**. The waitlist page was built 2026-09-26: one promise, a "what do you want to improve most?" question (body / face and skin / style / discipline) as demand data, email, a confirmation email, a privacy notice naming Davide as controller; no age or gender line, global audience (Davide: "users all around the globe, especially first-world countries"). Then the videos, to test the promise and prices
    before building (sell before build, done properly this time).
 3. At build time: **a whole new brand and aesthetic, Apple-grade** (the part 1
    v5 charcoal system is gone; the logo is kept only for now and will very
