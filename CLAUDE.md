@@ -1,6 +1,6 @@
-# casdey
+# Casdey
 
-"casdey" is always written lowercase, even at the start of a sentence.
+Write the name as **Casdey** (capital C) in text and copy, since 2026-09-27 (Davide: cleaner; before that it was always lowercase). The logo wordmark may still be drawn lowercase if that looks better; that is a design choice.
 
 ## What casdey is now
 casdey is Davide's business: one founder, no team, no legal entity yet (see
