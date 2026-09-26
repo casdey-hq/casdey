@@ -3,9 +3,10 @@ import Link from "next/link";
 import { Mark } from "@/components/mark";
 import { requireAdmin } from "@/lib/admin";
 import {
-  RANGES, countBy, dayKey, daysBetween, inWindow, loadSignups, loadVisitors, parseRange, windowFor,
-  type Visitors,
+  LAUNCH, RANGES, countBy, dayKey, daysBetween, hourOf, inWindow, loadSignups, loadTodayVisitors, loadVisitors, parseRange, todayWindow, windowFor,
+  type Today, type Visitors,
 } from "@/lib/stats";
+import { dayPoint, hourPoint } from "@/lib/chart-points";
 import { BarChart } from "./bar-chart";
 
 export const metadata: Metadata = { title: "Admin · Casdey", robots: { index: false, follow: false } };
@@ -60,17 +61,25 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   const allSignups = await loadSignups();
   const signups = inWindow(allSignups, period.from, period.to);
   const previousSignups = period.previousFrom ? inWindow(allSignups, period.previousFrom, period.from).length : null;
-  const today = dayKey(new Date());
-  const signupsToday = allSignups.filter((signup) => dayKey(new Date(signup.created_at)) === today).length;
+  const now = new Date();
+  const todaySpan = todayWindow(now);
+  const signupsToday = inWindow(allSignups, todaySpan.from, now);
+  const signupsYesterday = inWindow(allSignups, todaySpan.yesterdayFrom, todaySpan.yesterdayTo).length;
+  const signupsByHour = new Map(countBy(signupsToday, (signup) => String(hourOf(new Date(signup.created_at)))).map((row) => [Number(row.label), row.value]));
+  const hours = Array.from({ length: 24 }, (_, hour) => hour);
 
   let visitors: Visitors | null = null;
+  let today: Today | null = null;
   try {
-    visitors = await loadVisitors(period);
+    [visitors, today] = await Promise.all([loadVisitors(period), loadTodayVisitors(now)]);
   } catch (error) {
     console.error("admin: PostHog failed", error);
   }
 
   const days = daysBetween(period.from, period.to);
+  const hadYesterday = todaySpan.yesterdayFrom >= LAUNCH;
+  const vsYesterday = (value: number, before: number | null) =>
+    before === null || !hadYesterday ? "No full yesterday to compare yet" : value === before ? "Same as yesterday by now" : `${value > before ? "+" : ""}${value - before} vs yesterday by now`;
   const signupsByDay = new Map(countBy(signups, (signup) => dayKey(new Date(signup.created_at))).map((row) => [row.label, row.value]));
 
   return (
@@ -91,6 +100,45 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
       </header>
 
       <main className="admin-main">
+        <section className="today" aria-labelledby="today-title">
+          <div className="today-head">
+            <h2 id="today-title">Today</h2>
+            <span>{new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Rome", weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }).format(now)}</span>
+          </div>
+          <div className="today-kpis">
+            <div className="kpi">
+              <span className="kpi-label">Visitors</span>
+              <b>{today ? today.visitors : "–"}</b>
+              <span className="kpi-note">{today ? vsYesterday(today.visitors, today.visitorsYesterday) : "PostHog didn’t answer"}</span>
+            </div>
+            <div className="kpi">
+              <span className="kpi-label">Signups</span>
+              <b>{signupsToday.length}</b>
+              <span className="kpi-note">{vsYesterday(signupsToday.length, signupsYesterday)}</span>
+            </div>
+            <div className="kpi">
+              <span className="kpi-label">Conversion</span>
+              <b>{today ? percent(signupsToday.length, today.visitors) : "–"}</b>
+              <span className="kpi-note">Signups per visitor today</span>
+            </div>
+          </div>
+          <div className="charts">
+            <div className="panel">
+              <h2>Visitors per hour</h2>
+              {today ? (
+                <BarChart points={hours.map((hour) => hourPoint(hour, today.hourly.get(hour) ?? 0))} unit={["visitor", "visitors"]} />
+              ) : (
+                <p className="empty">Visitor data is unavailable right now.</p>
+              )}
+            </div>
+            <div className="panel">
+              <h2>Signups per hour</h2>
+              <BarChart points={hours.map((hour) => hourPoint(hour, signupsByHour.get(hour) ?? 0))} unit={["signup", "signups"]} />
+            </div>
+          </div>
+        </section>
+
+        <div className="period-head"><h2>{RANGES.find((option) => option.value === range)?.label}</h2></div>
         <section className="kpis" aria-label="Summary">
           <div className="kpi">
             <span className="kpi-label">Visitors</span>
@@ -108,9 +156,9 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <span className="kpi-note">Signups per visitor</span>
           </div>
           <div className="kpi">
-            <span className="kpi-label">Signups today</span>
-            <b>{signupsToday}</b>
-            <span className="kpi-note">{allSignups.length} on the list in total</span>
+            <span className="kpi-label">On the list</span>
+            <b>{allSignups.length}</b>
+            <span className="kpi-note">Everyone who has joined</span>
           </div>
         </section>
 
@@ -118,14 +166,14 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
           <div className="panel">
             <h2>Visitors per day</h2>
             {visitors ? (
-              <BarChart points={days.map((day) => ({ day, value: visitors.daily.get(day) ?? 0 }))} unit={["visitor", "visitors"]} />
+              <BarChart points={days.map((day) => dayPoint(day, visitors.daily.get(day) ?? 0))} unit={["visitor", "visitors"]} />
             ) : (
               <p className="empty">Visitor data is unavailable right now.</p>
             )}
           </div>
           <div className="panel">
             <h2>Signups per day</h2>
-            <BarChart points={days.map((day) => ({ day, value: signupsByDay.get(day) ?? 0 }))} unit={["signup", "signups"]} />
+            <BarChart points={days.map((day) => dayPoint(day, signupsByDay.get(day) ?? 0))} unit={["signup", "signups"]} />
           </div>
         </section>
 

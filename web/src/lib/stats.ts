@@ -141,3 +141,64 @@ export async function loadVisitors(window: Window): Promise<Visitors> {
     devices: rows(devices, "Unknown"),
   };
 }
+
+// ---------- today ----------
+
+/** Minutes the time zone is ahead of UTC at a given instant. */
+function offsetMinutes(at: Date): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIME_ZONE, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit",
+  }).formatToParts(at);
+  const get = (type: string) => Number(parts.find((part) => part.type === type)?.value);
+  const local = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+  return Math.round((local - at.getTime()) / 60_000);
+}
+
+/** The instant a YYYY-MM-DD day starts in Davide's time zone. */
+export function startOfDay(key: string): Date {
+  const guess = new Date(`${key}T00:00:00Z`);
+  return new Date(guess.getTime() - offsetMinutes(guess) * 60_000);
+}
+
+/** Hour of the day (0-23) of an instant in Davide's time zone. */
+export function hourOf(at: Date): number {
+  return Number(new Intl.DateTimeFormat("en-GB", { timeZone: TIME_ZONE, hour: "2-digit", hourCycle: "h23" }).format(at));
+}
+
+export type Today = {
+  from: Date;
+  yesterdayFrom: Date;
+  yesterdayTo: Date;
+  visitors: number;
+  /** Null until the waitlist has a full yesterday to compare against. */
+  visitorsYesterday: number | null;
+  hourly: Map<number, number>;
+};
+
+/** Today so far, and yesterday up to the same time, for a fair comparison. */
+export function todayWindow(now = new Date()): { from: Date; yesterdayFrom: Date; yesterdayTo: Date } {
+  const dayStart = startOfDay(dayKey(now));
+  const from = dayStart < LAUNCH ? LAUNCH : dayStart;
+  const yesterdayFrom = startOfDay(dayKey(new Date(dayStart.getTime() - 12 * 3_600_000)));
+  const yesterdayTo = new Date(yesterdayFrom.getTime() + (now.getTime() - dayStart.getTime()));
+  return { from, yesterdayFrom, yesterdayTo };
+}
+
+export async function loadTodayVisitors(now = new Date()): Promise<Today> {
+  const { from, yesterdayFrom, yesterdayTo } = todayWindow(now);
+  const [today, yesterday, hourly] = await Promise.all([
+    hogql<[number]>(`SELECT count(DISTINCT distinct_id) FROM events WHERE ${pageviews(from, now)}`),
+    yesterdayFrom >= LAUNCH
+      ? hogql<[number]>(`SELECT count(DISTINCT distinct_id) FROM events WHERE ${pageviews(yesterdayFrom, yesterdayTo)}`)
+      : Promise.resolve(null),
+    hogql<[number, number]>(
+      `SELECT toHour(toTimeZone(timestamp, '${TIME_ZONE}')) AS h, count(DISTINCT distinct_id) FROM events WHERE ${pageviews(from, now)} GROUP BY h ORDER BY h`,
+    ),
+  ]);
+  return {
+    from, yesterdayFrom, yesterdayTo,
+    visitors: today[0]?.[0] ?? 0,
+    visitorsYesterday: yesterday ? yesterday[0]?.[0] ?? 0 : null,
+    hourly: new Map(hourly.map(([hour, value]) => [Number(hour), value])),
+  };
+}
