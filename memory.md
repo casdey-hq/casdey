@@ -107,6 +107,53 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   RevenueCat (phone), Resend. Apple developer about €90/yr and Google €25 only
   for a phone app.
 
+- **Davide runs the posting himself** (2026-09-26): about 2 short videos a day,
+  his own plan. From *$100M Leads*, the parts to keep in mind: every video is
+  hook, retain, reward (curiosity through lists, steps and stories); "how I"
+  beats "how to"; give until they ask (at least 3-4 value posts per ask), and
+  on short-form the ask is an occasional standalone post; one call to action at
+  a time ("free analysis, link in bio"); repeat the core message; narrow first;
+  measure audience size and growth monthly, and hold the cadence.
+- **No Sunday check-up for now** (Davide, 2026-09-26): with only daily content to
+  do, a weekly review has little to discuss until there is traction.   is where the numbers live. Per-platform tracked links (UTM) were offered and
+  are not built.
+
+### The site (, live since 2026-09-26)
+- **Stack:** Next.js 16.3 (App Router;  replaces middleware), plain
+  CSS tokens in , the mark as a React component
+  (, animated on the hero). Vercel project ,
+  root directory , deploys on every push to .
+- **Waitlist:**  validates, lowercases, and inserts into the
+  Supabase  table (email unique, so a repeat signup changes nothing
+  and sends no second email), stores goal, source (hero or closing form) and
+  country (), then sends the confirmation through Resend.
+  A hidden honeypot field drops bots. The table has RLS with no policies and
+  explicit service-role grants (select, insert, update; no delete, so test rows
+  are removed over ). Test signups use   with .
+- **Analytics:** cookieless PostHog (EU), no cookie banner needed; pageviews and
+   only, never on . Each visit carries
+   from , because cookieless mode drops the IP.
+- **:** Google sign-in via Supabase, allowlist davide@casdey.com,
+  info@casdey.com and 07davide.longo@gmail.com (,
+   overrides). Periods Today (per hour, against yesterday up to
+  the same time), 7 days, 30 days, Since launch (per day, against the same
+  length just before); KPIs, two bar charts, breakdowns (goal, referrer with
+  own-site hops shown as "Within the site", countries, devices, form used)
+  and the latest signups. Nothing before  (2026-09-26 19:00 UTC) counts,
+  since the PostHog project still holds part 1 events. Switching period dims
+  the page with a progress bar; first load shows a skeleton.
+- **Checks:** from , [41m                                                                               [0m
+[41m[37m                This is not the tsc command you are looking for                [0m
+[41m                                                                               [0m
+
+To get access to the TypeScript compiler, [34mtsc[0m, from the command line either:
+
+- Use [1mnpm install typescript[0m to first add TypeScript to your project [1mbefore[0m using npx
+- Use [1myarn[0m to avoid accidentally running code from un-installed packages, ,
+  . Local dev:  (, port
+  3000);  holds the subset of keys the site needs
+  ( lists them).
+
 ### Next steps (in order)
 1. ~~Clean the project folder~~ (done 2026-09-26).
 2. **Waitlist plus the first TikTok videos**. The waitlist page was built 2026-09-26: one promise, a "what do you want to improve most?" question (body / face and skin / style / discipline) as demand data, email, a confirmation email, a privacy notice naming Davide as controller; no age or gender line, global audience (Davide: "users all around the globe, especially first-world countries"). Then the videos, to test the promise and prices
