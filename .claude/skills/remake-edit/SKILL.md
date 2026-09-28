@@ -68,6 +68,17 @@ rule above before going further.
   other people and cutaways.
 - Record crop centre (cx, cy as fractions of the frame) and `side` (crop height
   as a fraction of source height) per shot by reading a single frame.
+- Lessons from the first remake (2026-09-28, Davide posted it):
+  - **Long slots (over 1.5 s) need a steady subject.** Check the frame every
+    0.5 s across the whole slot, not one frame: the 3.8 s opening shot drifted
+    off-centre as he moved. Pick a calmer moment or loosen the crop (`side`
+    higher).
+  - **One scene per source, once.** Don't reuse the same interview set for two
+    slots (Troy appeared twice); variety of settings is what makes the montage
+    feel rich.
+  - **Quality first when choosing sources.** Prefer 720p+ uploads; 240p-480p TV
+    rips look soft next to the inspo. Search for "HD" or "remastered" versions
+    before settling.
 
 ### 5. Render
 Write `plan.json` next to the inspo and run
@@ -94,4 +105,4 @@ top level) overrides the default look; `vf` adds a filter to one shot.
   other people or the interviewer at the edges of a shot (happened three times
   on the first run). Fix `start` and re-render.
 - Send the file with `SendUserFile` and list what was kept, what was replaced
-  and from where.
+  and from where, plus an honest list of what's still weak.
