@@ -62,7 +62,14 @@ rule above before going further.
   "src/%(id)s.%(ext)s" <url>` (video only; audio comes from the inspo).
 
 ### 4. Pick shots
-- Per source, a timestamped sheet: `fps=1/N,scale=240:-2,drawtext=...%{pts\:hms}...,tile=8x6`.
+- Per source, a timestamped sheet built by **frame number**, never `fps=1/N`:
+  `select='not(mod(n\,N))',scale=160:-2,drawtext=...text='<id> %{pts\:flt}'...,tile=12x10`
+  with `-fps_mode passthrough` (N = seconds between tiles x source fps). The fps
+  filter labels frames seconds away from where they really are (2026-09-28: a
+  "shirtless" pick turned out to be a car). Stamp the source id on every tile
+  and build sheets one at a time.
+- Fan edits re-cut the same clips: skip any stretch of a source that contains
+  the inspo's own shots.
 - One shot per replaced slot, matching the slot's energy (smile, glance, laugh
   on the beat) and length. Prefer close faces, avoid lower-thirds, logos,
   other people and cutaways.
@@ -123,6 +130,15 @@ in scene detection. Remove the original creator's signature/watermark (e.g.
 "DP" at the end) and replace it with black unless Davide wants the Casdey mark.
 Check Pinterest images for stock watermarks (dreamstime, shutterstock) and
 use `format=gbrp` before any `blend` filter, or the colours go magenta.
+
+**Letterboxed inspos** (a picture band inside 9:16, e.g. 720x532 at y 374 in
+720x1280): find the band with `cropdetect`, set `size` to the band's aspect
+(e.g. [1080, 798]) and deliver only the `_shorts` file, which pads it back to
+9:16 exactly like the inspo. **Callbacks**: when the inspo repeats a shot later
+(the second half replaying the first), reuse the same new clip there too.
+**Grade**: compare the band's average brightness (`signalstats`, YAVG) between
+inspo and remake and tune `grade` until they're close; the first guess for a
+dark phonk edit (2026-09-28, Tren Twins) crushed half the shots to black.
 
 `keep` ranges are inspo frames `[from, to)`; `frames` per shot = the slot's
 length in frames, so the sum equals the inspo's frame count. `grade` (optional,
