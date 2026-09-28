@@ -51,7 +51,7 @@ legal and tax. Don't load it for tasks that don't need it.
   rules change; never copy business facts into them.
 - `.claude/skills/`: `hormozi` (with `references/books/`, gitignored),
   `frontend-design` (read before any visual work), `grill-me`,
-  `push-github`, `update-project` (keeps `CLAUDE.md` and `memory.md`
+  `push-github`, `remake-edit` (inspo video to remade edit with ffmpeg), `update-project` (keeps `CLAUDE.md` and `memory.md`
   current), `session-handoff`.
 - `web/`: www.casdey.com (Next.js 16, App Router, plain CSS in direction A):
   the waitlist page, `/privacy`, and `/admin`, the metrics page behind Google
