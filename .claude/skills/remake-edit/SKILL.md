@@ -100,9 +100,19 @@ If the edit isn't 9:16, the script also writes `<output>_shorts.mp4`
 TikTok and Instagram letterbox it fine. Send both files and say which is for
 Shorts.
 
-**Slide edits (text baked into images).** When the replaceable parts are
-quote slides rather than footage (2026-09-28, the "I wasn't born to be
-average" edit): keep the story hook and pure-typography parts, rebuild each
+**Slide edits (text baked into images).** Davide's call (2026-09-28): **use
+finished Pinterest images, don't build slides.** Search Pinterest for images
+that already carry a designed quote in the same vibe (search the quote
+itself, "motivational quote aesthetic", "dark discipline quote"), and pick
+ones that look as good as the inspo: high resolution (grab the `originals/`
+size, reject anything under about 1000 px), clean typography, no watermark.
+Swapping in a different finished quote image is fine; the slide doesn't need
+the same words. Show the picks before rendering. Rebuilding a slide
+(composing image plus text yourself) is a last resort for when no decent
+finished image exists, and say so when you do it: the first attempt
+(2026-09-28, the "I wasn't born to be average" edit) looked fine but the fonts
+and soft sources were visibly weaker than the inspo. How that fallback works:
+keep the story hook and pure-typography parts, rebuild each
 slide with a scratch `build.js` that composes a new image plus the same text
 (same words, similar font from `C:/Windows/Fonts`, same position) into one PNG
 per motion phase (small text, punch-zoomed text, image alone...). Then use
