@@ -100,6 +100,20 @@ If the edit isn't 9:16, the script also writes `<output>_shorts.mp4`
 TikTok and Instagram letterbox it fine. Send both files and say which is for
 Shorts.
 
+**Slide edits (text baked into images).** When the replaceable parts are
+quote slides rather than footage (2026-09-28, the "I wasn't born to be
+average" edit): keep the story hook and pure-typography parts, rebuild each
+slide with a scratch `build.js` that composes a new image plus the same text
+(same words, similar font from `C:/Windows/Fonts`, same position) into one PNG
+per motion phase (small text, punch-zoomed text, image alone...). Then use
+`{ "image": "slides/x.png", "frames": N, "vf": "gblur=sigma=70:sigmaV=0.5:enable='lt(n\\,4)'" }`
+entries: the `vf` is a 4-frame horizontal blur that mimics a whip-in. Map the
+phases with a 15-30 fps timestamped strip, since punch-zooms don't show up
+in scene detection. Remove the original creator's signature/watermark (e.g.
+"DP" at the end) and replace it with black unless Davide wants the Casdey mark.
+Check Pinterest images for stock watermarks (dreamstime, shutterstock) and
+use `format=gbrp` before any `blend` filter, or the colours go magenta.
+
 `keep` ranges are inspo frames `[from, to)`; `frames` per shot = the slot's
 length in frames, so the sum equals the inspo's frame count. `grade` (optional,
 top level) overrides the default look; `vf` adds a filter to one shot.

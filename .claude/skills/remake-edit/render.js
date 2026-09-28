@@ -25,7 +25,11 @@ fs.mkdirSync(segDir);
 
 const names = plan.timeline.map((entry, i) => {
   const out = path.join(segDir, `${String(i).padStart(3, "0")}.mp4`);
-  if (entry.keep) {
+  if (entry.image) {
+    // A still (a rebuilt slide), held for `frames`; `vf` can animate it (e.g. a whip-in blur).
+    const vf = [`scale=${W}:${H}`, "setsar=1", entry.vf].filter(Boolean).join(",");
+    ff(["-loop", "1", "-framerate", String(fps), "-i", path.join(dir, entry.image), "-vf", vf, "-frames:v", String(entry.frames), ...enc, out]);
+  } else if (entry.keep) {
     // Kept part of the inspo, frame-exact: [from, to) in inspo frames.
     const [from, to] = entry.keep;
     ff(["-i", inspo, "-vf", `fps=${fps},trim=start_frame=${from}:end_frame=${to},setpts=PTS-STARTPTS,scale=${W}:${H},setsar=1`, ...enc, out]);
@@ -43,11 +47,16 @@ const names = plan.timeline.map((entry, i) => {
   return path.basename(out);
 });
 
-const list = path.join(segDir, "list.txt");
-fs.writeFileSync(list, names.map((n) => `file '${n}'`).join("\n"));
+// Join through the concat filter and re-encode: a stream-copy join drops frames
+// where segment timestamps meet (4 lost at 60 fps on the second remake).
 const output = path.join(dir, plan.output || "remake.mp4");
-ff(["-f", "concat", "-safe", "0", "-i", list, "-i", inspo, "-map", "0:v", "-map", "1:a?", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", output]);
-console.log(`done: ${output}`);
+const want = plan.timeline.reduce((n, e) => n + (e.keep ? e.keep[1] - e.keep[0] : e.frames), 0);
+const inputs = names.flatMap((n) => ["-i", path.join(segDir, n)]);
+const join = `${names.map((_, i) => `[${i}:v]`).join("")}concat=n=${names.length}:v=1:a=0[v]`;
+ff([...inputs, "-i", inspo, "-filter_complex", join, "-map", "[v]", "-map", `${names.length}:a?`, ...enc.filter((a) => a !== "-an"), "-c:a", "aac", "-b:a", "192k", "-frames:v", String(want), "-t", (want / fps).toFixed(4), "-movflags", "+faststart", output]);
+const got = Number(execFileSync(FFPROBE, ["-v", "error", "-count_frames", "-select_streams", "v", "-show_entries", "stream=nb_read_frames", "-of", "csv=p=0", output]).toString().trim());
+if (got !== want) throw new Error(`rendered ${got} frames, plan has ${want}`);
+console.log(`done: ${output} (${got} frames)`);
 
 // YouTube Shorts crops anything that isn't 9:16 (TikTok and Instagram letterbox
 // it themselves), so a non-vertical edit also gets a 1080x1920 copy, centred on black.
