@@ -95,6 +95,11 @@ Write `plan.json` next to the inspo and run
 }
 ```
 
+If the edit isn't 9:16, the script also writes `<output>_shorts.mp4`
+(1080×1920, edit centred on black): YouTube Shorts crops a 1:1 upload, while
+TikTok and Instagram letterbox it fine. Send both files and say which is for
+Shorts.
+
 `keep` ranges are inspo frames `[from, to)`; `frames` per shot = the slot's
 length in frames, so the sum equals the inspo's frame count. `grade` (optional,
 top level) overrides the default look; `vf` adds a filter to one shot.

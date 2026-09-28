@@ -48,3 +48,12 @@ fs.writeFileSync(list, names.map((n) => `file '${n}'`).join("\n"));
 const output = path.join(dir, plan.output || "remake.mp4");
 ff(["-f", "concat", "-safe", "0", "-i", list, "-i", inspo, "-map", "0:v", "-map", "1:a?", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", output]);
 console.log(`done: ${output}`);
+
+// YouTube Shorts crops anything that isn't 9:16 (TikTok and Instagram letterbox
+// it themselves), so a non-vertical edit also gets a 1080x1920 copy, centred on black.
+if (W * 16 !== H * 9) {
+  const shorts = output.replace(/(\.\w+)$/, "_shorts$1");
+  const scale = W / H > 9 / 16 ? "scale=1080:-2" : "scale=-2:1920";
+  ff(["-i", output, "-vf", `${scale},pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black,setsar=1`, "-c:v", "libx264", "-crf", "16", "-preset", "medium", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", shorts]);
+  console.log(`done: ${shorts}`);
+}
