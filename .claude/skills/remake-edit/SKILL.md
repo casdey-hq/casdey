@@ -78,6 +78,14 @@ rule above before going further.
 - One shot per replaced slot, matching the slot's energy (smile, glance, laugh
   on the beat) and length. Prefer close faces, avoid lower-thirds, logos,
   other people and cutaways.
+- **Framing (Davide, 2026-09-29): never over-zoom, never cut the face.** The
+  whole head (hair to chin) stays in frame with some headroom, sized like the
+  inspo's shots, usually head and shoulders. Default `side: 1` (the full
+  source height) and only set `cx` to centre the face; go below `side: 0.85`
+  only for wide shots where he's small, and never so far that the top of the
+  head or the chin is cut. In the per-shot check, look at every tile for a
+  cut forehead, chin or half a face, and compare one frame per section
+  side by side with the inspo's.
 - Record crop centre (cx, cy as fractions of the frame) and `side` (crop height
   as a fraction of source height) per shot by reading a single frame.
 - Lessons from the first remake (2026-09-28, Davide posted it):
@@ -151,10 +159,14 @@ by hand with one ffmpeg `overlay` (kept inspo frames as background, new shot
 on top, `y` animated with an ease-out expression, captions with
 `drawtext` in `seguisb.ttf`, which is close to TikTok's font), save it to
 `src/transition.mp4` and put it in the timeline as a normal shot with
-`side: 1`. **Mixed frames** (a band inside 9:16 with a different band size
-per section): render at the full 1080x1920, set top-level `grade: "null"`,
-and put the grade plus `crop=<band>,pad=1080:1920:0:<y>:black` in each new
-shot's `vf`. **Minors in the montage**: if the replaceable footage shows
+`side: 1`. **Picture bands** (the shots sit in a band inside 9:16): render at the full
+size and set `band: [bw, bh, x, y]` (from `cropdetect`) at the top level or
+per entry. The renderer then crops each source to the band's aspect and pads
+it into place. **Never** crop the band out afterwards in `vf`: on 2026-09-29
+that cropped a 9:16 strip, blew it up and cut it again, so every face came
+out giant and cut off. Entries can override `grade` (e.g. `"null"` for a
+pre-built transition) and `band` (e.g. `[1080,1920,0,0]` for a full-frame
+segment). **Minors in the montage**: if the replaceable footage shows
 someone who may be under 18, don't copy him; ask Davide for the source
 (an adult creator, an adult celebrity, or his own footage).
 

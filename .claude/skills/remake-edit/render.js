@@ -36,12 +36,19 @@ const names = plan.timeline.map((entry, i) => {
   } else {
     const src = path.join(dir, entry.src);
     const [w, h] = dims(src);
-    // Crop the largest box with the output's aspect ratio that fits `side` x source height.
-    const ch = Math.round(Math.min(entry.side * h, h, (w * H) / W));
-    const cw = Math.round((ch * W) / H);
+    // Shots can fill a picture band inside the frame (letterboxed edits):
+    // `band: [bw, bh, bx, by]` on the entry or the plan. The crop takes the
+    // band's aspect, never the full frame's, or a 9:16 crop of a 16:9 source
+    // gets blown up and cut again and the face ends up giant or cut off.
+    const [bw, bh, bx, by] = entry.band || plan.band || [W, H, 0, 0];
+    // Largest box with the band's aspect that fits `side` (default 1 = full height).
+    const side = entry.side ?? 1;
+    const ch = Math.round(Math.min(side * h, h, (w * bh) / bw));
+    const cw = Math.round((ch * bw) / bh);
     const x = Math.round(Math.min(Math.max(entry.cx * w - cw / 2, 0), w - cw));
     const y = Math.round(Math.min(Math.max(entry.cy * h - ch / 2, 0), h - ch));
-    const vf = [`fps=${fps}`, `crop=${cw}:${ch}:${x}:${y}`, `scale=${W}:${H}:flags=lanczos`, grade, entry.vf, "setsar=1"].filter(Boolean).join(",");
+    const place = bw === W && bh === H ? null : `pad=${W}:${H}:${bx}:${by}:black`;
+    const vf = [`fps=${fps}`, `crop=${cw}:${ch}:${x}:${y}`, `scale=${bw}:${bh}:flags=lanczos`, entry.grade ?? grade, entry.vf, place, "setsar=1"].filter(Boolean).join(",");
     ff(["-ss", String(entry.start), "-i", src, "-vf", vf, "-frames:v", String(entry.frames), ...enc, out]);
   }
   return path.basename(out);
