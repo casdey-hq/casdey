@@ -62,12 +62,17 @@ rule above before going further.
   "src/%(id)s.%(ext)s" <url>` (video only; audio comes from the inspo).
 
 ### 4. Pick shots
-- Per source, a timestamped sheet built by **frame number**, never `fps=1/N`:
-  `select='not(mod(n\,N))',scale=160:-2,drawtext=...text='<id> %{pts\:flt}'...,tile=12x10`
-  with `-fps_mode passthrough` (N = seconds between tiles x source fps). The fps
-  filter labels frames seconds away from where they really are (2026-09-28: a
-  "shirtless" pick turned out to be a car). Stamp the source id on every tile
-  and build sheets one at a time.
+- Per source, a timestamped sheet built by **frame number**, never `fps=1/N`
+  (the fps filter labels frames seconds away from where they really are;
+  2026-09-28 a "shirtless" pick turned out to be a car). Use the helper, which
+  does it right: `FFMPEG=<path>/ffmpeg.exe node .claude/skills/remake-edit/sheets.js <workdir>`
+  writes `sheets/<id>.jpg` for every file in `src/`, 120 tiles each stamped with
+  the source id and real time. (Don't do the maths in bash: ffprobe's CRLF
+  output breaks it on Windows.)
+- Drop sources the subject isn't in (a cast interview can be all co-stars).
+- **No watermarks or logos in frame**: Getty, POPSUGAR, tv.aol.com, photo-agency
+  ID numbers. Check the corners of each pick and crop tighter (`side` lower,
+  shift `cy` up) or swap the source.
 - Fan edits re-cut the same clips: skip any stretch of a source that contains
   the inspo's own shots.
 - One shot per replaced slot, matching the slot's energy (smile, glance, laugh
