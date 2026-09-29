@@ -145,6 +145,19 @@ use `format=gbrp` before any `blend` filter, or the colours go magenta.
 inspo and remake and tune `grade` until they're close; the first guess for a
 dark phonk edit (2026-09-28, Tren Twins) crushed half the shots to black.
 
+**Transitions that mix kept and new footage** (e.g. the new shot slides up
+over the kept hook while a caption appears, 2026-09-29): build that segment
+by hand with one ffmpeg `overlay` (kept inspo frames as background, new shot
+on top, `y` animated with an ease-out expression, captions with
+`drawtext` in `seguisb.ttf`, which is close to TikTok's font), save it to
+`src/transition.mp4` and put it in the timeline as a normal shot with
+`side: 1`. **Mixed frames** (a band inside 9:16 with a different band size
+per section): render at the full 1080x1920, set top-level `grade: "null"`,
+and put the grade plus `crop=<band>,pad=1080:1920:0:<y>:black` in each new
+shot's `vf`. **Minors in the montage**: if the replaceable footage shows
+someone who may be under 18, don't copy him; ask Davide for the source
+(an adult creator, an adult celebrity, or his own footage).
+
 `keep` ranges are inspo frames `[from, to)`; `frames` per shot = the slot's
 length in frames, so the sum equals the inspo's frame count. `grade` (optional,
 top level) overrides the default look; `vf` adds a filter to one shot.
