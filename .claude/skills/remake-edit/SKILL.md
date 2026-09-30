@@ -180,6 +180,21 @@ clips), not look-alikes or a similar scene.
     re-encoded clips that stutter.
   - **Light and look:** similar lighting and colour (bright daylight selfies
     vs dark rooms) so the cuts feel like one montage.
+- **One-person edits (Davide, 2026-09-30, Marlon "tuff security" remake).** If
+  the edit is about a single person, do NOT hunt for a similar scene or
+  look-alikes: keep the hook clip and fill every other slot with footage of that
+  same person. Find him by name (his own streams and clips on YouTube; the night
+  IRL stream "I Got Pressed By Gangsters" matched a dark bodyguard edit
+  perfectly), scan the sources on frame-exact sheets, and match the slot's
+  mood (night, guards, crowd).
+- **Match brightness per slot.** Dark inspos (night edits, YAVG 25-45) against
+  normal footage (60-160) look wrong. After `preview.js`, run
+  `node .claude/skills/remake-edit/gradematch.js <workdir>` (measures every
+  slot in the inspo and in a raw render, writes a per-shot `eq=gamma`), then
+  render. If one shot needs a gamma below ~0.45, swap the moment instead.
+- **Stream overlays.** Twitch chat and follow banners sit in the top right and
+  bottom of streamer footage; pick `cx` so the crop ends before the chat and
+  move `cy` down a little. Avoid the first 10 s of a stream (banners).
 - **Every replaced slot gets a different face (Davide, 2026-09-30).** If the
   inspo shows 7 different people, the remake shows 7 different people; never
   fill slots with the same person from other scenes. If a download fails or a
