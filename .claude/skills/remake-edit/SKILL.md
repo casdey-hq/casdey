@@ -309,3 +309,15 @@ top level) overrides the default look; `vf` adds a filter to one shot.
   on the first run). Fix `start` and re-render.
 - Send the file with `SendUserFile` and list what was kept, what was replaced
   and from where, plus an honest list of what's still weak.
+
+### 7. Clean up (Davide, 2026-09-30)
+Everything downloaded or rendered lives on Davide's PC in the session
+scratchpad (`remake-<name>/`: sources, Pinterest clips, contact sheets, segment
+files, earlier versions; a few remakes reached 1-2 GB each). Once Davide has
+approved a remake, keep ONLY its final `remake.mp4` (copy it to
+`<scratchpad>/final/<name>-final.mp4`) and delete everything else in that
+work folder. Do this when Davide says the remake is fine or asks to clean up,
+not before: until then he may ask for another version that needs the sources.
+Tell him the finals are still in the temporary scratchpad and to copy them
+somewhere permanent. Never touch the repo for this; nothing from a remake is
+committed.
