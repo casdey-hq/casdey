@@ -162,6 +162,19 @@ clips), not look-alikes or a similar scene.
   - Pins come with the creator's own overlays (TikTok handle, lyric text, IG
     story UI). Crop them out with `side`/`cy` and check with `preview.js`.
   - Titles are often empty; only cast a face you can name and know is adult.
+  - Pinterest name searches return look-alikes too (v. Hacker search, 2026-09-30):
+    confirm the person by his handle watermark or tattoos before casting.
+  - **Square inspos (1:1) can't crop out a TikTok watermark on a 9:16 clip**:
+    the square spans nearly the full width, so `cx` can only shift ~60 px.
+    Add `delogo=x=2:y=<y>:w=150:h=<h>` (output coordinates) to that shot's
+    `vf` instead, and check the left edge of every shot.
+- **Replace competitor ads.** If the inspo ends on another app's screen
+  (e.g. "Ascension - Facial Analysis" / @PSL App rating a face "Chad"), don't
+  keep it: end on a new shot fading to black, or the Casdey mark if Davide
+  wants it.
+- **Check who the subject is before sourcing.** Search his name once. On
+  2026-09-30 the subject (Hullo / Mason Hull) had been arrested on CSAM
+  charges; Davide chose to recast with another face (Vinnie Hacker).
 - **Same vibe, not just same category (Davide, 2026-09-30, after v4 of "The
   funny guy": "some clips are too laggy, others too zoomed, not the same
   vibe").** Before sourcing, write down what every inspo shot has in common
