@@ -187,6 +187,18 @@ clips), not look-alikes or a similar scene.
   IRL stream "I Got Pressed By Gangsters" matched a dark bodyguard edit
   perfectly), scan the sources on frame-exact sheets, and match the slot's
   mood (night, guards, crowd).
+  **Variety and visible faces (Davide, 2026-09-30, after the Marlon remake
+  came out as one long stream scene: "what the fuck is this? follow what the
+  inspo does").** Every slot must be a different short clip, ideally from
+  different videos, and each must show the person's FACE clearly and
+  front-facing (a selfie, POV or webcam moment). Never fill a one-person edit
+  with a single stream or with far shots where the face is tiny or in profile.
+  Before rendering, look at three frames per shot and reject any where the
+  face is small, cut off, turned away, or shares the frame with a
+  chat/banner/subtitle/watermark ("PRISM Live", "Cheered 100 Bits").
+  Compilation videos ("<name> rizzing up girls", "<name> clips") are the best
+  quarry: many scenes, mostly POV close-ups. Scan them with `sheets.js`-style
+  3-4 s tiles and pick one moment per scene.
 - **Match brightness per slot.** Dark inspos (night edits, YAVG 25-45) against
   normal footage (60-160) look wrong. After `preview.js`, run
   `node .claude/skills/remake-edit/gradematch.js <workdir>` (measures every
