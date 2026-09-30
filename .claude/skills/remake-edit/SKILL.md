@@ -109,6 +109,19 @@ clips), not look-alikes or a similar scene.
   side by side with the inspo's.
 - Record crop centre (cx, cy as fractions of the frame) and `side` (crop height
   as a fraction of source height) per shot by reading a single frame.
+- **The preview is enforced (2026-09-30).** After Davide's framing rule was
+  already here, a remake still shipped with his head cut in every shot: the
+  crops were tightened AFTER the preview and never re-checked. Now
+  `preview.js` writes `preview.stamp` (a hash of every crop, via
+  `cropstamp.js`) and `render.js` refuses to render if the crops changed since
+  the last preview. Never bypass it with `SKIP_PREVIEW_CHECK`; after every crop
+  change, re-run `preview.js` and actually look at `preview.jpg`.
+- **Square (1:1) edits from 9:16 clips:** use `side: 1` (the renderer then
+  takes the full width) and set only `cy` so the whole head, hair to chin, sits
+  inside the box with headroom. Don't shrink `side` to dodge a watermark: that
+  zooms in and cuts the head. Remove the watermark from the source first
+  (`ffmpeg -vf delogo=...` into `src/c_<id>.mp4`), measuring its position on
+  the source frame, not on a scaled grid.
 - **Before rendering, run `preview.js`** (`FFMPEG=... node
   .claude/skills/remake-edit/preview.js <workdir>`): it draws each shot's crop
   box and centre line on the source's first, middle and last frame of the slot

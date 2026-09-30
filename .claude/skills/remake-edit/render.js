@@ -20,6 +20,16 @@ const ff = (args) => execFileSync(FFMPEG, ["-v", "error", "-y", ...args], { stdi
 const dims = (f) => execFileSync(FFPROBE, ["-v", "error", "-select_streams", "v", "-show_entries", "stream=width,height", "-of", "csv=p=0", f]).toString().trim().split(",").map(Number);
 const enc = ["-c:v", "libx264", "-crf", "16", "-preset", "medium", "-pix_fmt", "yuv420p", "-r", String(fps), "-an"];
 
+// Every crop must have been seen in preview.jpg before it's rendered.
+if (!process.env.SKIP_PREVIEW_CHECK) {
+  const stampFile = path.join(dir, "preview.stamp");
+  const want = require("./cropstamp")(plan);
+  if (!fs.existsSync(stampFile) || fs.readFileSync(stampFile, "utf8").trim() !== want) {
+    console.error("Crops changed since the last preview. Run preview.js, look at preview.jpg (whole head in frame, face on the red line), then render.");
+    process.exit(1);
+  }
+}
+
 fs.rmSync(segDir, { recursive: true, force: true });
 fs.mkdirSync(segDir);
 

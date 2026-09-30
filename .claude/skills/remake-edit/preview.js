@@ -44,4 +44,8 @@ shots.forEach((entry, row) => {
   });
 });
 execFileSync(FFMPEG, ["-v", "error", "-y", "-i", path.join(tmp, "%03d.png"), "-vf", `tile=3x${shots.length}`, "-frames:v", "1", path.join(dir, "preview.jpg")]);
+// render.js refuses to run unless this stamp matches the plan's current crops,
+// so a crop changed after the preview can't reach the video unchecked
+// (2026-09-30: every crop was tightened after the preview and heads came out cut).
+fs.writeFileSync(path.join(dir, "preview.stamp"), require("./cropstamp")(plan));
 console.log(`done: ${path.join(dir, "preview.jpg")} (${shots.length} shots)`);
