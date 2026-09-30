@@ -29,7 +29,15 @@ so it is not a clip-for-clip copy.
 - The winget PATH change needs a new shell, so call them by full path (glob
   the folder). No Python on this PC; scripts are Node.
 - `drawtext` needs `fontfile='C\:/Windows/Fonts/arialbd.ttf'` (fontconfig is
-  missing and the filter segfaults without it).
+  missing and the filter segfaults without it). Inside a `plan.json` `vf`
+  (passed through `render.js`) write `fontfile='/Windows/Fonts/...'` with no
+  drive letter: the `C\:` escape gets lost there and ffmpeg fails to parse.
+- Captions redrawn on new shots (e.g. "The funny guy", 2026-09-30): `drawtext`
+  with `segoeuib.ttf`, white, `borderw=5:bordercolor=black`, centred, sized and
+  placed to match the inspo. For an ending fade, put `fade=t=out` before the
+  `drawtext` in the same `vf` so the caption stays on black like the inspo.
+- Letterboxed sources (films, scene packs): run `cropdetect` on the slot and
+  set `side` just inside the picture height (e.g. 0.92) so no black bar shows.
 - The browser pane can't decode video while hidden; don't use it for frames.
 
 Work in the session scratchpad (`<scratchpad>/remake-<name>/`), never the repo.
@@ -88,6 +96,14 @@ rule above before going further.
   side by side with the inspo's.
 - Record crop centre (cx, cy as fractions of the frame) and `side` (crop height
   as a fraction of source height) per shot by reading a single frame.
+- **Every replaced slot gets a different face (Davide, 2026-09-30).** If the
+  inspo shows 7 different people, the remake shows 7 different people; never
+  fill slots with the same person from other scenes. If a download fails or a
+  source is too soft, find another person instead of reusing one.
+- **Face centred in the frame (Davide, 2026-09-30).** Nose on the vertical
+  centre line and eyes in the upper third, like a front-camera selfie. Profiles,
+  faces pushed to one side, and people who drift off-centre during the slot
+  don't qualify. Check `cx` on the middle frame and on both edges of the slot.
 - Lessons from the first remake (2026-09-28, Davide posted it):
   - **Long slots (over 1.5 s) need a steady subject.** Check the frame every
     0.5 s across the whole slot, not one frame: the 3.8 s opening shot drifted
@@ -96,9 +112,12 @@ rule above before going further.
   - **One scene per source, once.** Don't reuse the same interview set for two
     slots (Troy appeared twice); variety of settings is what makes the montage
     feel rich.
-  - **Quality first when choosing sources.** Prefer 720p+ uploads; 240p-480p TV
-    rips look soft next to the inspo. Search for "HD" or "remastered" versions
-    before settling.
+  - **Quality first when choosing sources (Davide, 2026-09-30: "more high
+    quality").** A 9:16 crop of a 16:9 source keeps only a third of its width,
+    so download 1080p (`bv*[height<=1080]`) and prefer vertical or 4K sources
+    ("4K scene pack", vertical red-carpet clips). Reject anything that leaves the
+    face under about 500 px tall after the crop. Avoid wide TV-studio shots
+    (e.g. Kimmel) that need a tight crop; they came out visibly soft.
 
 ### 5. Render
 Write `plan.json` next to the inspo and run
