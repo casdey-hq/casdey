@@ -125,6 +125,16 @@ rule above before going further.
   clips:** TikTok and Instagram Reels (the guys' own accounts and fan re-uploads)
   and Pinterest video pins. YouTube is the last resort for this kind of edit.
   What actually worked (2026-09-30):
+  - **Bulk and filtered, the default:** `FFMPEG=... node
+    .claude/skills/remake-edit/pindl.js <workdir>/pins "<name> selfie"
+    "<name>" ...` searches Pinterest for every query, downloads each pin, and
+    keeps only native vertical, 540+ px, 24+ fps, low-duplicate clips
+    (`index.tsv` lists them). Then build a numbered middle-frame sheet, pick
+    the ones that do what the inspo shots do, and check each with a 6-frame
+    strip across the clip before `preview.js`. v5 of "The funny guy" came from
+    ~250 clips over 20 names; searching "<name> selfie" for TikTok-famous guys
+    (Jacob Rott, Noah Beck, Vinnie Hacker, Josh Richards, Bryce Hall, Cameron
+    Porras, Michele Morrone) gave the most front-camera stares.
   - **Pinterest, no login:** `node .claude/skills/remake-edit/pinsearch.js
     "<name> selfie" 10` prints `pin id | duration | size | title | m3u8` from
     Pinterest's video search. Search each face by name ("laurence coke",
@@ -140,6 +150,24 @@ rule above before going further.
   - Pins come with the creator's own overlays (TikTok handle, lyric text, IG
     story UI). Crop them out with `side`/`cy` and check with `preview.js`.
   - Titles are often empty; only cast a face you can name and know is adult.
+- **Same vibe, not just same category (Davide, 2026-09-30, after v4 of "The
+  funny guy": "some clips are too laggy, others too zoomed, not the same
+  vibe").** Before sourcing, write down what every inspo shot has in common
+  and match all of it:
+  - **Action and expression:** e.g. a static front-camera shot, the guy
+    holding still and staring into the lens with a straight face. No
+    talking, laughing, turning away, hand-in-hair or props unless the inspo
+    does it.
+  - **Framing:** measure the inspo's face size and position (e.g. head about
+    40% of the width, eyes in the upper third, shoulders visible) and pick
+    clips that already look like that at full frame.
+  - **No zoom:** use native vertical 9:16 clips at `side` 0.9-1. Never crop into
+    a small part of a clip to fix framing; find another clip instead.
+  - **No lag:** only real videos at 24-30 fps. Check `r_frame_rate` and run
+    `mpdecimate` to count duplicate frames; drop 12.5 fps GIF loops and
+    re-encoded clips that stutter.
+  - **Light and look:** similar lighting and colour (bright daylight selfies
+    vs dark rooms) so the cuts feel like one montage.
 - **Every replaced slot gets a different face (Davide, 2026-09-30).** If the
   inspo shows 7 different people, the remake shows 7 different people; never
   fill slots with the same person from other scenes. If a download fails or a
