@@ -44,6 +44,18 @@ Work in the session scratchpad (`<scratchpad>/remake-<name>/`), never the repo.
 
 ## Steps
 
+### 0. Getting the inspo from a link (worked 2026-09-30)
+Davide may send a TikTok link (`vm.tiktok.com/...`) instead of a file. yt-dlp
+fails on it ("TikTok is requiring login"), so use SnapTik in the built-in
+browser: open `https://snaptik.app/en2`, decline the cookie banner (Manage
+options, then Confirm choices; never Accept all), fill the link field, submit.
+The page calls `/api/extract`; read that response with `read_network_requests`
+(find its requestId in the list) and `curl -L` the `downloadUrl` (a
+`d.rapidcdn.app` link, plain mp4, no watermark, HEVC 720x1280). Verify with
+ffprobe before using. The response also has the title, hashtags and play
+count, useful for judging what the edit is. Downloading is only for the inspo
+Davide named; source footage still needs his yes first.
+
 ### 1. Map the inspo
 - `ffprobe` for size, fps, duration.
 - Cuts: `ffmpeg -i inspo.mp4 -vf "select='gt(scene,0.25)',showinfo" -an -f null -`
