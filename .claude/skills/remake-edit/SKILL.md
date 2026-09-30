@@ -96,6 +96,25 @@ rule above before going further.
   side by side with the inspo's.
 - Record crop centre (cx, cy as fractions of the frame) and `side` (crop height
   as a fraction of source height) per shot by reading a single frame.
+- **Before rendering, run `preview.js`** (`FFMPEG=... node
+  .claude/skills/remake-edit/preview.js <workdir>`): it draws each shot's crop
+  box and centre line on the source's first, middle and last frame of the slot
+  into `preview.jpg`. Guessing `cx` from grids was off by up to 0.2 on
+  2026-09-30 (faces landed at the frame edge); the preview shows drift, cut
+  heads and watermarks at once. Fix `cx`/`start` until every face sits on the
+  red line in all three frames.
+- Casting Clavicular: he was charged with raping a 17-year-old (charges filed
+  2026-09-08, public 2026-09-22). Leave him out unless Davide says otherwise.
+- **Cast looksmaxxing faces, not actors (Davide, 2026-09-30, the most important
+  casting rule).** Casdey's audience knows the looksmaxxing canon, so the new
+  faces must be the guys that world worships: male models with textbook
+  features (sharp jaw, hunter eyes, great hair, e.g. Francisco Lachowski,
+  Jordan Barrett, Sean O'Pry, Matthew Noszka, Parker van Noord, Lucky Blue
+  Smith) and pretty-boy / looksmaxxing influencers and TikTokers. A cast of
+  mainstream actors (Bridgerton, Saltburn, Outer Banks) got "who the fuck are
+  these guys". Prefer their own front-camera, selfie, GRWM and close-up
+  content over film or talk-show footage. Adults-only still applies: only use
+  someone whose adult age is clear.
 - **Every replaced slot gets a different face (Davide, 2026-09-30).** If the
   inspo shows 7 different people, the remake shows 7 different people; never
   fill slots with the same person from other scenes. If a download fails or a
