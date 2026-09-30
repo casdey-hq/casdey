@@ -115,6 +115,31 @@ rule above before going further.
   these guys". Prefer their own front-camera, selfie, GRWM and close-up
   content over film or talk-show footage. Adults-only still applies: only use
   someone whose adult age is clear.
+- **Match the inspo's production level, and default to amateur (Davide,
+  2026-09-30).** If the inspo's shots are phone selfies, front-camera clips,
+  mirror videos or casual stories, the new shots must be the same kind:
+  unpolished, handheld, vertical, shot by the person himself. Never swap in
+  cinematic footage, campaigns, runway, film scenes or interviews unless the
+  inspo itself is cinematic. v3 of "The funny guy" (models from campaigns and
+  interviews) was "too cinematic and professional". **Where to find amateur
+  clips:** TikTok and Instagram Reels (the guys' own accounts and fan re-uploads)
+  and Pinterest video pins. YouTube is the last resort for this kind of edit.
+  What actually worked (2026-09-30):
+  - **Pinterest, no login:** `node .claude/skills/remake-edit/pinsearch.js
+    "<name> selfie" 10` prints `pin id | duration | size | title | m3u8` from
+    Pinterest's video search. Search each face by name ("laurence coke",
+    "jacob rott selfie", "michele morrone selfie", "noah beck selfie").
+  - **Downloading a pin:** the m3u8 is a master playlist whose variants point at
+    one fragmented MP4 (`..._720w.cmfv`) through byte ranges. `ffmpeg -c copy`
+    on the m3u8 stops after 2 s, so read the master, take the last (highest)
+    video variant, read the `.cmfv` name from it, `curl` that whole file and
+    remux it with `ffmpeg -i x.cmfv -c copy x.mp4`. Some pins really are 2 s
+    GIF loops at 12.5 fps; only use those for short slots.
+  - **TikTok profiles need a login** in yt-dlp (`@user` pages fail); single
+    video URLs may still work.
+  - Pins come with the creator's own overlays (TikTok handle, lyric text, IG
+    story UI). Crop them out with `side`/`cy` and check with `preview.js`.
+  - Titles are often empty; only cast a face you can name and know is adult.
 - **Every replaced slot gets a different face (Davide, 2026-09-30).** If the
   inspo shows 7 different people, the remake shows 7 different people; never
   fill slots with the same person from other scenes. If a download fails or a
