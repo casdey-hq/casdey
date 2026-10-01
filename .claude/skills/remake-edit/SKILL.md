@@ -175,6 +175,29 @@ clips), not look-alikes or a similar scene.
     video variant, read the `.cmfv` name from it, `curl` that whole file and
     remux it with `ffmpeg -i x.cmfv -c copy x.mp4`. Some pins really are 2 s
     GIF loops at 12.5 fps; only use those for short slots.
+  - **TikTok in 1080p without a login (worked 2026-10-01, the best source for
+    amateur clips; Pinterest re-uploads are only 576-720 px).** tiktok.com
+    itself redirects to login, but:
+    1. **List an account's videos** on Urlebird in the built-in browser
+       (`https://urlebird.com/user/<handle>/`, also `/hash/<tag>/`); from that
+       origin, `fetch('/user/<handle>/')` for several handles and regex the
+       video ids (`/video/<slug>-<id>/`).
+    2. **Resolve them in bulk on SnapTik**: on `snaptik.app/en2`, per id:
+       `POST /api/token` (headers `X-Requested-With: XMLHttpRequest`,
+       `Content-Type: application/json`) gives `{id,p}`;
+       `await window._solveChallenge(id,p)` gives the `X-Verify` header for
+       `GET /api/extract?url=https://www.tiktok.com/@<handle>/video/<id>`. The
+       JSON has `thumbnail`, `videoDuration`, `title`, `downloadUrl`.
+    3. **Screen in the page:** render all thumbnails as a numbered grid and
+       screenshot it (retry once if it times out); only copy the `downloadUrl`
+       token for the picks (they are ~1 KB each, so never dump them all), write
+       them to `tokens.txt` and `curl -L` each on the PC.
+    The browser can't post data to a localhost server on the PC (blocked).
+    **The hard part is knowing which accounts post the right clips.** Big
+    creators' own feeds are mostly talking, vlogs and ads; moody stare clips
+    come from smaller pretty-boy accounts (e.g. @p6rs9, Parsa: dark selfies)
+    and the accounts the inspo's creator edits (check his other videos'
+    captions on Urlebird for @mentions). Ask Davide for handles early.
   - **TikTok profiles need a login** in yt-dlp (`@user` pages fail); single
     video URLs may still work.
   - Pins come with the creator's own overlays (TikTok handle, lyric text, IG
