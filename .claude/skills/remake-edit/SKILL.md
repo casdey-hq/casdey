@@ -175,6 +175,17 @@ clips), not look-alikes or a similar scene.
     video variant, read the `.cmfv` name from it, `curl` that whole file and
     remux it with `ffmpeg -i x.cmfv -c copy x.mp4`. Some pins really are 2 s
     GIF loops at 12.5 fps; only use those for short slots.
+  - **Default: `tiktok.js` (runs on the PC, no browser needed).**
+    `node .claude/skills/remake-edit/tiktok.js users <dir> <handle>...`
+    lists accounts' videos with thumbnails, `add <dir> ids.txt` does the same
+    for `handle/id` pairs (when Urlebird shows the PC Cloudflare's "Just a
+    moment" page, collect the ids in the built-in browser and pass them here),
+    `sheet <dir>` builds numbered sheets, `get <dir> <n>...` downloads picks in
+    HD where available. Never ask Davide for handles (2026-10-01: "SEARCH THEM
+    YOURSELF"): mine hashtag pages, curator accounts and @mentions in captions.
+    Good pretty-boy accounts found so far: p6rs9, julianmayboca, aejae9,
+    _jrx.jace, mure843, qayro9, itscamsworld, vhackerr, gabriel.fadini; looksmax
+    edit accounts sterl1ng.lucian, psl.halo, vexmog point at more faces.
   - **TikTok in 1080p without a login (worked 2026-10-01, the best source for
     amateur clips; Pinterest re-uploads are only 576-720 px).** tiktok.com
     itself redirects to login, but:
