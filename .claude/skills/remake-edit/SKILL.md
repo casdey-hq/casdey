@@ -321,8 +321,11 @@ Write `plan.json` next to the inspo and run
 
 If the edit isn't 9:16, the script also writes `<output>_shorts.mp4`
 (1080×1920, edit centred on black): YouTube Shorts crops a 1:1 upload, while
-TikTok and Instagram letterbox it fine. Send both files and say which is for
-Shorts.
+TikTok and Instagram letterbox it fine. **Deliver only the 9:16 Shorts version
+by default (Davide, 2026-10-01)**: send `<output>_shorts.mp4` (or `remake.mp4`
+when the edit is already 9:16) and nothing else; the other format only if he
+asks. Keep the sent file under 30 MB so it reaches his phone (re-encode with
+`-crf 21 -preset slow` if bigger).
 
 **Slide edits (text baked into images).** Davide's call (2026-09-28): **use
 finished Pinterest images, don't build slides.** Search Pinterest for images
