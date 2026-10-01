@@ -136,6 +136,14 @@ clips), not look-alikes or a similar scene.
   red line in all three frames.
 - Casting Clavicular: he was charged with raping a 17-year-old (charges filed
   2026-09-08, public 2026-09-22). Leave him out unless Davide says otherwise.
+- **Judge the face first, then the clip (Davide, 2026-10-01: "in some of the
+  clips there are fat guys what the hell?").** Every face must be lean with a
+  sharp jaw and defined cheekbones, the looksmaxxing ideal: no chubby or soft
+  faces, no double chin, whatever the lighting or vibe. A random pretty-boy
+  hashtag account is not enough; check the face on its own before checking
+  stillness, light and quality. The safest sources are looksmax edit accounts
+  (psl.halo, vexmog, sterl1ng.lucian), which only post high-rated faces; mind
+  their creator tags (e.g. "-KIRA") and blur them with `delogo` in the source.
 - **Cast looksmaxxing faces, not actors (Davide, 2026-09-30, the most important
   casting rule).** Casdey's audience knows the looksmaxxing canon, so the new
   faces must be the guys that world worships: male models with textbook
@@ -183,8 +191,9 @@ clips), not look-alikes or a similar scene.
     `sheet <dir>` builds numbered sheets, `get <dir> <n>...` downloads picks in
     HD where available. Never ask Davide for handles (2026-10-01: "SEARCH THEM
     YOURSELF"): mine hashtag pages, curator accounts and @mentions in captions.
-    Good pretty-boy accounts found so far: p6rs9, julianmayboca, aejae9,
-    _jrx.jace, mure843, qayro9, itscamsworld, vhackerr, gabriel.fadini; looksmax
+    Good pretty-boy accounts found so far: p6rs9,
+    _jrx.jace, mure843, qayro9, itscamsworld, vhackerr, gabriel.fadini (not
+    julianmayboca or aejae9: rejected as not lean enough); looksmax
     edit accounts sterl1ng.lucian, psl.halo, vexmog point at more faces.
   - **TikTok in 1080p without a login (worked 2026-10-01, the best source for
     amateur clips; Pinterest re-uploads are only 576-720 px).** tiktok.com
