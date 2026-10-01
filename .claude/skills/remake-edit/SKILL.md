@@ -30,6 +30,11 @@ so it is not a clip-for-clip copy.
   missing and the filter segfaults without it). Inside a `plan.json` `vf`
   (passed through `render.js`) write `fontfile='/Windows/Fonts/...'` with no
   drive letter: the `C\:` escape gets lost there and ffmpeg fails to parse.
+- A caption with a colon ("Average single guy:") breaks the filter even when
+  escaped inside plan.json; write it to `<workdir>/cap.txt` and use
+  `textfile=cap.txt`, then run render.js/gradematch.js with the workdir as cwd.
+  Serif captions like that one match `georgiab.ttf`.
+- If the SnapTik `curl` stalls, re-run it with `-C - --max-time 60` (resume).
 - Captions redrawn on new shots (e.g. "The funny guy", 2026-09-30): `drawtext`
   with `segoeuib.ttf`, white, `borderw=5:bordercolor=black`, centred, sized and
   placed to match the inspo. For an ending fade, put `fade=t=out` before the
