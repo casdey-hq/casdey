@@ -236,6 +236,13 @@ clips), not look-alikes or a similar scene.
 - **Check who the subject is before sourcing.** Search his name once. On
   2026-09-30 the subject (Hullo / Mason Hull) had been arrested on CSAM
   charges; Davide chose to recast with another face (Vinnie Hacker).
+  That was a one-off: when Davide names the subject ("this guy is called
+  hullo", 2026-10-02) the remake uses THAT person; a recast got "bro it's
+  not him". Flag a real reputational risk in one line, then do it.
+  **Finding a creator's original clips:** archive accounts re-post them in
+  their native 9:16 ("<name>_deleted_videos", "<name>s.deleted.vault" on
+  Urlebird); fan edits are mostly square and zoom/cut the head when cropped
+  to 9:16. Pinterest name searches can return nothing of him ("hullo").
 - **Same vibe, not just same category (Davide, 2026-09-30, after v4 of "The
   funny guy": "some clips are too laggy, others too zoomed, not the same
   vibe").** Before sourcing, write down what every inspo shot has in common
