@@ -366,7 +366,19 @@ by hand with one ffmpeg `overlay` (kept inspo frames as background, new shot
 on top, `y` animated with an ease-out expression, captions with
 `drawtext` in `seguisb.ttf`, which is close to TikTok's font), save it to
 `src/transition.mp4` and put it in the timeline as a normal shot with
-`side: 1`. **Picture bands** (the shots sit in a band inside 9:16): render at the full
+`side: 1`. **Glitch transitions (Davide, 2026-10-02, Jordan Barrett edit: "the
+transition to Jordan isn't good like in the inspo")**: always check the frames
+where the hook hands over to the montage with a 2-frame strip and rebuild
+whatever effect is there; a hard cut there looks cheap. For an RGB-split /
+slice glitch: freeze the last CLEAN hook frame (the inspo's own glitch frames
+already ghost its old footage in), `blend` it into the first new shot over
+~15 frames (`all_expr` with an eased N ramp, both `format=gbrp`), then `geq`
+with r/b shifted ±18 px and random 36 px bands shifted up to 70 px, all scaled
+by `sin(PI*N/14)`. Crop the new shot exactly like render.js will (same x),
+save as `src/transition.mp4`, end the `keep` at that clean frame, and start
+the next shot 15 frames later in the same source so it continues seamlessly.
+Open a montage on a calm, sharp frame, not a source's whip blur.
+**Picture bands** (the shots sit in a band inside 9:16): render at the full
 size and set `band: [bw, bh, x, y]` (from `cropdetect`) at the top level or
 per entry. The renderer then crops each source to the band's aspect and pads
 it into place. **Never** crop the band out afterwards in `vf`: on 2026-09-29
