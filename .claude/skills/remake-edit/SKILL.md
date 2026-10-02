@@ -292,6 +292,17 @@ clips), not look-alikes or a similar scene.
   inspo shows 7 different people, the remake shows 7 different people; never
   fill slots with the same person from other scenes. If a download fails or a
   source is too soft, find another person instead of reusing one.
+- **Centre on the PEOPLE, and source like the inspo (Davide, 2026-10-02,
+  Tren Twins v1: "you have a SERIOUS problem with centering people in the
+  frame").** Wide 16:9 scene packs cropped to the inspo's square left a
+  twin cut at the edge or off-centre in most shots. Default for duo/group
+  edits: take shots from fan edits of the same people (Urlebird hashtag
+  pages), which are already framed tight around them, and in `preview.js`
+  check that every head is inside the box and the group (not one person,
+  not the empty middle) sits on the red line. Match the inspo's settings
+  too (daylight Muscle Beach vs dark gym). Start each shot at least 0.1 s
+  after its scene boundary in the source: fan edits put flashes and shake
+  on their own cuts, and a start 1-2 frames in shows the previous scene.
 - **Face centred in the frame (Davide, 2026-09-30).** Nose on the vertical
   centre line and eyes in the upper third, like a front-camera selfie. Profiles,
   faces pushed to one side, and people who drift off-centre during the slot
