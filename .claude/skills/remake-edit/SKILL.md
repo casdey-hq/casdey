@@ -400,6 +400,16 @@ top level) overrides the default look; `vf` adds a filter to one shot.
 
 ### 6. Verify before sending
 - Frame count and duration equal the inspo's.
+- **Cuts in sync with the song (Davide, 2026-10-02, Hullo "Mogged!!": "it's
+  not really in sync with the song").** The cut frames matched the inspo, but
+  six source clips (re-posts and fan edits) had their OWN jump cuts inside
+  the slot, so extra cuts landed between beats. Every cut must be the
+  inspo's cut: run the same `select='gt(scene,0.15)',showinfo` scene detect
+  on the remake and on the inspo and compare the lists. Any time in the
+  remake that isn't in the inspo is a cut inside a source; move that shot's
+  `start` (or pick another moment) until the lists are identical, then
+  re-render. Check sources for internal cuts before casting too: a scene
+  shorter than the slot means a cut will show.
 - Per shot, a strip of its first, middle and last frame: catches cutaways to
   other people or the interviewer at the edges of a shot (happened three times
   on the first run). Fix `start` and re-render.
