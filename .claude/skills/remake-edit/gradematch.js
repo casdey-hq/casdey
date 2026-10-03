@@ -43,7 +43,10 @@ const out = base.timeline.map((e) => {
   const t = luma(base.inspo, a, at), m = luma("raw.mp4", a, at);
   const g = Math.max(0.42, Math.min(1.2, Math.log(Math.max(m, 1) / 255) / Math.log(Math.max(t, 1) / 255)));
   console.log(`slot ${a}-${at}: inspo ${t.toFixed(0)}, raw ${m.toFixed(0)}, gamma ${g.toFixed(2)}`);
-  return { ...e, grade: `eq=gamma=${g.toFixed(2)}:contrast=1.05,unsharp=5:5:0.4` };
+  // Keep the plan's own look (e.g. `hue=s=0` for a B&W edit) and add the gamma
+  // on top; replacing it dropped the B&W grade on 2026-10-03.
+  const look = base.grade ? `${base.grade},` : "eq=contrast=1.05,unsharp=5:5:0.4,";
+  return { ...e, grade: `${look}eq=gamma=${g.toFixed(2)}` };
 });
 fs.writeFileSync(path.join(dir, "plan.json"), JSON.stringify({ ...base, timeline: out }, null, 1));
 console.log("plan.json updated; now run render.js");
