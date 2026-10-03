@@ -239,6 +239,16 @@ clips), not look-alikes or a similar scene.
   That was a one-off: when Davide names the subject ("this guy is called
   hullo", 2026-10-02) the remake uses THAT person; a recast got "bro it's
   not him". Flag a real reputational risk in one line, then do it.
+  **Use the person's OWN account first (Davide, 2026-10-03, Clav v1: "some
+  clips are shit, the light is strange and they are stretched").** v1 came
+  from fan edits and 4:3 YouTube-style compilations: the compilations
+  squash 9:16 clips into 1440x1080 (faces come out wide), and fan edits
+  carry their own colour grades and flashes. His verified account on
+  Urlebird (`/user/<name>/`) had 1080x1920 originals with natural light.
+  For 9:16 originals into a square slot, set `side` about 0.42 so the head
+  fills the frame like the inspo, and `cy` so the face sits in the upper
+  half. Clamp `gradematch` to gamma 0.85-1.15: 1.2 washed night shots out
+  and 0.5 crushed them.
   **Finding a creator's original clips:** archive accounts re-post them in
   their native 9:16 ("<name>_deleted_videos", "<name>s.deleted.vault" on
   Urlebird); fan edits are mostly square and zoom/cut the head when cropped
@@ -284,7 +294,7 @@ clips), not look-alikes or a similar scene.
   normal footage (60-160) look wrong. After `preview.js`, run
   `node .claude/skills/remake-edit/gradematch.js <workdir>` (measures every
   slot in the inspo and in a raw render, writes a per-shot `eq=gamma`), then
-  render. If one shot needs a gamma below ~0.45, swap the moment instead.
+  render. The gamma is clamped to 0.85-1.15 (2026-10-03); if a shot still looks far off, swap the moment instead.
 - **Stream overlays.** Twitch chat and follow banners sit in the top right and
   bottom of streamer footage; pick `cx` so the crop ends before the chat and
   move `cy` down a little. Avoid the first 10 s of a stream (banners).

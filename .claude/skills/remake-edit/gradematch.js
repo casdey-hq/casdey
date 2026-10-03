@@ -41,7 +41,7 @@ const out = base.timeline.map((e) => {
   at += len;
   if (!e.src) return e;
   const t = luma(base.inspo, a, at), m = luma("raw.mp4", a, at);
-  const g = Math.max(0.42, Math.min(1.2, Math.log(Math.max(m, 1) / 255) / Math.log(Math.max(t, 1) / 255)));
+  const g = Math.max(0.85, Math.min(1.15, Math.log(Math.max(m, 1) / 255) / Math.log(Math.max(t, 1) / 255)));
   console.log(`slot ${a}-${at}: inspo ${t.toFixed(0)}, raw ${m.toFixed(0)}, gamma ${g.toFixed(2)}`);
   // Keep the plan's own look (e.g. `hue=s=0` for a B&W edit) and add the gamma
   // on top; replacing it dropped the B&W grade on 2026-10-03.
