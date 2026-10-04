@@ -6,11 +6,12 @@
 // the day-1 C fades in at 45%, the day-90 C steps up and to the right. Then the
 // offer line, a white "link in bio" pill and casdey.com.
 // Smoothness (Davide, 2026-10-04: v1 "should be more smooth"): the edit
-// crossfades into the card, every fade is a slow smootherstep, the mark is
+// crossfades into the card, every fade is a smootherstep (v2 at about 0.5 s
+// each was "should be faster": the whole build now lands in about 1.1 s), the mark is
 // rendered here frame by frame with sub-pixel positions (ffmpeg's overlay
 // snaps to whole pixels and judders), and the text fades without moving.
 // Usage: node endcard.js <edit.mp4> [--out x.mp4] [--line "Your free glow-up analysis"]
-//          [--pill "link in bio"] [--foot "casdey.com"] [--secs 3.5]
+//          [--pill "link in bio"] [--foot "casdey.com"] [--secs 2.5]
 //   (needs FFMPEG=path\to\ffmpeg.exe). Default output: <edit>_cta.mp4, CRF 21
 //   so it stays under the 30 MB delivery limit.
 const { execFileSync, spawnSync } = require("child_process");
@@ -31,8 +32,8 @@ const out = path.resolve(opt("--out", edit.replace(/\.mp4$/i, "_cta.mp4")));
 const line = opt("--line", "Your free glow-up analysis");
 const pill = opt("--pill", "link in bio");
 const foot = opt("--foot", "casdey.com");
-const secs = Number(opt("--secs", 3.5));
-const XF = 0.5; // crossfade from the edit into the card
+const secs = Number(opt("--secs", 2.5));
+const XF = 0.3; // crossfade from the edit into the card
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const FFPROBE = FFMPEG.replace(/ffmpeg(\.exe)?$/i, "ffprobe$1");
 const FONT = "/Windows/Fonts/seguisb.ttf"; // no drive letter: see SKILL.md
@@ -72,7 +73,7 @@ function cCoverage(x, y) {
   return clamp(0.5 - (d - 3.5) * U);
 }
 const L = Math.ceil(48 * U + step + 8); // layer side, centred on the mark
-const T = { back: [0.25, 0.85], frontIn: [0.55, 0.95], move: [0.65, 1.45], line: [1.15, 1.65], pill: [1.4, 1.9], foot: [1.65, 2.15] };
+const T = { back: [0.05, 0.35], frontIn: [0.2, 0.4], move: [0.25, 0.75], line: [0.55, 0.85], pill: [0.7, 1.0], foot: [0.85, 1.15] };
 const frames = Math.round(secs * fps);
 const back = new Float32Array(L * L);
 for (let py = 0; py < L; py++)
