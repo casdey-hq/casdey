@@ -1,11 +1,13 @@
 ---
 name: hormozi
-description: Analyze casdey offer, pricing, lead-generation, or monetization decisions using the project’s Alex Hormozi reference framework when requested or clearly relevant.
+description: Analyze Casdey offer, pricing, lead-generation, content or monetization decisions using Alex Hormozi's frameworks when requested or clearly relevant.
 ---
 
-# casdey Hormozi lens
+# Casdey Hormozi lens
 
-Read `.claude/skills/hormozi/SKILL.md` and only the linked references relevant
-to the decision. Treat the ledger as a record of deliberate casdey decisions,
-not as a substitute for the user's current direction. Do not change pricing,
-outreach, or production systems without explicit authorization.
+The skill lives at user level, shared by all of Davide's projects. Read
+`C:\Users\GIUSEPPE\.claude\skills\hormozi\SKILL.md` and only the references
+relevant to the decision, then Casdey's ledger at
+`.claude/hormozi-ledger.md`. Treat the ledger as a record of deliberate
+decisions, not as a substitute for Davide's current direction. Do not change
+pricing, outreach, or production systems without explicit authorization.

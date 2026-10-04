@@ -15,8 +15,12 @@ subscription, and a free first analysis as the hook.
 
 **Stage: pre-build, selling first.** The brand is set (direction A, the
 "before and after" mark, see `memory.md`) and **the waitlist is live at
-www.casdey.com since 2026-09-26**. Next: the first short-form videos, to test
-the promise and prices before building. Then the choice of iOS app vs web app.
+www.casdey.com since 2026-09-26**. Short-form videos are posting daily:
+looksmaxxing edits remade with `/remake-edit` (gym and motivation content
+doesn't work), 6 a day from the week of 2026-10-05. **Goals:** at least 10
+waitlist signups by 2026-10-13 (0 on 2026-10-04), €2,000/month by
+2026-12-31. Then the choice of iOS app vs web app. Davide's personal goals
+and life context live in his own project, `..\davide\`.
 
 ## Read `memory.md` when the task touches
 the research and reasoning behind part 2 · marketing and budget · accounts,
@@ -29,8 +33,9 @@ legal and tax. Don't load it for tasks that don't need it.
   numbers and history go in `memory.md`; this file only says what casdey is
   now, the rules, and where things live.
 - **Hormozi is the lens** for business calls (offer, pricing, channels, "is
-  this worth it"): `.claude/skills/hormozi/`, which carries the decision
-  ledger and the books.
+  this worth it"): the `hormozi` skill, at user level
+  (`~/.claude/skills/hormozi/`, shared by all Davide's projects since
+  2026-10-04). Casdey's decision ledger is `.claude/hormozi-ledger.md`.
 - **Copy what already works, then make it better.** Prefer proven markets and
   proven mechanics over new inventions.
 - **Sell before build.** Validate demand before building for real.
@@ -49,10 +54,10 @@ legal and tax. Don't load it for tasks that don't need it.
 - `AGENTS.md` and `.agents/skills/`: thin entrypoints for other AI agents
   (Codex and others), pointing back here. Keep them in sync when skills or
   rules change; never copy business facts into them.
-- `.claude/skills/`: `hormozi` (with `references/books/`, gitignored),
-  `frontend-design` (read before any visual work), `grill-me`,
+- `.claude/skills/`: `frontend-design` (read before any visual work), `grill-me`,
   `push-github`, `remake-edit` (inspo video to remade edit with ffmpeg), `update-project` (keeps `CLAUDE.md` and `memory.md`
-  current), `session-handoff`.
+  current), `session-handoff`. `.claude/hormozi-ledger.md`: Casdey's
+  Hormozi decisions (the skill itself is user level).
 - `web/`: www.casdey.com (Next.js 16, App Router, plain CSS in direction A):
   the waitlist page, `/privacy`, and `/admin`, the metrics page behind Google
   sign-in for Davide's addresses only. How it works, and how to check and run

@@ -572,3 +572,17 @@ Follows or diverges: **Follows.** Market first, proven demand, a niche wedge
 (the execution gap, no fake scores, trust, polish), sell before build.
 Reason: part 1's mistake was a blue ocean with a product built before the
 market was proven; see `memory.md` for the full research.
+
+## 2026-10-04 — Content narrows to looksmaxxing edits, volume doubles to 6 a day
+Framework: $100M Leads / post free content, More / Better / New (More first),
+narrow first, one call to action at a time.
+Decision: after about a week of daily posting, only the looksmaxxing edits
+get traction; gym and motivation content is dropped. Posting goes from 3 to
+6 a day from the week of 2026-10-05. The ask stays in the description, with
+an optional CTA clip added to the end of some edits.
+Follows or diverges: **Follows** (More: double volume on what works; narrow
+to the format that performs, which is also the app's own topic).
+Reason: the format is proven by the edits being remade. Open risk: on
+2026-10-04 the waitlist had 0 signups and the site almost no visits, so the
+leads constraint is now the path from a view to the site, not the volume of
+views. About 75% of viewers are in Italy while the target is the US.

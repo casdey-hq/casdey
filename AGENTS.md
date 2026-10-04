@@ -27,8 +27,11 @@ all agents work from the same knowledge.
   copy implying a team.
 - No em dashes as punctuation in Casdey copy. Hyphens in compound words are
   fine.
-- Business calls are judged through Alex Hormozi's frameworks:
-  `.claude/skills/hormozi/`.
+- Business calls are judged through Alex Hormozi's frameworks: the skill is
+  at user level, `C:\Users\GIUSEPPE\.claude\skills\hormozi\SKILL.md`, and
+  Casdey's decision ledger is `.claude/hormozi-ledger.md`.
+- Davide's personal goals and life context are not Casdey facts: they live
+  in his personal project, `..\davide\` (its own `CLAUDE.md` and `AGENTS.md`).
 
 ## Safety
 - Treat credentials and personal data as sensitive. Never print, commit or

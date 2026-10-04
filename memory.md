@@ -26,7 +26,10 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   Crowd, niche the same product to an avatar ("X for Y"), sell before build.
 - **Budget: about €1.7k** as of 2026-09-26. A part-time job is what buys the
   100+ days any app needs (RevenueCat 2026: even top categories take over 100
-  days to reach $10k).
+  days to reach $10k). On 2026-10-04 Davide confirmed the plan: one business
+  plus a part-time job, whose pay funds paid ads to get momentum faster
+  (freelancing was the alternative, rejected as more painful). The job search
+  is tracked in his personal project, `..\davide\`.
 
 ### Market research (2026-09-26)
 - **Self-improvement pays, young audiences included.** Gen Z spends more on
@@ -107,8 +110,9 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   RevenueCat (phone), Resend. Apple developer about €90/yr and Google €25 only
   for a phone app.
 
-- **Davide runs the posting himself** (2026-09-26): about 2 short videos a day,
-  his own plan. From *$100M Leads*, the parts to keep in mind: every video is
+- **Davide runs the posting himself.** Planned at about 2 a day on
+  2026-09-26, it ran at 3 a day and goes to **6 a day from the week of
+  2026-10-05**. From *$100M Leads*, the parts to keep in mind: every video is
   hook, retain, reward (curiosity through lists, steps and stories); "how I"
   beats "how to"; give until they ask (at least 3-4 value posts per ask), and
   on short-form the ask is an occasional standalone post; one call to action at
@@ -118,6 +122,31 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   do, a weekly review has little to discuss until there is traction. `/admin`
   is where the numbers live. Per-platform tracked links (UTM) were offered and
   are not built.
+
+### Content: what's working (state on 2026-10-04)
+- **Format: remade looksmaxxing edits.** Davide picks an inspo (a TikTok edit
+  that already performed) and Claude remakes it with the `remake-edit` skill:
+  same cuts, text and song, new footage, delivered as 9:16 under 30 MB. Claude
+  finds the sources and handles itself, and there are no content restrictions
+  on who appears. Davide posts nearly every remake (he doesn't always say so).
+  17 remakes were delivered in the two remake sessions before 2026-10-04.
+- **Looksmaxxing works; gym and motivation content doesn't** (Davide,
+  2026-10-04). Traction picked up around 2026-10-02 compared with the first
+  days. Content stays on looksmaxxing, which is also what the app is about.
+- **About 75% of viewers are in Italy**, Davide's own location, so the
+  platforms push the videos locally first. The target audience is
+  English-speaking, mainly the US: reaching it is the next big lever.
+- **The call to action:** the waitlist link in the video descriptions, and in
+  some videos a separate CTA clip added at the end of the edit (the edit
+  itself stays unchanged).
+- **Views are not reaching the site yet.** On 2026-10-04 the waitlist had
+  **0 signups**, and PostHog counted 23 pageviews on launch day (2026-09-26)
+  and 6 in total from 2026-09-27 to 2026-10-04. The path from video to site
+  is the constraint, not the content.
+- **Goals:** at least **10 waitlist signups by 2026-10-13** (Davide set 10;
+  100 was discussed and judged unrealistic from 0 visits), and **€2,000 a
+  month by 2026-12-31**, which Davide calls sketchy but possible with flawless
+  execution.
 
 ### The site (`web/`, live since 2026-09-26)
 - **Stack:** Next.js 16.3 (App Router; `proxy.ts` replaces middleware), plain
@@ -151,9 +180,17 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
 
 ### Next steps (in order)
 1. ~~Clean the project folder~~ (done 2026-09-26).
-2. **Waitlist plus the first TikTok videos**. The waitlist page was built 2026-09-26: one promise, a "what do you want to improve most?" question (body / face and skin / style / discipline) as demand data, email, a confirmation email, a privacy notice naming Davide as controller; no age or gender line, global audience (Davide: "users all around the globe, especially first-world countries"). Then the videos, to test the promise and prices
-   before building (sell before build, done properly this time).
-3. At build time: **a whole new brand and aesthetic, Apple-grade** (the part 1
+2. ~~Waitlist plus the first TikTok videos~~ (live: waitlist 2026-09-26,
+   videos daily since). The waitlist page: one promise, a "what do you want to
+   improve most?" question (body / face and skin / style / discipline) as
+   demand data, email, a confirmation email, a privacy notice naming Davide as
+   controller; no age or gender line, global audience (Davide: "users all
+   around the globe, especially first-world countries").
+3. **Now: turn views into signups** (see "Content: what's working"): get the
+   video-to-waitlist path working, reach the US audience, hit 10 signups by
+   2026-10-13. Then test the promise and prices before building (sell before
+   build, done properly this time).
+4. At build time: **a whole new brand and aesthetic, Apple-grade** (the part 1
    v5 charcoal system is gone; the logo is kept only for now and will very
    likely change too), and the choice of iOS app vs web app.
 

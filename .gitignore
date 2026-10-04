@@ -12,7 +12,3 @@ node_modules/
 .next/
 .vercel
 .DS_Store
-
-# Alex Hormozi book PDFs and their OCR text: copyrighted, local reference only.
-# The distilled notes beside them in references/ ARE committed.
-.claude/skills/hormozi/references/books/
