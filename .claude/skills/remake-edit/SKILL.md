@@ -95,6 +95,15 @@ clips), not look-alikes or a similar scene.
   writes `sheets/<id>.jpg` for every file in `src/`, 120 tiles each stamped with
   the source id and real time. (Don't do the maths in bash: ffprobe's CRLF
   output breaks it on Windows.)
+- **Cast by scene, the default for montage edits (added 2026-10-04, used for
+  every remake since 2026-10-02):** `FFMPEG=... node
+  .claude/skills/remake-edit/scenes.js <workdir> [--min <slot s>]` scene-detects
+  every file in `src/` (threshold 0.15, the same as the step 6 sync check) and
+  writes `scenes/sheet-NN.jpg`, one numbered tile per scene from the middle of
+  it, stamped `#n source start +length`, plus `scenes/scenes.tsv`. Set `--min`
+  to the longest slot you're filling so no tile would put a source's own cut
+  between beats. Then a pick is a lookup: shot `start` = the scene's start +
+  0.1 s or more. About 5 s per source.
 - Drop sources the subject isn't in (a cast interview can be all co-stars).
 - **No watermarks or logos in frame**: Getty, POPSUGAR, tv.aol.com, photo-agency
   ID numbers. Check the corners of each pick and crop tighter (`side` lower,
@@ -354,6 +363,18 @@ by default (Davide, 2026-10-01)**: send `<output>_shorts.mp4` (or `remake.mp4`
 when the edit is already 9:16) and nothing else; the other format only if he
 asks. Keep the sent file under 30 MB so it reaches his phone (re-encode with
 `-crf 21 -preset slow` if bigger).
+
+**CTA end card (Davide, 2026-10-04).** Some videos get the Casdey call to
+action as a separate clip after the edit; the edit itself never changes. When
+Davide asks for it ("with CTA", "add the end card"), run
+`FFMPEG=... node .claude/skills/remake-edit/endcard.js <final 9:16 mp4>
+[--line "..."] [--pill "link in bio"] [--secs 3]`. It writes `<name>_cta.mp4`:
+the edit, then a 3 s Studio White card where the mark animates (day-1 C fades
+in, day-90 C steps up and right), the offer line, a black "link in bio" pill
+and casdey.com, on silence. Everything sits in the middle of the frame, clear
+of TikTok's caption and button overlays. Default line: "Your free glow-up
+analysis"; use whatever CTA wording Davide is running at the time. Send both
+the plain and the `_cta` version unless he asked for one.
 
 **Slide edits (text baked into images).** Davide's call (2026-09-28): **use
 finished Pinterest images, don't build slides.** Search Pinterest for images
