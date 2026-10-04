@@ -368,11 +368,16 @@ asks. Keep the sent file under 30 MB so it reaches his phone (re-encode with
 action as a separate clip after the edit; the edit itself never changes. When
 Davide asks for it ("with CTA", "add the end card"), run
 `FFMPEG=... node .claude/skills/remake-edit/endcard.js <final 9:16 mp4>
-[--line "..."] [--pill "link in bio"] [--secs 3]`. It writes `<name>_cta.mp4`:
-the edit, then a 3 s Studio White card where the mark animates (day-1 C fades
-in, day-90 C steps up and right), the offer line, a black "link in bio" pill
-and casdey.com, on silence. Everything sits in the middle of the frame, clear
-of TikTok's caption and button overlays. Default line: "Your free glow-up
+[--line "..."] [--pill "link in bio"] [--secs 3.5]`. It writes `<name>_cta.mp4`:
+the edit crossfades (0.5 s, audio fading out with it) into a 3.5 s dark card
+(Ink #1D1D1F, white mark, like `casdey-logo-dark.png`; Davide chose dark over
+white on 2026-10-04) where the mark animates (day-1 C fades in at 45%, day-90
+C steps up and right), then the offer line, a white "link in bio" pill and
+casdey.com fade in. v1 got "should be more smooth": keep every fade slow
+(smootherstep, about 0.5 s), keep the mark rendered frame by frame with
+sub-pixel motion (ffmpeg's overlay snaps to whole pixels and judders), and
+never animate text position. Everything sits in the middle of the frame,
+clear of TikTok's caption and button overlays. Default line: "Your free glow-up
 analysis"; use whatever CTA wording Davide is running at the time. Send both
 the plain and the `_cta` version unless he asked for one.
 
