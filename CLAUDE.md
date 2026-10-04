@@ -19,8 +19,10 @@ www.casdey.com since 2026-09-26**. Short-form videos are posting daily:
 looksmaxxing edits remade with `/remake-edit` (gym and motivation content
 doesn't work), 6 a day from the week of 2026-10-05. **Goals:** at least 10
 waitlist signups by 2026-10-13 (0 on 2026-10-04), €2,000/month by
-2026-12-31. Then the choice of iOS app vs web app. Davide's personal goals
-and life context live in his own project, `..\davide\`.
+2026-12-31 (as set on 2026-10-04; the current goals and plan are always in
+Davide's Notion, "Journey", which he keeps updated: read it there, never
+edit it unasked). Then the choice of iOS app vs web app. Davide's personal
+goals and life context live in his own project, `..\davide\`.
 
 ## Read `memory.md` when the task touches
 the research and reasoning behind part 2 · marketing and budget · accounts,
