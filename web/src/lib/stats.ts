@@ -141,9 +141,9 @@ function utc(date: Date): string {
   return date.toISOString().slice(0, 19).replace("T", " ");
 }
 
-function pageviews(from: Date, to: Date): string {
+function pageviews(from: Date, to: Date, event = "$pageview"): string {
   const hosts = HOSTS.map((host) => `'${host}'`).join(", ");
-  return `event = '$pageview' AND timestamp >= toDateTime('${utc(from)}') AND timestamp <= toDateTime('${utc(to)}') AND properties.$host IN (${hosts})`;
+  return `event = '${event}' AND timestamp >= toDateTime('${utc(from)}') AND timestamp <= toDateTime('${utc(to)}') AND properties.$host IN (${hosts})`;
 }
 
 export type Visitors = {
@@ -154,6 +154,9 @@ export type Visitors = {
   referrers: { label: string; value: number }[];
   countries: { label: string; value: number }[];
   devices: { label: string; value: number }[];
+  /** Visitors and signups by bio link (utm_source from /tt, /ig, /yt). */
+  platforms: { label: string; value: number }[];
+  platformSignups: { label: string; value: number }[];
 };
 
 export async function loadVisitors(window: Window): Promise<Visitors> {
@@ -165,7 +168,7 @@ export async function loadVisitors(window: Window): Promise<Visitors> {
     hogql<[string | null, number]>(
       `SELECT ${property} AS k, count(DISTINCT distinct_id) AS v FROM events WHERE ${where} GROUP BY k ORDER BY v DESC LIMIT 8`,
     );
-  const [totals, series, previous, referrers, countries, devices] = await Promise.all([
+  const [totals, series, previous, referrers, countries, devices, platforms, platformSignups] = await Promise.all([
     hogql<[number]>(`SELECT count(DISTINCT distinct_id) FROM events WHERE ${where}`),
     hogql<[string, number]>(`SELECT ${bucket} AS b, count(DISTINCT distinct_id) FROM events WHERE ${where} GROUP BY b`),
     window.previous
@@ -174,6 +177,10 @@ export async function loadVisitors(window: Window): Promise<Visitors> {
     breakdown("properties.$referring_domain"),
     breakdown("properties.visitor_country"),
     breakdown("properties.$device_type"),
+    breakdown("properties.utm_source"),
+    hogql<[string | null, number]>(
+      `SELECT properties.utm_source AS k, count() AS v FROM events WHERE ${pageviews(window.from, window.to, "waitlist_joined")} GROUP BY k ORDER BY v DESC LIMIT 8`,
+    ),
   ]);
   const rows = (list: [string | null, number][], blank: string) =>
     list.map(([label, value]) => ({
@@ -187,5 +194,7 @@ export async function loadVisitors(window: Window): Promise<Visitors> {
     referrers: rows(referrers, "Direct or unknown"),
     countries: rows(countries, "Unknown"),
     devices: rows(devices, "Unknown"),
+    platforms: rows(platforms, "No bio link"),
+    platformSignups: rows(platformSignups, "No bio link"),
   };
 }

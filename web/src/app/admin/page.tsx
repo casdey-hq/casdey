@@ -15,6 +15,8 @@ const country = (code: string) => {
   if (!/^[A-Z]{2}$/.test(code)) return code;
   try { return regions.of(code) ?? code; } catch { return code; }
 };
+const PLATFORMS: Record<string, string> = { tiktok: "TikTok (/tt)", instagram: "Instagram (/ig)", youtube: "YouTube (/yt)" };
+const platform = (label: string) => PLATFORMS[label] ?? label;
 const percent = (part: number, whole: number) => (whole ? `${Math.round((part / whole) * 1000) / 10}%` : "0%");
 
 function Delta({ now, before, than, none }: { now: number; before: number | null; than: string; none: string }) {
@@ -138,6 +140,18 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             rows={visitors?.referrers ?? []}
             total={visitors?.total ?? 0}
             empty="No visits in this period yet."
+          />
+          <Breakdown
+            title="Visitors by bio link"
+            rows={(visitors?.platforms ?? []).map((row) => ({ ...row, label: platform(row.label) }))}
+            total={visitors?.total ?? 0}
+            empty="No visits in this period yet."
+          />
+          <Breakdown
+            title="Signups by bio link"
+            rows={(visitors?.platformSignups ?? []).map((row) => ({ ...row, label: platform(row.label) }))}
+            total={(visitors?.platformSignups ?? []).reduce((sum, row) => sum + row.value, 0)}
+            empty="No signups in this period yet."
           />
           <Breakdown
             title="Visitor countries"
