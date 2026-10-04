@@ -24,7 +24,9 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   idea, mine its reviews (App Store, Trustpilot, Reddit) for pain points and
   missing features, and make that gap the edge. Combine with Hormozi: Starving
   Crowd, niche the same product to an avatar ("X for Y"), sell before build.
-- **Budget: about €1.7k** as of 2026-09-26. A part-time job is what buys the
+- **Budget: about €1.7k** as of 2026-09-26; **corrected 2026-10-04 to about
+  €600** for the business (Davide checked his accounts: the rest is personal
+  money, savings and crypto he won't touch; details in `..\davide\memory.md`). A part-time job is what buys the
   100+ days any app needs (RevenueCat 2026: even top categories take over 100
   days to reach $10k). On 2026-10-04 Davide confirmed the plan: one business
   plus a part-time job, whose pay funds paid ads to get momentum faster
