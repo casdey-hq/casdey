@@ -144,9 +144,9 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   and 6 in total from 2026-09-27 to 2026-10-04. The path from video to site
   is the constraint, not the content.
 - **Goals:** at least **10 waitlist signups by 2026-10-13** (Davide set 10;
-  100 was discussed and judged unrealistic from 0 visits), and **€2,000 a
-  month by 2026-12-31**, which Davide calls sketchy but possible with flawless
-  execution.
+  100 was discussed and judged unrealistic from 0 visits), and **December
+  2026 as a €2,000 month in profit** (profit, not revenue: Davide,
+  2026-10-04), which he calls sketchy but possible with flawless execution.
 
 ### The site (`web/`, live since 2026-09-26)
 - **Stack:** Next.js 16.3 (App Router; `proxy.ts` replaces middleware), plain
