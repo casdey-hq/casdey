@@ -192,7 +192,21 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
    demand data, email, a confirmation email, a privacy notice naming Davide as
    controller; no age or gender line, global audience (Davide: "users all
    around the globe, especially first-world countries").
-3. **Now: turn views into signups** (see "Content: what's working"): get the
+3. **Superseded 2026-10-05: the waitlist goes, a live product replaces it.**
+   Davide, thinking as the customer: a profile with a waitlist and no product
+   sends a buyer to an app that exists today (Umax and peers), especially in
+   this impulse, crowded niche. "Sell before build" is kept in Hormozi's real
+   sense, sell something real before the expensive version: **(1)** the free
+   analysis live on www.casdey.com (photo in, top 3 levers out in seconds,
+   Claude vision, no score, 18+ gate, photos deleted, price shown before
+   upload); **(2)** the paid 90-day plan behind it, delivered by hand (a
+   personal plan plus daily photo check-ins on WhatsApp or Telegram, checked
+   by Davide with Claude), workable up to about 20-30 clients; **(3)** the
+   full app only once people pay for (2), shaped by their check-ins. No
+   "coming soon" anywhere. The funnel stages of Davide's stop rule stay the
+   same, now each tested for real. Scope of (1) and (2): to be set next.
+   The old step 3 follows for history.
+   **Before (2026-10-04): turn views into signups** (see "Content: what's working"): get the
    video-to-waitlist path working, reach the US audience, hit 10 signups by
    2026-10-13. Then test the promise and prices before building (sell before
    build, done properly this time).

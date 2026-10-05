@@ -13,9 +13,13 @@ check-ins, one integrated plan, total pricing trust, Apple-grade polish, and
 real-world appearance instead of fake face scores. It uses a normal
 subscription, and a free first analysis as the hook.
 
-**Stage: pre-build, selling first.** The brand is set (direction A, the
-"before and after" mark, see `memory.md`) and **the waitlist is live at
-www.casdey.com since 2026-09-26**. Short-form videos are posting daily:
+**Stage: selling a real, small product first.** The brand is set (direction A, the
+"before and after" mark, see `memory.md`). The waitlist has been live at
+www.casdey.com since 2026-09-26, and **on 2026-10-05 Davide decided to replace it**
+(a "coming soon" loses an impulse buyer to Umax): (1) a free photo analysis
+live on the site, (2) a paid 90-day plan behind it, delivered by hand with
+daily check-ins, (3) the full app built only once people pay for (2).
+Reasoning in `memory.md` and the ledger. Short-form videos are posting daily:
 looksmaxxing edits remade with `/remake-edit` (gym and motivation content
 doesn't work), 6 a day from the week of 2026-10-05. **Goals:** at least 10
 waitlist signups by 2026-10-13 (0 on 2026-10-04), December 2026 as a

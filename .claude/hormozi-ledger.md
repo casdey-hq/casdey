@@ -614,3 +614,21 @@ on the opinion of someone who isn't buying.
 Reason: Davide agreed explicitly. Do not reopen the niche on someone's gut
 feeling; reopen it only when the funnel reaches the "signups but no
 payment" stage and fails there.
+
+## 2026-10-05 — Waitlist replaced by a live free analysis and a paid plan done by hand
+Framework: $100M Leads / lead magnets (a real small win, delivered now);
+"sell before you build" read as Hormozi practised it (Gym Launch began as a
+done-by-hand service, productised later); $100M Offers / Value Equation
+(time delay and perceived likelihood).
+Decision: the waitlist goes. Step 1, a free photo analysis live on the site
+(top 3 levers, no score). Step 2, a paid 90-day plan behind it, delivered by
+hand with daily photo check-ins, which sells differentiator 1 (the execution
+gap) today. Step 3, the app, only after step 2 has paying clients. Same day
+as the "niche stays" entry above, and it changes that entry's second move
+(the analysis by DM) into the analysis on the site.
+Follows or diverges: **Follows**, and corrects a misreading: the waitlist
+treated "sell before build" as "promise before build". In a crowded B2C
+market the buyer has a working alternative today, so a promise carries the
+worst possible time delay in the Value Equation.
+Reason: Davide's call, thinking as the customer (he is close to the avatar):
+seeing a waitlist and no product, he would download an existing app.
