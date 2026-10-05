@@ -204,7 +204,12 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
    by Davide with Claude), workable up to about 20-30 clients; **(3)** the
    full app only once people pay for (2), shaped by their check-ins. No
    "coming soon" anywhere. The funnel stages of Davide's stop rule stay the
-   same, now each tested for real. Scope of (1) and (2): to be set next.
+   same, now each tested for real. Scoped the same day (spec:
+   `web/MVP_PLAN.md`): a quiz before the photos (Davide's MacroFactor
+   point: the investment raises expectation, but no surprise paywall),
+   email to see the result, face required and body optional, check-ins
+   **in the platform** (not WhatsApp), a **7-day free trial with card
+   upfront** and a day-6 reminder, then **€9.99/month or €59.99/year**.
    The old step 3 follows for history.
    **Before (2026-10-04): turn views into signups** (see "Content: what's working"): get the
    video-to-waitlist path working, reach the US audience, hit 10 signups by

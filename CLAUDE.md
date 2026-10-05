@@ -19,7 +19,7 @@ www.casdey.com since 2026-09-26, and **on 2026-10-05 Davide decided to replace i
 (a "coming soon" loses an impulse buyer to Umax): (1) a free photo analysis
 live on the site, (2) a paid 90-day plan behind it, delivered by hand with
 daily check-ins, (3) the full app built only once people pay for (2).
-Reasoning in `memory.md` and the ledger. Short-form videos are posting daily:
+Reasoning in `memory.md` and the ledger; the build spec is `web/MVP_PLAN.md`. Short-form videos are posting daily:
 looksmaxxing edits remade with `/remake-edit` (gym and motivation content
 doesn't work), 6 a day from the week of 2026-10-05. **Goals:** at least 10
 waitlist signups by 2026-10-13 (0 on 2026-10-04), December 2026 as a
