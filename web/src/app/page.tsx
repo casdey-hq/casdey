@@ -1,7 +1,16 @@
+import Link from "next/link";
 import { Mark } from "@/components/mark";
 import { PhoneToday } from "@/components/phone-today";
-import { WaitlistForm } from "@/components/waitlist-form";
 import { SiteFooter, SiteNav } from "@/components/site-chrome";
+
+function StartAnalysis() {
+  return (
+    <div className="hero-cta">
+      <Link href="/analysis" className="btn btn-link">Get your free analysis</Link>
+      <p className="fine">About 2 minutes. Photos are analysed, then deleted.</p>
+    </div>
+  );
+}
 
 const promises = [
   {
@@ -18,7 +27,7 @@ const promises = [
   },
   {
     title: "Honest from day one.",
-    body: "The price is clear before you upload anything. No pay-per-scan. If you leave, your photos are deleted.",
+    body: "The price is on this page, before you upload anything. No pay-per-scan. A reminder before your trial ends, and one tap to cancel.",
   },
 ];
 
@@ -30,10 +39,10 @@ export default function Home() {
         <section className="hero" id="join">
           <div className="wrap">
             <Mark className="hero-mark" animate title="Casdey" />
-            <div className="eyebrow">Coming soon</div>
+            <div className="eyebrow">Free analysis. No score.</div>
             <h1>Glow up in 90&nbsp;days.</h1>
-            <p className="lede">A real plan for your body, skin and style. Checked every day. No fake scores.</p>
-            <WaitlistForm source="hero" />
+            <p className="lede">See the 3 changes that would make the biggest difference to how you look. Then a real plan, checked every day.</p>
+            <StartAnalysis />
           </div>
         </section>
 
@@ -65,9 +74,9 @@ export default function Home() {
 
         <section className="closing" aria-labelledby="closing-title">
           <div className="wrap">
-            <h2 className="section-title" id="closing-title">Be first in&nbsp;line.</h2>
-            <p className="lede">Your free face and physique analysis, the day Casdey opens.</p>
-            <WaitlistForm source="closing" />
+            <h2 className="section-title" id="closing-title">Start with the&nbsp;truth.</h2>
+            <p className="lede">Your free analysis today. The full plan comes with a 7&#8209;day free trial, then €9.99 a month or €59.99 a year.</p>
+            <StartAnalysis />
           </div>
         </section>
       </main>

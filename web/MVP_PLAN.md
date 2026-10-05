@@ -27,7 +27,13 @@ file is the build spec; tick phases off as they ship.
    hand while numbers are small.
 
 ## Phases (each one can ship alone)
-- **A. Quiz + photos + free analysis + email.** Replaces the waitlist form on
+- **A. Quiz + photos + free analysis + email.** **Built 2026-10-06** on
+  branch `mvp-phase-a` (not live until pushed to `main`): `/analysis`,
+  `/api/analysis`, `src/lib/{quiz,analysis,analysis-email}.ts`, Supabase
+  table `analyses`, waitlist form and route removed, privacy notice rewritten,
+  `/admin` counts analyses as signups. Model `claude-opus-5-5`, effort medium,
+  server-side refusal fallback on; about 15 s per analysis. Needs
+  `ANTHROPIC_API_KEY` in Vercel before it goes live. Original spec: Replaces the waitlist form on
   the home page. Claude vision via `ANTHROPIC_API_KEY` (in the root
   `.env.local`; add to `web/.env.local` and Vercel). Photos are processed and
   **not stored** unless the person starts the trial. Leads go to Supabase
@@ -43,10 +49,8 @@ file is the build spec; tick phases off as they ship.
   trial-ending email.
 
 ## Before money is taken (blocking phase B going live)
-- **Partita IVA.** `memory.md` §5: recurring subscriptions are habitual
-  activity, prestazione occasionale likely does not fit. Needs a
-  commercialista before the first paid conversion (trials can start; the
-  first charge is day 8). Also VAT on EU digital sales (OSS).
+- **Partita IVA: not blocking.** Davide, 2026-10-05: deal with it once
+  money actually comes in, not before. Background in `memory.md` §5.
 - **Privacy notice** rewritten: face photos (sensitive in practice), Anthropic
   as processor, retention and deletion, 18+.
 - **Terms:** subscription, trial, cancellation, and the EU 14-day withdrawal

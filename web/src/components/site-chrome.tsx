@@ -9,7 +9,7 @@ export function SiteNav() {
           <Mark />
           Casdey
         </Link>
-        <Link href="/#join" className="nav-cta">Join the waitlist</Link>
+        <Link href="/analysis" className="nav-cta">Free analysis</Link>
       </div>
     </header>
   );

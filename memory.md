@@ -159,7 +159,17 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   CSS tokens in `src/app/globals.css`, the mark as a React component
   (`src/components/mark.tsx`, animated on the hero). Vercel project `casdey`,
   root directory `web`, deploys on every push to `main`.
-- **Waitlist:** `/api/waitlist` validates, lowercases and inserts into the
+- **Free analysis (built 2026-10-06, branch `mvp-phase-a`, replaces the
+  waitlist once merged):** `/analysis` is a one-question-per-screen quiz,
+  photos resized in the browser to 1280 px JPEG, then `/api/analysis` calls
+  `claude-opus-5-5` (structured JSON, refusal fallback on) and returns the
+  top 3 levers, about 15 s. Rows go to the Supabase `analyses` table (no
+  photos, ever); a copy is emailed through Resend after the response. Limit 3
+  per email per day. Test with `delivered@resend.dev` and `?utm_source=test`,
+  then delete rows with `source = 'test'`. Gotcha: the model reads numbers
+  burned into an image as an age, so test photos must be clean. Spec and
+  phases: `web/MVP_PLAN.md`.
+- **Waitlist (until the analysis ships):** `/api/waitlist` validates, lowercases and inserts into the
   Supabase `waitlist` table (email unique, so a repeat signup changes nothing
   and sends no second email), storing goal, source (hero or closing form) and
   country (`x-vercel-ip-country`), then sends the confirmation through Resend.

@@ -9,7 +9,7 @@ const interTight = Inter_Tight({ subsets: ["latin"], variable: "--font-inter-tig
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.casdey.com"),
   title: "Casdey: glow up in 90 days",
-  description: "A real plan for your body, skin and style. Checked every day. No fake scores. Join the waitlist for a free face and physique analysis.",
+  description: "Your free glow-up analysis: the 3 changes that would make the biggest difference to how you look. Then a real plan, checked every day. No fake scores.",
   openGraph: {
     title: "Casdey: glow up in 90 days",
     description: "A real plan for your body, skin and style. Checked every day. No fake scores.",

@@ -94,16 +94,29 @@ export function bucketOf(window: Window, at: Date): string {
 
 export type Signup = { email: string; goal: string | null; country: string | null; source: string | null; created_at: string };
 
+/**
+ * Every lead: waitlist signups (until 2026-10-05) and completed free analyses
+ * (from then on). A repeat analysis by the same email counts once, at its first.
+ */
 export async function loadSignups(): Promise<Signup[]> {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) throw new Error("Supabase is not configured");
-  const response = await fetch(`${url}/rest/v1/waitlist?select=email,goal,country,source,created_at&order=created_at.desc&limit=10000`, {
-    headers: { apikey: key, Authorization: `Bearer ${key}` },
-    cache: "no-store",
-  });
-  if (!response.ok) throw new Error(`Supabase answered ${response.status}`);
-  return (await response.json()) as Signup[];
+  const load = async (table: string) => {
+    const response = await fetch(`${url}/rest/v1/${table}?select=email,goal,country,source,created_at&order=created_at.asc&limit=10000`, {
+      headers: { apikey: key, Authorization: `Bearer ${key}` },
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error(`Supabase answered ${response.status} for ${table}`);
+    return (await response.json()) as Signup[];
+  };
+  const [waitlist, analyses] = await Promise.all([load("waitlist"), load("analyses")]);
+  const first = new Map<string, Signup>();
+  for (const signup of [...waitlist, ...analyses]) {
+    const seen = first.get(signup.email);
+    if (!seen || signup.created_at < seen.created_at) first.set(signup.email, signup);
+  }
+  return [...first.values()].sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
 
 export function inWindow(signups: Signup[], from: Date, to: Date): Signup[] {
@@ -141,9 +154,9 @@ function utc(date: Date): string {
   return date.toISOString().slice(0, 19).replace("T", " ");
 }
 
-function pageviews(from: Date, to: Date, event = "$pageview"): string {
+function pageviews(from: Date, to: Date, events = ["$pageview"]): string {
   const hosts = HOSTS.map((host) => `'${host}'`).join(", ");
-  return `event = '${event}' AND timestamp >= toDateTime('${utc(from)}') AND timestamp <= toDateTime('${utc(to)}') AND properties.$host IN (${hosts})`;
+  return `event IN (${events.map((event) => `'${event}'`).join(", ")}) AND timestamp >= toDateTime('${utc(from)}') AND timestamp <= toDateTime('${utc(to)}') AND properties.$host IN (${hosts})`;
 }
 
 export type Visitors = {
@@ -179,7 +192,7 @@ export async function loadVisitors(window: Window): Promise<Visitors> {
     breakdown("properties.$device_type"),
     breakdown("properties.utm_source"),
     hogql<[string | null, number]>(
-      `SELECT properties.utm_source AS k, count() AS v FROM events WHERE ${pageviews(window.from, window.to, "waitlist_joined")} GROUP BY k ORDER BY v DESC LIMIT 8`,
+      `SELECT properties.utm_source AS k, count() AS v FROM events WHERE ${pageviews(window.from, window.to, ["waitlist_joined", "analysis_done"])} GROUP BY k ORDER BY v DESC LIMIT 8`,
     ),
   ]);
   const rows = (list: [string | null, number][], blank: string) =>
