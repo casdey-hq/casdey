@@ -16,7 +16,11 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
 - **Davide's rule: do something that already works.** Enter a proven, crowded
   market (many competitors means proven demand) and make it better. Part 1 went
   into a blue ocean and it was, in his words, suicide.
-- **B2C**, software or app. Davide knows the audience from the inside and has
+- **The reason for looksmaxxing is that it is proven to work** (Davide,
+  2026-10-05). He does a kind of looksmaxxing himself but is not part of the
+  community; that was never the point. Reviewed and kept on 2026-10-05 after
+  doubts (his and his friend Abhi's): see the ledger entry of that date.
+- **B2C**, software or app. Davide has
   real short-form content experience (a motivation/success/money TikTok account:
   about 1,000 followers in 3 days, videos at 500k and 400k views).
 - **Method** (from a mikestrives reel plus Starter Story videos): browse

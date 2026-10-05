@@ -586,3 +586,31 @@ Reason: the format is proven by the edits being remade. Open risk: on
 2026-10-04 the waitlist had 0 signups and the site almost no visits, so the
 leads constraint is now the path from a view to the site, not the volume of
 views. About 75% of viewers are in Italy while the target is the US.
+
+## 2026-10-05 — The niche stays. Doubt is not data; the funnel decides
+Framework: $100M Offers / Starving Crowd (market > offer > persuasion);
+$100M Leads / lead magnets (deliver a real small win now), "give a model
+time" (Rule of 100, consistency).
+Decision: Abhi said the "looksmaxxing app" isn't convincing, a doubt Davide
+had felt for some days. Reviewed and **kept**. The niche was chosen for one
+reason, Davide's own: it is proven to work (Umax about $350-500k a month and
+several smaller apps with verified revenue). Davide does a kind of
+looksmaxxing himself but is not part of the community, and that was never
+the point. Since then the market added a second reason: the looksmaxxing
+edits get traction where gym and motivation content did not, so attention
+is cheapest here. Part 2 was 9 days old with 0 signups on 2026-10-04, and
+that failure sits at the first funnel stage (views to clicks), which is
+fixable and would follow any niche. Nothing has tested the idea itself yet.
+Two moves inside the niche instead of leaving it: (1) bridge the edits to
+the offer, since an edit gives no reason to click; (2) make the lead magnet
+real now by delivering the free glow-up analysis by hand, instead of
+promising it behind a waitlist.
+Kill criteria, to be set by Davide with real numbers, along his own stop
+rule: after enough site visits (about 300-500), a low signup rate means the
+page or offer; signups that won't take a cheap presale means the idea. Only
+the last one is a reason to change niche.
+Follows or diverges: **Follows.** Market first, judged on behaviour, not
+on the opinion of someone who isn't buying.
+Reason: Davide agreed explicitly. Do not reopen the niche on someone's gut
+feeling; reopen it only when the funnel reaches the "signups but no
+payment" stage and fails there.
