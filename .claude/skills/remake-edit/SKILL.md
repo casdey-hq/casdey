@@ -242,6 +242,19 @@ clips), not look-alikes or a similar scene.
   (e.g. "Ascension - Facial Analysis" / @PSL App rating a face "Chad"), don't
   keep it: end on a new shot fading to black, or the Casdey mark if Davide
   wants it.
+- **Don't ship known-weak shots (Davide, 2026-10-04, the PSL/Ian "foid" remake:
+  "this is shit", after the wrap-up listed its weak spots).** That remake went
+  out with a recurring hero built from one source (three beats were the same
+  portrait), a dark small face in a car, a half-talking mouth and a stray
+  TikTok logo, all of which were flagged in the preview and shipped anyway.
+  If a slot needs a recurring "hero" (one chad across several beats) and
+  `pindl` finds fewer than ~5 distinct clean looks of him, pick another hero
+  or source more (his own account, stills from Pinterest `originals/`)
+  before rendering. Every shot must be a stare at the lens, face big and
+  centred, no logo, no mid-word mouth. Fixing it later costs a whole round.
+  When an inspo's captions are a slur-based insult ("foid" rant), Claude
+  writes new clean captions on the same word timing instead (decided
+  2026-10-04); say so up front in one line.
 - **Check who the subject is before sourcing.** Search his name once. On
   2026-09-30 the subject (Hullo / Mason Hull) had been arrested on CSAM
   charges; Davide chose to recast with another face (Vinnie Hacker).
@@ -364,21 +377,35 @@ when the edit is already 9:16) and nothing else; the other format only if he
 asks. Keep the sent file under 30 MB so it reaches his phone (re-encode with
 `-crf 21 -preset slow` if bigger).
 
+**Update 2026-10-05: no end card for now.** Davide approved the Sean O'Pry and
+Brad Pitt remakes and chose to keep the video itself clean and put the CTA in
+the video description instead ("we are not yet at the place to put such a
+CTA", the card "doesn't look crisp": the `_cta` file also re-encodes much
+smaller than the edit, so raise endcard.js quality before using it again).
+Default now: deliver only the plain 9:16 edit, plus the standard description
+CTA (2026-10-06, reused on every video): "Get your free glow-up analysis.
+Your 3 biggest levers in 2 minutes, no fake score. Link in bio." Build the card
+only when he asks for it.
+
 **CTA end card (Davide, 2026-10-04).** Some videos get the Casdey call to
 action as a separate clip after the edit; the edit itself never changes. When
 Davide asks for it ("with CTA", "add the end card"), run
 `FFMPEG=... node .claude/skills/remake-edit/endcard.js <final 9:16 mp4>
-[--line "..."] [--pill "link in bio"] [--secs 2.5]`. It writes `<name>_cta.mp4`:
+[--line "..."] [--sub "link in bio"] [--secs 2.5]`. It writes `<name>_cta.mp4`:
 the edit crossfades (0.3 s, audio fading out with it) into a 2.5 s dark card
 (Ink #1D1D1F, white mark, like `casdey-logo-dark.png`; Davide chose dark over
 white on 2026-10-04) where the mark animates (day-1 C fades in at 45%, day-90
-C steps up and right), then the offer line, a white "link in bio" pill and
-casdey.com fade in, all built by about 1.1 s. v1 got "should be more smooth"
+C steps up and right), then one line ("Free glow-up analysis") and a grey
+"link in bio" fade in, all built by about 1.1 s. **v3 (2026-10-06): three
+elements only.** v2 also had a white pill and casdey.com and Davide found it
+"too much stuff going on"; keep the line short enough to sit well inside the
+frame (about 21 characters at the default size). Output is CRF 16: at CRF 21
+the `_cta` file came out softer than the edit. v1 got "should be more smooth"
 and v2 (fades of about 0.5 s) "should be faster": keep smootherstep fades of
 about 0.3 s, staggered, keep the mark rendered frame by frame with
 sub-pixel motion (ffmpeg's overlay snaps to whole pixels and judders), and
 never animate text position. Everything sits in the middle of the frame,
-clear of TikTok's caption and button overlays. Default line: "Your free glow-up
+clear of TikTok's caption and button overlays. Default line: "Free glow-up
 analysis"; use whatever CTA wording Davide is running at the time. Send both
 the plain and the `_cta` version unless he asked for one.
 
@@ -441,6 +468,16 @@ that cropped a 9:16 strip, blew it up and cut it again, so every face came
 out giant and cut off. Entries can override `grade` (e.g. `"null"` for a
 pre-built transition) and `band` (e.g. `[1080,1920,0,0]` for a full-frame
 segment).
+
+**Morph / crossfade beats (added 2026-10-04):** an entry with `"xfade": N`
+crossfades into its shot over its first N frames from the previous one (the
+face-flip morphs in "the average guy becomes the chad" edits). The previous
+shot is rendered N frames longer automatically, so the plan's `frames` still
+sum to the inspo's count. Words over the whole edit (captions that cross
+cuts) are a separate pass on `remake.mp4`: one `drawtext` per word with
+`enable='between(n,a,b)'`, font path written `/Windows/Fonts/impact.ttf` (no
+drive letter), then re-pad to 9:16 yourself since `render.js` built its
+`_shorts` before the captions.
 
 `keep` ranges are inspo frames `[from, to)`; `frames` per shot = the slot's
 length in frames, so the sum equals the inspo's frame count. `grade` (optional,

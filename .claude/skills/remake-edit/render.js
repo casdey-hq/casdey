@@ -59,10 +59,26 @@ const names = plan.timeline.map((entry, i) => {
     const y = Math.round(Math.min(Math.max(entry.cy * h - ch / 2, 0), h - ch));
     const place = bw === W && bh === H ? null : `pad=${W}:${H}:${bx}:${by}:black`;
     const vf = [`fps=${fps}`, `crop=${cw}:${ch}:${x}:${y}`, `scale=${bw}:${bh}:flags=lanczos`, entry.grade ?? grade, entry.vf, place, "setsar=1"].filter(Boolean).join(",");
-    ff(["-ss", String(entry.start), "-i", src, "-vf", vf, "-frames:v", String(entry.frames), ...enc, out]);
+    // A shot followed by an `xfade: N` entry runs N frames longer, so the fade has footage to play over.
+    const tail = plan.timeline[i + 1]?.xfade || 0;
+    ff(["-ss", String(entry.start), "-i", src, "-vf", vf, "-frames:v", String(entry.frames + tail), ...enc, out]);
   }
   return path.basename(out);
 });
+
+// `xfade: N` on a shot crossfades it in over its first N frames from the previous
+// shot (the morph beats of a face-flip edit). Each pair is merged into one segment
+// of the summed length: (prev + N) + own - N.
+const lens = plan.timeline.map((e, i) => (e.keep ? e.keep[1] - e.keep[0] : e.frames + (plan.timeline[i + 1]?.xfade || 0)));
+for (let i = names.length - 1; i > 0; i--) {
+  const x = plan.timeline[i].xfade || 0;
+  if (!x) continue;
+  const out = path.join(segDir, `x${names[i]}`);
+  const graph = `[0:v][1:v]xfade=transition=${plan.timeline[i].xfadeKind || "fade"}:duration=${(x / fps).toFixed(4)}:offset=${((lens[i - 1] - x) / fps).toFixed(4)},format=yuv420p[v]`;
+  ff(["-i", path.join(segDir, names[i - 1]), "-i", path.join(segDir, names[i]), "-filter_complex", graph, "-map", "[v]", ...enc, out]);
+  names.splice(i - 1, 2, path.basename(out));
+  lens.splice(i - 1, 2, lens[i - 1] + lens[i] - x);
+}
 
 // Join through the concat filter and re-encode: a stream-copy join drops frames
 // where segment timestamps meet (4 lost at 60 fps on the second remake).
