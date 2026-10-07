@@ -1,6 +1,7 @@
 import { after, type NextRequest } from "next/server";
 import { analyse, type Photo } from "@/lib/analysis";
 import { sendAnalysis } from "@/lib/analysis-email";
+import { alertDavide } from "@/lib/alert";
 import { describe, validAnswers, validBody } from "@/lib/quiz";
 
 // The model call takes a while with two photos.
@@ -94,6 +95,8 @@ export async function POST(request: NextRequest) {
     return Response.json({ score: result.score, potential: result.potential, read: result.read, levers: result.levers });
   } catch (error) {
     console.error("analysis error", error);
+    const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    after(() => alertDavide(/credit balance/i.test(detail) ? "Casdey: analysis down, out of Anthropic credit" : "Casdey: the free analysis failed", detail));
     return Response.json({ error: FAILED }, { status: 502 });
   }
 }
