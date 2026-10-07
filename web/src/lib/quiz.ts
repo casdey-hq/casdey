@@ -13,6 +13,7 @@ export const QUESTIONS: Question[] = [
       { value: "face", label: "Face and skin" },
       { value: "style", label: "Style" },
       { value: "discipline", label: "Discipline" },
+      { value: "everything", label: "All of it" },
     ],
   },
   {

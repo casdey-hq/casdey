@@ -632,3 +632,18 @@ market the buyer has a working alternative today, so a promise carries the
 worst possible time delay in the Value Equation.
 Reason: Davide's call, thinking as the customer (he is close to the avatar):
 seeing a waitlist and no product, he would download an existing app.
+
+## 2026-10-07 — The analysis gives a score and a 90-day potential (reverses "no fake scores")
+Framework: $100M Offers / Value Equation (dream outcome made concrete,
+perceived likelihood); $100M Leads / lead magnets (reveal the next problem).
+Decision: the free analysis now shows a 1-10 score now, a gain on each of the
+3 levers, and a potential in 90 days that is the score plus those gains. The
+video "bridge" card shows the same pair (now and potential), styled after the
+PSL App clips that reach millions.
+Follows or diverges: **Follows** Hormozi; **reverses** part 2's own
+differentiator 5 ("real-world appearance instead of fake face scores").
+Reason: Davide's call, from the market: the score is what makes Umax and PSL
+addictive and shareable. Kept honest two ways: the score is calibrated (most
+men 4.5 to 7) and the potential is derived from the plan's levers, not a
+second guess, so "where you could be" is literally what the plan claims to
+deliver. That gap is the reason to buy the plan.

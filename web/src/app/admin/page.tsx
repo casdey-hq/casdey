@@ -9,7 +9,7 @@ import { PeriodBody, PeriodProvider, PeriodTabs } from "./period";
 export const metadata: Metadata = { title: "Admin · Casdey", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
 
-const GOALS: Record<string, string> = { body: "Body", face: "Face and skin", style: "Style", discipline: "Discipline", none: "Didn't pick" };
+const GOALS: Record<string, string> = { body: "Body", face: "Face and skin", style: "Style", discipline: "Discipline", everything: "All of it", none: "Didn't pick" };
 const regions = new Intl.DisplayNames(["en"], { type: "region" });
 const country = (code: string) => {
   if (!/^[A-Z]{2}$/.test(code)) return code;

@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
         email,
         goal: body.answers.goal,
         answers: { ...body.answers, body: body.body },
-        result: { read: result.read, levers: result.levers },
+        result: { score: result.score, potential: result.potential, read: result.read, levers: result.levers },
         had_body_photo: Boolean(bodyPhoto),
         source,
         country: request.headers.get("x-vercel-ip-country"),
@@ -86,12 +86,12 @@ export async function POST(request: NextRequest) {
 
     // The person sees the result straight away; the email copy goes out after the response.
     after(async () => {
-      if ((await sendAnalysis(email, result.read, result.levers)) && row) {
+      if ((await sendAnalysis(email, result)) && row) {
         await supabase(`analyses?id=eq.${row.id}`, { method: "PATCH", body: JSON.stringify({ email_sent_at: new Date().toISOString() }) });
       }
     });
 
-    return Response.json({ read: result.read, levers: result.levers });
+    return Response.json({ score: result.score, potential: result.potential, read: result.read, levers: result.levers });
   } catch (error) {
     console.error("analysis error", error);
     return Response.json({ error: FAILED }, { status: 502 });

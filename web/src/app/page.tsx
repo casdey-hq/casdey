@@ -14,8 +14,8 @@ function StartAnalysis() {
 
 const promises = [
   {
-    title: "A plan, not a score.",
-    body: "Other apps rate your face and leave you there. Casdey tells you exactly what to do today, and again tomorrow.",
+    title: "A score, and the plan to raise it.",
+    body: "Other apps rate your face and leave you there. Casdey shows your potential and tells you exactly what to do today, and again tomorrow, to reach it.",
   },
   {
     title: "Checked, not just tracked.",
@@ -39,9 +39,9 @@ export default function Home() {
         <section className="hero" id="join">
           <div className="wrap">
             <Mark className="hero-mark" animate title="Casdey" />
-            <div className="eyebrow">Free analysis. No score.</div>
+            <div className="eyebrow">Free analysis. Your score and your potential.</div>
             <h1>Glow up in 90&nbsp;days.</h1>
-            <p className="lede">See the 3 changes that would make the biggest difference to how you look. Then a real plan, checked every day.</p>
+            <p className="lede">See where you are, where you could be in 90 days, and the 3 changes that get you there. Then a real plan, checked every day.</p>
             <StartAnalysis />
           </div>
         </section>

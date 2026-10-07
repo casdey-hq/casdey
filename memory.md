@@ -231,7 +231,13 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
    by Davide with Claude), workable up to about 20-30 clients; **(3)** the
    full app only once people pay for (2), shaped by their check-ins. No
    "coming soon" anywhere. The funnel stages of Davide's stop rule stay the
-   same, now each tested for real. Scoped the same day (spec:
+   same, now each tested for real. **2026-10-07: the analysis gives a score
+   after all** (Davide: scores are addictive, Umax's loop runs on them): a
+   1-10 score now, a gain per lever, and a 90-day potential that is the score
+   plus the three gains, so the prediction is tied to the plan. Site copy
+   saying "no score" was rewritten. Same day: an "All of it" goal, and the
+   height and weight boxes start empty (they used to show 180 and 78, which
+   read as pre-filled). Scoped the same day (spec:
    `web/MVP_PLAN.md`): a quiz before the photos (Davide's MacroFactor
    point: the investment raises expectation, but no surprise paywall),
    email to see the result, face required and body optional, check-ins

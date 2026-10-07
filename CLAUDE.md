@@ -10,7 +10,8 @@ glow-up app for men, worldwide** (first-world countries first; the research
 centred on 18-28, the site itself names no age), entering a proven market (Umax and peers) with
 five differentiators: close the execution gap with AI-verified daily
 check-ins, one integrated plan, total pricing trust, Apple-grade polish, and
-real-world appearance instead of fake face scores. It uses a normal
+real-world appearance. Since 2026-10-07 the analysis does give a score (now
+and a 90-day potential tied to the plan), by Davide's call. It uses a normal
 subscription, and a free first analysis as the hook.
 
 **Stage: selling a real, small product first.** The brand is set (direction A, the

@@ -6,7 +6,7 @@ import posthog from "posthog-js";
 import { Mark } from "@/components/mark";
 import { QUESTIONS, toMetric, type Units } from "@/lib/quiz";
 
-type Lever = { title: string; why: string; first_step: string };
+type Lever = { title: string; why: string; first_step: string; gain: number };
 type Step =
   | { kind: "intro" }
   | { kind: "question"; index: number }
@@ -14,7 +14,7 @@ type Step =
   | { kind: "photos" }
   | { kind: "email" }
   | { kind: "working" }
-  | { kind: "result"; read: string; levers: Lever[] };
+  | { kind: "result"; score: number; potential: number; read: string; levers: Lever[] };
 
 // The body step sits right after age, so the order is goal, age, body, then the rest.
 const BODY_AFTER = QUESTIONS.findIndex((q) => q.id === "age");
@@ -103,7 +103,7 @@ export function AnalysisFlow() {
     event.preventDefault();
     const { cm, kg } = toMetric({ units, height: Number(height), weight: Number(weight) });
     if (!(cm >= 130 && cm <= 230 && kg >= 35 && kg <= 250)) {
-      setError(units === "metric" ? "Enter your height in cm and weight in kg, like 180 and 78." : "Enter your height in inches and weight in pounds, like 71 and 172.");
+      setError(units === "metric" ? "Enter your height in cm and your weight in kg." : "Enter your height in inches and your weight in pounds.");
       return;
     }
     go({ kind: "question", index: BODY_AFTER + 1 });
@@ -143,7 +143,7 @@ export function AnalysisFlow() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const body = (await response.json().catch(() => ({}))) as { error?: string; retake?: string; read?: string; levers?: Lever[] };
+      const body = (await response.json().catch(() => ({}))) as { error?: string; retake?: string; score?: number; potential?: number; read?: string; levers?: Lever[] };
       if (body.retake) {
         posthog.capture("analysis_retake");
         setFace(null);
@@ -151,15 +151,15 @@ export function AnalysisFlow() {
         setError(body.retake);
         return;
       }
-      if (!response.ok || !body.levers || !body.read) {
+      if (!response.ok || !body.levers || !body.read || !body.score || !body.potential) {
         posthog.capture("analysis_error", { status: response.status });
         setStep({ kind: "email" });
         setError(body.error ?? "The analysis didn't go through. Try again in a moment.");
         return;
       }
-      posthog.capture("analysis_done", { goal: answers.goal });
+      posthog.capture("analysis_done", { goal: answers.goal, score: body.score, potential: body.potential });
       setHistory([]);
-      setStep({ kind: "result", read: body.read, levers: body.levers });
+      setStep({ kind: "result", score: body.score, potential: body.potential, read: body.read, levers: body.levers });
     } catch {
       setStep({ kind: "email" });
       setError("No connection. Check your internet and try again.");
@@ -189,7 +189,7 @@ export function AnalysisFlow() {
           <div className="flow-step flow-intro">
             <Mark className="flow-mark" animate title="Casdey" />
             <h1>Your free glow&#8209;up analysis</h1>
-            <p className="flow-sub">Answer a few questions, add a photo, and see the 3 changes that would make the biggest difference to how you look. About 2 minutes.</p>
+            <p className="flow-sub">Answer a few questions, add a photo, and get your score, your potential, and the 3 changes that get you there. About 2 minutes.</p>
             <button
               type="button"
               className="btn flow-cta"
@@ -200,7 +200,7 @@ export function AnalysisFlow() {
             >
               Start
             </button>
-            <p className="fine">The analysis is free. The full 90-day plan comes with a 7&#8209;day free trial, then €9.99 a month or €59.99 a year. No score, ever.</p>
+            <p className="fine">The analysis is free. The full 90-day plan comes with a 7&#8209;day free trial, then €9.99 a month or €59.99 a year.</p>
           </div>
         ) : null}
 
@@ -235,12 +235,12 @@ export function AnalysisFlow() {
             <div className="measures">
               <label htmlFor={`${id}-height`}>
                 <span>Height</span>
-                <input id={`${id}-height`} inputMode="numeric" value={height} onChange={(e) => setHeight(e.target.value.replace(/[^\d.]/g, ""))} placeholder={units === "metric" ? "180" : "71"} required />
+                <input id={`${id}-height`} inputMode="numeric" value={height} onChange={(e) => setHeight(e.target.value.replace(/[^\d.]/g, ""))} required />
                 <em>{units === "metric" ? "cm" : "in"}</em>
               </label>
               <label htmlFor={`${id}-weight`}>
                 <span>Weight</span>
-                <input id={`${id}-weight`} inputMode="numeric" value={weight} onChange={(e) => setWeight(e.target.value.replace(/[^\d.]/g, ""))} placeholder={units === "metric" ? "78" : "172"} required />
+                <input id={`${id}-weight`} inputMode="numeric" value={weight} onChange={(e) => setWeight(e.target.value.replace(/[^\d.]/g, ""))} required />
                 <em>{units === "metric" ? "kg" : "lb"}</em>
               </label>
             </div>
@@ -289,13 +289,34 @@ export function AnalysisFlow() {
         {step.kind === "result" ? (
           <div className="flow-step flow-result">
             <p className="eyebrow">Your analysis</p>
-            <h1>Your 3 biggest levers</h1>
+            <div className="scorecard">
+              {face ? (
+                // eslint-disable-next-line @next/next/no-img-element -- the photo they just added, a local data URL
+                <img className="scorecard-face" src={face} alt="" />
+              ) : null}
+              <div className="scores">
+                <div className="score">
+                  <span>Your score now</span>
+                  <b>{step.score.toFixed(1)}</b>
+                </div>
+                <div className="score is-potential">
+                  <span>Potential in 90 days</span>
+                  <b>{step.potential.toFixed(1)}</b>
+                </div>
+              </div>
+              <div className="score-track" aria-hidden="true">
+                <i className="score-now" style={{ width: `${step.score * 10}%` }} />
+                <i className="score-gain" style={{ left: `${step.score * 10}%`, width: `${(step.potential - step.score) * 10}%` }} />
+              </div>
+            </div>
             <p className="flow-sub">{step.read}</p>
+            <h2 className="levers-title">Your 3 biggest levers</h2>
             <ol className="levers">
               {step.levers.map((lever, i) => (
                 <li className="lever" key={lever.title} style={{ animationDelay: `${0.15 + i * 0.18}s` }}>
                   <span className="lever-n" aria-hidden="true">{i + 1}</span>
                   <h2>{lever.title}</h2>
+                  <span className="lever-gain">+{lever.gain.toFixed(1)}</span>
                   <p>{lever.why}</p>
                   <div className="lever-step"><b>This week</b>{lever.first_step}</div>
                 </li>
@@ -305,7 +326,7 @@ export function AnalysisFlow() {
               <Mark className="next-mark" />
               <h2>Your 90-day plan is next</h2>
               <p>
-                These three, turned into one daily plan, with a quick photo check-in each day so you actually do it. It opens soon,
+                These three, turned into one daily plan that takes you from {step.score.toFixed(1)} to {step.potential.toFixed(1)}, with a quick photo check-in each day so you actually do it. It opens soon,
                 with a 7&#8209;day free trial. We&rsquo;ll email you the day it&rsquo;s ready.
               </p>
             </div>
