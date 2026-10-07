@@ -241,7 +241,14 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
    plus the three gains, so the prediction is tied to the plan. Site copy
    saying "no score" was rewritten. Same day: an "All of it" goal, and the
    height and weight boxes start empty (they used to show 180 and 78, which
-   read as pre-filled). Scoped the same day (spec:
+   read as pre-filled). **Score calibrated 2026-10-07** against Davide's
+   scale (average man 5 to 7, Marlon 9.2, his reference face 9.7) and 24 faces
+   rated by 60 people each (SCUT-FBP5500, deleted after use; its top faces
+   are celebrity headshots, so its 1-5 top end is squashed). Error went from
+   0.68 to 0.36 points; the model had been too harsh on average men and on
+   phone selfies, so the prompt now tells it to judge the face, not the
+   photo. Bad photos (blur, mid-expression, steep angle) are refused, not
+   scored. Re-run with `web/scripts/calibrate.mjs <set.json>`. Scoped the same day (spec:
    `web/MVP_PLAN.md`): a quiz before the photos (Davide's MacroFactor
    point: the investment raises expectation, but no surprise paywall),
    email to see the result, face required and body optional, check-ins
