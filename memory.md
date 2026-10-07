@@ -149,6 +149,15 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   **0 signups**, and PostHog counted 23 pageviews on launch day (2026-09-26)
   and 6 in total from 2026-09-27 to 2026-10-04. The path from video to site
   is the constraint, not the content.
+- **TikTok analytics, 2026-10-07** (first read of TikTok Studio, full table in
+  `analytics/tiktok-2026-10-07.md`): 24.6K views in 28 days and growing, but
+  only 65 profile views and **2 followers**, 68% of viewers in Italy. The bio
+  shows `casdey.com/tt` as **plain text, not a link** (TikTok usually gives
+  clickable links at 1,000 followers), which is why the site had 0 bio-link
+  visits. Davide is trying a Business account to unlock the link. Per-video
+  views fell from about 1K-4.9K to about 250-400 when posting went to 6 a day,
+  and three morning posts on 2026-10-06 got 2-12 views. Save every future
+  analytics read the same way: a dated file in `analytics/` plus one line here.
 - **Goals:** at least **10 waitlist signups by 2026-10-13** (Davide set 10;
   100 was discussed and judged unrealistic from 0 visits), and **December
   2026 as a €2,000 month in profit** (profit, not revenue: Davide,
