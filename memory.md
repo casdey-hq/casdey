@@ -160,7 +160,9 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   verification with business documents (and limits music), so it was dropped;
   the route is the TikTok profile linking to Instagram, whose bio link works.
   **Instagram, same day** (`analytics/instagram-2026-10-07.md`): 4,336 views in
-  30 days, 33 profile visits, 1 link tap, 11 followers. Save every future
+  30 days, 33 profile visits, 1 link tap, 11 followers. **YouTube Shorts not
+  read yet** (Davide posts there too): read YouTube Studio before judging the
+  content mix, and in the 2026-10-14 re-read of all three. Save every future
   analytics read the same way: a dated file in `analytics/` plus one line here.
 - **Goals:** at least **10 waitlist signups by 2026-10-13** (Davide set 10;
   100 was discussed and judged unrealistic from 0 visits), and **December
