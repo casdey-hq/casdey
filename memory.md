@@ -142,9 +142,13 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
 - **About 75% of viewers are in Italy**, Davide's own location, so the
   platforms push the videos locally first. The target audience is
   English-speaking, mainly the US: reaching it is the next big lever.
-- **The call to action:** the waitlist link in the video descriptions, and in
-  some videos a separate CTA clip added at the end of the edit (the edit
-  itself stays unchanged).
+- **The call to action (2026-10-07):** the Casdey **score card**, PSL App
+  style (face, score, 90-day potential, "Get yours free · casdey.com"), cut
+  onto the end of 1 of the 3 daily videos, with real numbers from the live
+  analysis; it replaced the old end card. Every description carries the
+  standard CTA line. How-to: the remake-edit skill. Posting cadence is 3 a
+  day, spaced, evening-heavy (6 a day hurt reach on TikTok and Shorts), and
+  only edits that are genuinely crisp get posted (Davide, 2026-10-07).
 - **Views are not reaching the site yet.** On 2026-10-04 the waitlist had
   **0 signups**, and PostHog counted 23 pageviews on launch day (2026-09-26)
   and 6 in total from 2026-09-27 to 2026-10-04. The path from video to site

@@ -1,0 +1,54 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0}
+html,body{width:1080px;height:1920px;background:transparent;font-family:"Segoe UI Variable Display","Segoe UI",Arial,sans-serif;color:#fff;overflow:hidden}
+#bg{position:absolute;inset:0;background:#0c0c0d}
+.wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.brand{display:flex;align-items:center;gap:22px;font-weight:700;font-size:64px;letter-spacing:-1.5px;margin-bottom:64px}
+.brand svg{width:78px;height:78px;overflow:visible}
+.facebox{position:relative;width:456px;height:456px;margin-bottom:72px}
+.face{position:absolute;inset:8px;border-radius:50%;background:url(__FACE__) center/cover}
+.ring{position:absolute;inset:-6px;width:468px;height:468px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:28px;width:880px}
+.tile{position:relative;background:#1c1c1e;border:2px solid #2c2c2e;border-radius:40px;padding:40px 40px 44px}
+.tile .k{font-size:34px;font-weight:600;color:#a1a1a6;letter-spacing:2px;text-transform:uppercase}
+.tile .v{font-size:150px;font-weight:700;letter-spacing:-6px;line-height:1.05;margin-top:6px;font-variant-numeric:tabular-nums}
+.bar{height:16px;border-radius:16px;background:#2c2c2e;margin-top:22px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:16px;background:#8e8e93;transform-origin:left}
+.tile.pot{background:#fff;color:#0c0c0d;border-color:#fff}
+.tile.pot .k{color:#6e6e73}.tile.pot .bar{background:#e5e5ea}.tile.pot .bar i{background:#0c0c0d}
+.cta{margin-top:64px;font-size:46px;font-weight:600;color:#d1d1d6;letter-spacing:-0.3px;padding:24px 44px;border-radius:999px;border:2px solid #3a3a3c;background:#1c1c1e}
+.cta span{color:#6e6e73;margin:0 6px}.cta b{color:#fff;font-weight:700}
+</style></head><body><div id="bg"></div><div class="wrap">
+<div class="brand" id="brand"><svg viewBox="0 0 48 48"><g fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-dasharray="76 100"><g id="mb" opacity=".45"><circle cx="22.5" cy="25.5" r="15" transform="rotate(48 22.5 25.5)"/></g><g id="ma"><circle cx="25.5" cy="22.5" r="15" transform="rotate(48 25.5 22.5)"/></g></g></svg><span id="word">Casdey</span></div>
+<div class="facebox" id="facebox"><div class="face" id="face"></div><svg class="ring" viewBox="0 0 468 468"><circle id="ring" cx="234" cy="234" r="228" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" transform="rotate(-90 234 234)"/></svg></div>
+<div class="tiles"><div class="tile" id="t1"><div class="k">Score</div><div class="v" id="v1">0.0</div><div class="bar"><i id="b1"></i></div></div>
+<div class="tile pot" id="t2"><div class="k">90-day potential</div><div class="v" id="v2">0.0</div><div class="bar"><i id="b2"></i></div></div></div>
+<div class="cta" id="sub">Get yours free <span>·</span> <b>__CTA__</b></div></div>
+<script>
+const SCORE=__SCORE__, POT=__POT__;
+const cl=(x)=>Math.min(Math.max(x,0),1);
+const p=(t,a,b)=>cl((t-a)/(b-a));
+const out3=(x)=>1-Math.pow(1-x,3);
+const outBack=(x)=>{const c=1.70158,d=c+1;return 1+d*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const smooth=(x)=>x*x*x*(x*(6*x-15)+10);
+const R=2*Math.PI*228;
+const $=(id)=>document.getElementById(id);
+window.render=(t)=>{
+  $("bg").style.opacity=0.97*smooth(p(t,0,0.2));
+  const br=out3(p(t,0.08,0.45)); $("brand").style.opacity=br; $("brand").style.transform="translateY("+(-40*(1-br))+"px)";
+  $("mb").setAttribute("opacity",(0.45*smooth(p(t,0.1,0.35))).toFixed(3));
+  const ma=smooth(p(t,0.22,0.6)); $("ma").style.opacity=cl(p(t,0.18,0.3)); $("ma").setAttribute("transform","translate("+(-3*(1-ma))+","+(3*(1-ma))+")");
+  const fc=p(t,0.12,0.6); $("facebox").style.opacity=smooth(p(t,0.12,0.3)); $("facebox").style.transform="scale("+(0.55+0.45*outBack(fc))+")";
+  $("face").style.filter="blur("+(14*(1-out3(fc))).toFixed(2)+"px)";
+  const rg=out3(p(t,0.3,0.85)); $("ring").setAttribute("stroke-dasharray",(R*rg)+" "+R);
+  [["t1",0.38],["t2",0.48]].forEach(([id,s])=>{const k=out3(p(t,s,s+0.42)); $(id).style.opacity=smooth(p(t,s,s+0.22)); $(id).style.transform="translateY("+(90*(1-k))+"px)";});
+  const c1=out3(p(t,0.5,1.2)), c2=out3(p(t,0.6,1.6));
+  const v2=POT*c2;
+  $("v1").textContent=(SCORE*c1).toFixed(1); $("v2").textContent=v2.toFixed(1);
+  $("b1").style.transform="scaleX("+(SCORE/10*c1)+")"; $("b2").style.transform="scaleX("+(v2/10)+")";
+  const g=Math.sin(Math.PI*p(t,1.65,2.15)); $("t2").style.boxShadow="0 0 "+(80*g)+"px "+(10*g)+"px rgba(255,255,255,"+(0.35*g)+")";
+  $("t2").style.transform+=" scale("+(1+0.035*g)+")";
+  {const k=out3(p(t,1.75,2.15)); $("sub").style.opacity=smooth(p(t,1.75,2.0)); $("sub").style.transform="translateY("+(30*(1-k))+"px)";}
+};
+window.render(0);
+</script></body></html>
