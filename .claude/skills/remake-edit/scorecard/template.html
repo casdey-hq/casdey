@@ -25,7 +25,7 @@ html,body{width:1080px;height:1920px;background:transparent;font-family:"Segoe U
 <div class="tile pot" id="t2"><div class="k">90-day potential</div><div class="v" id="v2">0.0</div><div class="bar"><i id="b2"></i></div></div></div>
 <div class="cta" id="sub">Get yours free <span>·</span> <b>__CTA__</b></div></div>
 <script>
-const SCORE=__SCORE__, POT=__POT__;
+const SCORE=__SCORE__, POT=__POT__, SPEED=__SPEED__, BLANK=__BLANK__;
 const cl=(x)=>Math.min(Math.max(x,0),1);
 const p=(t,a,b)=>cl((t-a)/(b-a));
 const out3=(x)=>1-Math.pow(1-x,3);
@@ -34,6 +34,7 @@ const smooth=(x)=>x*x*x*(x*(6*x-15)+10);
 const R=2*Math.PI*228;
 const $=(id)=>document.getElementById(id);
 window.render=(t)=>{
+  t=t*SPEED;
   $("bg").style.opacity=__BGA__*smooth(p(t,0,0.35));
   const br=out3(p(t,0.08,0.45)); $("brand").style.opacity=br; $("brand").style.transform="translateY("+(-40*(1-br))+"px)";
   $("mb").setAttribute("opacity",(0.45*smooth(p(t,0.1,0.35))).toFixed(3));
@@ -46,6 +47,7 @@ window.render=(t)=>{
   const v2=POT*c2;
   $("v1").textContent=(SCORE*c1).toFixed(1); $("v2").textContent=v2.toFixed(1);
   $("b1").style.transform="scaleX("+(SCORE/10*c1)+")"; $("b2").style.transform="scaleX("+(v2/10)+")";
+  if(BLANK){ $("v1").textContent="?"; $("v2").textContent="?"; $("b1").style.transform="scaleX(0)"; $("b2").style.transform="scaleX(0)"; }
   const g=Math.sin(Math.PI*p(t,1.65,2.15)); $("t2").style.boxShadow="0 0 "+(80*g)+"px "+(10*g)+"px rgba(255,255,255,"+(0.35*g)+")";
   $("t2").style.transform+=" scale("+(1+0.035*g)+")";
   {const k=out3(p(t,1.75,2.15)); $("sub").style.opacity=smooth(p(t,1.75,2.0)); $("sub").style.transform="translateY("+(30*(1-k))+"px)";}

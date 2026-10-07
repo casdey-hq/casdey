@@ -405,6 +405,7 @@ casdey.com" rises in. Davide approved v4 of the Brad Pitt remake.
 - **Score realism (Davide, same day: "how is Marlon a 7.4?").** Use the subject's best clean, sharp, front-facing photo; a blurry or mid-expression frame now gets refused by the analysis, and two runs of the same photo can differ by about 0.4. Never put a number on a card that the analysis didn't produce.
 - The CTA says **casdey.com**, typeable on every platform (TikTok's bio link
   isn't clickable under 1,000 followers).
+- Options: `--secs N` (card lasts N seconds, then the edit returns), `--blank` (no face, no numbers), `--mode solid|over`. `analyse.mjs` uses a unique test email each run so the 3-a-day limit doesn't block repeated tests.
 - **Description CTA, every video:** "Get your free glow-up analysis. Your
   score, your 90-day potential and the 3 changes that get you there. Link in
   bio." (On TikTok, "casdey.com/tt" instead of "Link in bio" until the link
@@ -479,6 +480,10 @@ cuts) are a separate pass on `remake.mp4`: one `drawtext` per word with
 `enable='between(n,a,b)'`, font path written `/Windows/Fonts/impact.ttf` (no
 drive letter), then re-pad to 9:16 yourself since `render.js` built its
 `_shorts` before the captions.
+
+**Person-to-model morph edits (2026-10-07, "official scores with @PSL App PART 2": a person's close-up morphs into a model portrait, holds about 0.6 s, hard-cuts back).** Rebuilt without the face-swap tooling: (1) map each cycle frame-exactly with per-frame `scene` score (the cut) and `signalstats` YDIF (the morph is steady YDIF of about 2.5-4 for about 16 frames, the model still drifts at 1-4); (2) the model portraits: frontal, sharp, 1000 px+ faces from Wikimedia Commons (search API `generator=search&gsrnamespace=6&prop=imageinfo&iiurlwidth=1100`, no login), different women than the inspo's; (3) align each portrait so its eyes land where the inspo's model eyes sit for that slot (eye midpoint and eye distance read off a 100 px grid), **and cap the scale so the chin stays at about 91% of the frame height with a margin below it** (matching eye distance alone cut chins off long faces); (4) per slot, `ffmpeg`: the person's last 16 clean frames played in reverse, `blend` into the aligned still over 16 frames with a smoothstep and a small mid-morph blur, then the still with a 5% zoom about the eyes; (5) trim everything else from the inspo and concat; the frame count must stay equal to the inspo's. Scripts used live in the scratchpad (`stills.mjs`, `build.mjs`), not the repo.
+
+**A competitor's score card inside the edit (the PSL card):** replace it with the Casdey card at the same frames: hold the last frame before it, `scorecard.mjs --at <start s> --secs <length s> --mode solid` (the card is played faster to fit a short slot). **If the subject can't be honestly analysed** (the tool refuses video frames, mid-laugh faces and filtered images, and is calibrated on men), use `--blank`: an empty profile circle, "Your score ?" and "90-day potential ?" with the same call to action. Never force a number from a refused frame.
 
 `keep` ranges are inspo frames `[from, to)`; `frames` per shot = the slot's
 length in frames, so the sum equals the inspo's frame count. `grade` (optional,
