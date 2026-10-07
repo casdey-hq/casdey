@@ -156,7 +156,11 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   clickable links at 1,000 followers), which is why the site had 0 bio-link
   visits. Davide is trying a Business account to unlock the link. Per-video
   views fell from about 1K-4.9K to about 250-400 when posting went to 6 a day,
-  and three morning posts on 2026-10-06 got 2-12 views. Save every future
+  and three morning posts on 2026-10-06 got 2-12 views. TikTok Business needs
+  verification with business documents (and limits music), so it was dropped;
+  the route is the TikTok profile linking to Instagram, whose bio link works.
+  **Instagram, same day** (`analytics/instagram-2026-10-07.md`): 4,336 views in
+  30 days, 33 profile visits, 1 link tap, 11 followers. Save every future
   analytics read the same way: a dated file in `analytics/` plus one line here.
 - **Goals:** at least **10 waitlist signups by 2026-10-13** (Davide set 10;
   100 was discussed and judged unrealistic from 0 visits), and **December
