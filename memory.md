@@ -160,9 +160,11 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
   verification with business documents (and limits music), so it was dropped;
   the route is the TikTok profile linking to Instagram, whose bio link works.
   **Instagram, same day** (`analytics/instagram-2026-10-07.md`): 4,336 views in
-  30 days, 33 profile visits, 1 link tap, 11 followers. **YouTube Shorts not
-  read yet** (Davide posts there too): read YouTube Studio before judging the
-  content mix, and in the 2026-10-14 re-read of all three. Save every future
+  30 days, 33 profile visits, 1 link tap, 11 followers. **YouTube, same day**
+  (`analytics/youtube-2026-10-07.md`): 24K views in 28 days, 24 subscribers,
+  Italy only 37% (the most international); Shorts either get about 1.2K views
+  or almost none, and at 6 a day 7 of 11 got under 10. The channel had no
+  clickable link (Links field empty). Re-read all three on 2026-10-14. Save every future
   analytics read the same way: a dated file in `analytics/` plus one line here.
 - **Goals:** at least **10 waitlist signups by 2026-10-13** (Davide set 10;
   100 was discussed and judged unrealistic from 0 visits), and **December
