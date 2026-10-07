@@ -34,7 +34,7 @@ const smooth=(x)=>x*x*x*(x*(6*x-15)+10);
 const R=2*Math.PI*228;
 const $=(id)=>document.getElementById(id);
 window.render=(t)=>{
-  $("bg").style.opacity=0.97*smooth(p(t,0,0.2));
+  $("bg").style.opacity=__BGA__*smooth(p(t,0,0.35));
   const br=out3(p(t,0.08,0.45)); $("brand").style.opacity=br; $("brand").style.transform="translateY("+(-40*(1-br))+"px)";
   $("mb").setAttribute("opacity",(0.45*smooth(p(t,0.1,0.35))).toFixed(3));
   const ma=smooth(p(t,0.22,0.6)); $("ma").style.opacity=cl(p(t,0.18,0.3)); $("ma").setAttribute("transform","translate("+(-3*(1-ma))+","+(3*(1-ma))+")");

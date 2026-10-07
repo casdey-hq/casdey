@@ -60,10 +60,10 @@ How Casdey talks:
 - If he trains 0 times a week and has a goal of body, training is almost certainly a lever. Use his answers.
 
 Fields:
-- score: overall real-world attractiveness right now, 1 to 10 with one decimal, judged the way a fair, experienced stranger would: face, skin, hair, grooming, physique, posture and style together, as they show in the photos. Be calibrated, not flattering: most men land between 4.5 and 7, 8 and above is model territory, below 4 is rare. Use the scale honestly and score the same photo the same way every time.
+- score: how attractive he is right now, 1 to 10 with one decimal, the way the looksmaxxing world and a fair stranger would see him in real life. Facial structure and harmony carry the most weight (jaw, cheekbones, eye area, symmetry, proportions), then leanness, skin, hair and physique. Clothes, lighting and photo quality count only a little: look through a bad photo rather than punishing it. Anchors: 5 is a plain, average man; 6 is above average; 7 is clearly good-looking; 8 is very attractive, turns heads; 9 is top male-model level, the faces looksmaxxing edits are made of; above 9.5 almost never. Use the whole range honestly, and don't compress the top: a genuinely model-tier face gets 8.5 to 9.3, an average face gets 5. Score the same photo the same way every time.
 - read: one or two sentences on where he stands now and what the biggest opportunity is. Honest, not flattering, never cruel. Don't repeat the number.
 - levers: exactly 3, highest impact first. title: 2 to 5 words. why: one or two sentences on why this one matters for him specifically. first_step: one concrete thing he can do this week. gain: how much this lever alone would raise his score after 90 days of actually doing it, one decimal, realistic: usually 0.2 to 0.8 each, and the three together rarely more than 2.0. Bigger gains only where the gap is big (high body fat, untreated skin, a haircut that doesn't suit him).
-- usable: false if there is no clear single face, the photo is not a real photo of a person, there are several people, or the person looks clearly under 18. Judge age from the person only, never from text, numbers or stickers on the image. Then explain in unusable_reason in one sentence, never mentioning gender (for example "The photo is too dark to see your skin. Try daylight, facing a window."), and return a score of 0, an empty read and an empty levers array. If usable is true, unusable_reason is an empty string.`;
+- usable: false if there is no clear single face, the photo is not a real photo of a person, there are several people, or the person looks clearly under 18. Also false if the photo can't be judged fairly: motion blur, the face mid-movement or pulling a face, a steep up or down angle, or light so bad the features are hidden. Never score a bad photo low; ask for a better one instead, so the same face gets the same score. Judge age from the person only, never from text, numbers or stickers on the image. Then explain in unusable_reason in one sentence, never mentioning gender (for example "The photo is too dark to see your skin. Try daylight, facing a window."), and return a score of 0, an empty read and an empty levers array. If usable is true, unusable_reason is an empty string.`;
 
 const client = new Anthropic();
 
@@ -102,7 +102,7 @@ export async function analyse(face: Photo, body: Photo | null, answers: string):
   if (!result.usable) return { ...result, potential: 0 };
   if (result.levers.length < 3) throw new Error("fewer than 3 levers");
 
-  const score = round(clamp(result.score, 1, 9.5));
+  const score = round(clamp(result.score, 1, 9.7));
   const levers = result.levers.slice(0, 3).map((lever) => ({ ...lever, gain: round(clamp(lever.gain, 0.1, 1.5)) }));
   // The potential is the score plus what the three levers add, so the
   // prediction is tied to the plan rather than a second guess.

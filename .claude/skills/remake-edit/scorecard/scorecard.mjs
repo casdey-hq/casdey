@@ -32,6 +32,10 @@ const score = Number(opt("--score"));
 const potential = Number(opt("--potential"));
 const at = Number(opt("--at"));
 const cta = opt("--cta", "casdey.com");
+// "over" (default, Davide 2026-10-07): the edit keeps playing under the card,
+// blurred and dimmed, so the song and the motion carry on. "solid" is the old
+// near-black wash.
+const mode = opt("--mode", "over");
 const edit = path.resolve(args.find((a) => !a.startsWith("--")) || "");
 const out = path.resolve(opt("--out", edit.replace(/\.mp4$/i, "_card.mp4")));
 if (!fs.existsSync(edit) || !face || !(score > 0) || !(potential >= score) || !(at >= 0)) {
@@ -54,14 +58,15 @@ const html = fs.readFileSync(path.join(here, "template.html"), "utf8")
   .replace("__FACE__", faceUrl)
   .replace("__SCORE__", String(score))
   .replace("__POT__", String(potential))
-  .replace("__CTA__", cta);
+  .replace("__CTA__", cta)
+  .replace("__BGA__", mode === "solid" ? "0.97" : "0.55");
 fs.writeFileSync(path.join(tmp, "card.html"), html);
 
 let r = spawnSync(process.execPath, [path.join(here, "capture.mjs"), path.join(tmp, "card.html"), path.join(tmp, "frames"), String(secs.toFixed(3)), String(fps)], { stdio: "inherit" });
 if (r.status) throw new Error("capture failed");
 
 r = spawnSync(FFMPEG, ["-v", "error", "-y", "-i", edit, "-framerate", String(fps), "-i", path.join(tmp, "frames", "%04d.png"),
-  "-filter_complex", `[1:v]format=rgba,setpts=PTS-STARTPTS+${at}/TB[c];[0:v][c]overlay=0:0:eof_action=repeat,format=yuv420p[v]`,
+  "-filter_complex", (mode === "solid" ? `[0:v]null[base];` : `[0:v]split[a][b];[b]trim=start=${at},setpts=PTS-STARTPTS,gblur=sigma=30,format=rgba,fade=t=in:st=0:d=0.35:alpha=1,setpts=PTS+${at}/TB[bl];[a][bl]overlay=0:0:eof_action=pass[base];`) + `[1:v]format=rgba,setpts=PTS-STARTPTS+${at}/TB[c];[base][c]overlay=0:0:eof_action=repeat,format=yuv420p[v]`,
   "-map", "[v]", "-map", "0:a?", "-t", String(duration), "-c:v", "libx264", "-crf", "16", "-preset", "slow", "-tune", "film", "-c:a", "copy", "-movflags", "+faststart", out]);
 if (r.status) throw new Error(r.stderr.toString());
 // Edge can hold its profile for a moment after exiting; cleanup is best effort.

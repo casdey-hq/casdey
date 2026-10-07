@@ -113,6 +113,7 @@ clips), not look-alikes or a similar scene.
 - One shot per replaced slot, matching the slot's energy (smile, glance, laugh
   on the beat) and length. Prefer close faces, avoid lower-thirds, logos,
   other people and cutaways.
+- **Chins (Davide, 2026-10-07, Marlon "That guy is Famous" v1: "you're cutting off his chin multiple times").** Matching the inspo's big face size by zooming in (side 0.45 on 9:16 clips) cut chins and caps in a third of the shots. For a square slot from a 9:16 clip start at the least zoom (side 0.5625 = the full width) and only move cy; if the head still doesn't fit (phone held too close, e.g. a big-grin selfie), swap the clip, don't crop. Check every shot's first, middle and last frame in the RENDER, not just preview.jpg.
 - **Framing (Davide, 2026-09-29): never over-zoom, never cut the face.** The
   whole head (hair to chin) stays in frame with some headroom, sized like the
   inspo's shots, usually head and shoulders. Default `side: 1` (the full
@@ -400,6 +401,8 @@ casdey.com" rises in. Davide approved v4 of the Brad Pitt remake.
   It writes `<edit>_card.mp4` (CRF 16, about 8 MB for 18 s). Frames come from
   headless Edge (`capture.mjs`, transparent background, sub-pixel motion);
   the timing lives in `template.html`'s `render(t)`.
+- **Over the edit, not a cut to black (Davide, 2026-10-07: "the transition to the card is strange... add the card on top of the edit").** Default `--mode over`: the edit keeps playing under the card, blurred and dimmed (card background at 55%), so the song and the motion carry on. `--mode solid` is the old near-black wash. If a card ever needs to run past the song's end, add a short signature sound instead of silence.
+- **Score realism (Davide, same day: "how is Marlon a 7.4?").** Use the subject's best clean, sharp, front-facing photo; a blurry or mid-expression frame now gets refused by the analysis, and two runs of the same photo can differ by about 0.4. Never put a number on a card that the analysis didn't produce.
 - The CTA says **casdey.com**, typeable on every platform (TikTok's bio link
   isn't clickable under 1,000 followers).
 - **Description CTA, every video:** "Get your free glow-up analysis. Your

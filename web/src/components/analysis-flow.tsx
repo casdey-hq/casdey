@@ -251,7 +251,7 @@ export function AnalysisFlow() {
         {step.kind === "photos" ? (
           <div className="flow-step">
             <h1>Add your photos</h1>
-            <p className="flow-sub">Daylight, facing a window, no filter. Your photos are analysed and then deleted, never stored.</p>
+            <p className="flow-sub">Daylight facing a window, phone at eye level, relaxed face, no filter. A clear photo gets an accurate score. Your photos are analysed and then deleted, never stored.</p>
             <div className="shots">
               <PhotoSlot label="Face" note="Required" value={face} onPick={(e) => pick(e, setFace)} onClear={() => setFace(null)} />
               <PhotoSlot label="Full body" note="Optional, for body and fit" value={bodyPhoto} onPick={(e) => pick(e, setBodyPhoto)} onClear={() => setBodyPhoto(null)} />
