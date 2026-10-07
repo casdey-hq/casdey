@@ -40,7 +40,11 @@ if (!fs.existsSync(edit) || !face || !(score > 0) || !(potential >= score) || !(
 }
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const FFPROBE = FFMPEG.replace(/ffmpeg(\.exe)?$/i, "ffprobe$1");
+const probe = (entries) => execFileSync(FFPROBE, ["-v", "error", "-select_streams", "v:0", "-show_entries", entries, "-of", "csv=p=0", edit]).toString().trim();
 const duration = Number(execFileSync(FFPROBE, ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", edit]).toString().trim());
+// Render the card at the edit's own frame rate (60 fps edits looked choppy at 30).
+const [rn, rd] = probe("stream=r_frame_rate").split("/").map(Number);
+const fps = Math.round(rn / (rd || 1)) || 30;
 const secs = duration - at;
 if (secs < 2.2) console.warn(`only ${secs.toFixed(2)} s for the card: it may not finish building; pick an earlier beat`);
 
@@ -53,10 +57,10 @@ const html = fs.readFileSync(path.join(here, "template.html"), "utf8")
   .replace("__CTA__", cta);
 fs.writeFileSync(path.join(tmp, "card.html"), html);
 
-let r = spawnSync(process.execPath, [path.join(here, "capture.mjs"), path.join(tmp, "card.html"), path.join(tmp, "frames"), String(secs.toFixed(3)), "30"], { stdio: "inherit" });
+let r = spawnSync(process.execPath, [path.join(here, "capture.mjs"), path.join(tmp, "card.html"), path.join(tmp, "frames"), String(secs.toFixed(3)), String(fps)], { stdio: "inherit" });
 if (r.status) throw new Error("capture failed");
 
-r = spawnSync(FFMPEG, ["-v", "error", "-y", "-i", edit, "-framerate", "30", "-i", path.join(tmp, "frames", "%04d.png"),
+r = spawnSync(FFMPEG, ["-v", "error", "-y", "-i", edit, "-framerate", String(fps), "-i", path.join(tmp, "frames", "%04d.png"),
   "-filter_complex", `[1:v]format=rgba,setpts=PTS-STARTPTS+${at}/TB[c];[0:v][c]overlay=0:0:eof_action=repeat,format=yuv420p[v]`,
   "-map", "[v]", "-map", "0:a?", "-t", String(duration), "-c:v", "libx264", "-crf", "16", "-preset", "slow", "-tune", "film", "-c:a", "copy", "-movflags", "+faststart", out]);
 if (r.status) throw new Error(r.stderr.toString());
