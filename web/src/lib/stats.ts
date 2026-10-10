@@ -1,3 +1,4 @@
+import { isAdmin } from "@/lib/admin";
 // Numbers for /admin. Signups come from the Supabase waitlist table, visitors
 // from PostHog (cookieless). Days and hours are counted in Davide's time zone.
 
@@ -113,6 +114,7 @@ export async function loadSignups(): Promise<Signup[]> {
   const [waitlist, analyses] = await Promise.all([load("waitlist"), load("analyses")]);
   const first = new Map<string, Signup>();
   for (const signup of [...waitlist, ...analyses]) {
+    if (isAdmin(signup.email)) continue; // Davide's own tests are not signups
     const seen = first.get(signup.email);
     if (!seen || signup.created_at < seen.created_at) first.set(signup.email, signup);
   }
