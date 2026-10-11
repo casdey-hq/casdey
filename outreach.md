@@ -20,7 +20,7 @@ accounts. Claude writes, never sends.
 `outreach/lists/<date>.md`: new posts by men 18+ asking to be rated on
 r/Rateme, r/truerateme, r/looksmaxxing and r/malegrooming, each with a
 ready reply. It reads the public RSS feeds, because Reddit gates new API apps.
-The lists stay local (gitignored): they name private users. Look at the
+It also writes a CSV, which Claude uploads to Google Drive as a Sheet in Davide's folder "Casdey outreach" (07davide.longo@gmail.com, folder id 15lam3MnKb-hC_MlSoiBlM0e86v4vYPYx), one Sheet a day, so he works from his phone. The local lists stay out of git: they name private users. Look at the
 photos and make the first sentence about him before posting.
 
 ## The replies (rotate, edit the first line to the person)

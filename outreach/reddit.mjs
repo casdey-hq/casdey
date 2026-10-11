@@ -50,8 +50,17 @@ function reply(title, sub) {
     return "Solid base. The quick wins for most guys are a sharper haircut, consistent skincare (cleanser + moisturiser + SPF), and posture in photos. For your face specifically, casdey.com gives you a free score, your 90-day potential and your own top 3 changes. Takes 2 min.";
   if (sub === "looksmaxxing")
     return "Good starting point, your potential is clearly higher than where you are now. If you want the exact gap, casdey.com is free: score now, 90-day potential, and the 3 levers that close it.";
-  return "Good base, you're closer to the top than you think. The fastest gains usually come from the cut, skin and how you hold your face in photos. If you want your exact numbers, casdey.com is free: your score, your 90-day potential and the 3 changes that get you there.";
+  // Identical comments across a subreddit read as spam, so the generic reply rotates.
+  return GENERIC[(reply.n = (reply.n ?? -1) + 1) % GENERIC.length];
 }
+
+const GENERIC = [
+  "Good base, you're closer to the top than you think. The fastest gains usually come from the cut, skin and how you hold your face in photos. If you want your exact numbers, casdey.com is free: your score, your 90-day potential and the 3 changes that get you there.",
+  "Solid. Honestly a sharper haircut and a bit of skincare would move you up more than anything else here. I made a free tool for exactly this, casdey.com: it gives you a score, a 90-day potential and your top 3 fixes.",
+  "Above average for sure. Lighting is doing you no favours in some of these, try daylight facing a window. If you want an honest breakdown, casdey.com does a free analysis with your score and the 3 things that'd raise it most.",
+  "You've got good features, it's mostly presentation now: hair, skin, posture. Small stuff with a big effect. casdey.com is free if you want to see your score and your 90-day potential.",
+  "Decent, and very fixable where it isn't. Biggest wins for most guys your age: grooming routine, a cut that suits your face shape, and sleep (it shows under the eyes). casdey.com gives you your own top 3 for free.",
+];
 
 const statePath = path.join(here, "lists", ".seen.json");
 fs.mkdirSync(path.join(here, "lists"), { recursive: true });
@@ -89,6 +98,11 @@ const lines = [
 ];
 const out = path.join(here, "lists", `${day}.md`);
 fs.writeFileSync(out, lines.join("\n"));
+// The same list as CSV, for the Google Sheet Davide works from on his phone.
+const cell = (v) => `"${String(v).replace(/"/g, '""')}"`;
+const csv = [["Done", "#", "Subreddit", "Post", "Link", "Age", "Reply (make the first sentence about him)"].map(cell).join(",")]
+  .concat(picks.map((p, i) => ["", i + 1, `r/${p.sub}`, p.title, p.link, p.age, reply(p.title, p.sub)].map(cell).join(",")));
+fs.writeFileSync(out.replace(/\.md$/, ".csv"), csv.join("\n"));
 for (const p of picks) seen.add(p.link);
 fs.writeFileSync(statePath, JSON.stringify([...seen].slice(-3000)));
 console.log(`${picks.length} posts -> ${out}`);
