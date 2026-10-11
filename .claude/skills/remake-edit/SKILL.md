@@ -405,6 +405,7 @@ casdey.com" rises in. Davide approved v4 of the Brad Pitt remake.
 - **Score realism (Davide, same day: "how is Marlon a 7.4?").** Use the subject's best clean, sharp, front-facing photo; a blurry or mid-expression frame now gets refused by the analysis, and two runs of the same photo can differ by about 0.4. Never put a number on a card that the analysis didn't produce.
 - The CTA says **casdey.com**, typeable on every platform (TikTok's bio link
   isn't clickable under 1,000 followers).
+- **Score reveal (2026-10-11, the content test in `outreach.md`):** pass the 3 levers too. `analyse.mjs` now prints `--score X --potential Y --levers "Title:gain|Title:gain|Title:gain"`; add that to `scorecard.mjs` and give the card at least 3.5 s (the levers slide in after the tiles, the CTA comes last). First one: the Marlon selfies remake, card at 11.11 s.
 - Options (the empty `--blank` card is a last resort, not a default): `--secs N` (card lasts N seconds, then the edit returns), `--blank` (no face, no numbers), `--mode solid|over`. `analyse.mjs` uses a unique test email each run so the 3-a-day limit doesn't block repeated tests.
 - **Description CTA, every video:** "Get your free glow-up analysis. Your
   score, your 90-day potential and the 3 changes that get you there. Link in

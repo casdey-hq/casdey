@@ -32,6 +32,11 @@ const score = Number(opt("--score"));
 const potential = Number(opt("--potential"));
 const at = Number(opt("--at"));
 const cta = opt("--cta", "casdey.com");
+// --levers "Skin:0.4|Jawline:0.3|Hair:0.2": the 3 levers that analyse.mjs prints, shown
+// under the tiles (the score-reveal format, 2026-10-11). Give the card about 3 s.
+const levers = (opt("--levers", "") || "").split("|").filter(Boolean)
+  .map((x) => { const i = x.lastIndexOf(":"); return { title: x.slice(0, i).trim(), gain: Number(x.slice(i + 1)) }; })
+  .filter((l) => l.title && l.gain > 0).slice(0, 3);
 // "over" (default, Davide 2026-10-07): the edit keeps playing under the card,
 // blurred and dimmed, so the song and the motion carry on. "solid" is the old
 // near-black wash.
@@ -70,7 +75,8 @@ const html = fs.readFileSync(path.join(here, "template.html"), "utf8")
   .replace("__SPEED__", String(speed))
   .replace("__BLANK__", blank ? "1" : "0")
   .replace("__CTA__", cta)
-  .replace("__BGA__", mode === "solid" ? "0.97" : "0.55");
+  .replace("__BGA__", mode === "solid" ? "0.97" : "0.55")
+  .replace("__LEVERS__", JSON.stringify(blank ? [] : levers));
 fs.writeFileSync(path.join(tmp, "card.html"), html);
 
 let r = spawnSync(process.execPath, [path.join(here, "capture.mjs"), path.join(tmp, "card.html"), path.join(tmp, "frames"), String(secs.toFixed(3)), String(fps)], { stdio: "inherit" });

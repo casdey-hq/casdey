@@ -18,4 +18,4 @@ const response = await fetch("https://www.casdey.com/api/analysis", {
 });
 const body = await response.json();
 console.log(JSON.stringify(body, null, 2));
-if (body.score) console.log(`\n--score ${body.score} --potential ${body.potential}`);
+if (body.score) console.log(`\n--score ${body.score} --potential ${body.potential} --levers "${(body.levers || []).map((l) => `${l.title.replace(/[|"]/g, "")}:${l.gain}`).join("|")}"`);

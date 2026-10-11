@@ -16,6 +16,13 @@ html,body{width:1080px;height:1920px;background:transparent;font-family:"Segoe U
 .bar i{display:block;height:100%;border-radius:16px;background:#8e8e93;transform-origin:left}
 .tile.pot{background:#fff;color:#0c0c0d;border-color:#fff}
 .tile.pot .k{color:#6e6e73}.tile.pot .bar{background:#e5e5ea}.tile.pot .bar i{background:#0c0c0d}
+.levers{width:880px;margin-top:40px;display:grid;gap:18px}
+.lv{display:flex;align-items:center;gap:26px;background:#1c1c1e;border:2px solid #2c2c2e;border-radius:30px;padding:26px 34px}
+.lv .n{width:56px;height:56px;border-radius:50%;background:#fff;color:#0c0c0d;display:grid;place-items:center;font-size:30px;font-weight:700;flex:none}
+.lv .t{flex:1;font-size:42px;font-weight:600;letter-spacing:-0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv .g{font-size:42px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+body.has-levers .brand{margin-bottom:44px}body.has-levers .facebox{width:380px;height:380px;margin-bottom:52px}body.has-levers .ring{width:392px;height:392px}
+body.has-levers .cta{margin-top:44px}
 .cta{margin-top:64px;font-size:46px;font-weight:600;color:#d1d1d6;letter-spacing:-0.3px;padding:24px 44px;border-radius:999px;border:2px solid #3a3a3c;background:#1c1c1e}
 .cta span{color:#6e6e73;margin:0 6px}.cta b{color:#fff;font-weight:700}
 </style></head><body><div id="bg"></div><div class="wrap">
@@ -23,9 +30,18 @@ html,body{width:1080px;height:1920px;background:transparent;font-family:"Segoe U
 <div class="facebox" id="facebox"><div class="face" id="face"></div><svg class="ring" viewBox="0 0 468 468"><circle id="ring" cx="234" cy="234" r="228" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" transform="rotate(-90 234 234)"/></svg></div>
 <div class="tiles"><div class="tile" id="t1"><div class="k">Score</div><div class="v" id="v1">0.0</div><div class="bar"><i id="b1"></i></div></div>
 <div class="tile pot" id="t2"><div class="k">90-day potential</div><div class="v" id="v2">0.0</div><div class="bar"><i id="b2"></i></div></div></div>
+<div class="levers" id="levers"></div>
 <div class="cta" id="sub">Get yours free <span>·</span> <b>__CTA__</b></div></div>
 <script>
-const SCORE=__SCORE__, POT=__POT__, SPEED=__SPEED__, BLANK=__BLANK__;
+const SCORE=__SCORE__, POT=__POT__, SPEED=__SPEED__, BLANK=__BLANK__, LEVERS=__LEVERS__;
+const LV=LEVERS.length?0.75:0; // the levers push the glow and the CTA later
+if(LEVERS.length){document.body.classList.add("has-levers");
+  const box=document.getElementById("levers");
+  LEVERS.forEach((l,i)=>{const row=document.createElement("div");row.className="lv";row.id="lv"+i;
+    const n=document.createElement("span");n.className="n";n.textContent=String(i+1);
+    const tt=document.createElement("span");tt.className="t";tt.textContent=l.title;
+    const g=document.createElement("span");g.className="g";g.textContent="+"+Number(l.gain).toFixed(1);
+    row.append(n,tt,g);box.append(row);});}
 const cl=(x)=>Math.min(Math.max(x,0),1);
 const p=(t,a,b)=>cl((t-a)/(b-a));
 const out3=(x)=>1-Math.pow(1-x,3);
@@ -48,9 +64,10 @@ window.render=(t)=>{
   $("v1").textContent=(SCORE*c1).toFixed(1); $("v2").textContent=v2.toFixed(1);
   $("b1").style.transform="scaleX("+(SCORE/10*c1)+")"; $("b2").style.transform="scaleX("+(v2/10)+")";
   if(BLANK){ $("v1").textContent="?"; $("v2").textContent="?"; $("b1").style.transform="scaleX(0)"; $("b2").style.transform="scaleX(0)"; }
-  const g=Math.sin(Math.PI*p(t,1.65,2.15)); $("t2").style.boxShadow="0 0 "+(80*g)+"px "+(10*g)+"px rgba(255,255,255,"+(0.35*g)+")";
+  LEVERS.forEach((l,i)=>{const s=1.45+i*0.2,k=out3(p(t,s,s+0.4)),e=$("lv"+i); e.style.opacity=smooth(p(t,s,s+0.25)); e.style.transform="translateX("+(-70*(1-k))+"px)";});
+  const g=Math.sin(Math.PI*p(t,1.65+LV,2.15+LV)); $("t2").style.boxShadow="0 0 "+(80*g)+"px "+(10*g)+"px rgba(255,255,255,"+(0.35*g)+")";
   $("t2").style.transform+=" scale("+(1+0.035*g)+")";
-  {const k=out3(p(t,1.75,2.15)); $("sub").style.opacity=smooth(p(t,1.75,2.0)); $("sub").style.transform="translateY("+(30*(1-k))+"px)";}
+  {const k=out3(p(t,1.75+LV,2.15+LV)); $("sub").style.opacity=smooth(p(t,1.75+LV,2.0+LV)); $("sub").style.transform="translateY("+(30*(1-k))+"px)";}
 };
 window.render(0);
 </script></body></html>
