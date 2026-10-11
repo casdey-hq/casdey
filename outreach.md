@@ -15,6 +15,14 @@ accounts. Claude writes, never sends.
    people who say or clearly look 18+. Skip anyone who looks younger, and
    skip anyone who sounds down on himself: we help, we never pile on.
 
+## Reddit, every day
+`node outreach/reddit.mjs` (a few minutes; Reddit throttles fast reads) writes
+`outreach/lists/<date>.md`: new posts by men 18+ asking to be rated on
+r/Rateme, r/truerateme, r/looksmaxxing and r/malegrooming, each with a
+ready reply. It reads the public RSS feeds, because Reddit gates new API apps.
+The lists stay local (gitignored): they name private users. Look at the
+photos and make the first sentence about him before posting.
+
 ## The replies (rotate, edit the first line to the person)
 - **A, a "rate me" comment:**
   "Run your photo through casdey.com, it's free and takes 2 min: you get
