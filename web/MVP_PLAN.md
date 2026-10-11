@@ -39,6 +39,7 @@ file is the build spec; tick phases off as they ship.
   **not stored** unless the person starts the trial. Leads go to Supabase
   (extend or replace `waitlist`). PostHog events per quiz step, to see the
   drop-off.
+- **B0. The plan sold by hand. Built 2026-10-11** (commit 97b8d24): an offer card under the result and in the analysis email (link `/plan?a=<id>`), Stripe Checkout subscription with a 7-day trial (product `prod_VQI9U108D8AG35`, live prices €9.99/month and €59.99/year, key `STRIPE_PLAN_SECRET_KEY` in Vercel), `/plan/welcome` records the trial on the `analyses` row (migration 0003) and emails the person and Davide. No accounts, no portal, no webhook: Davide writes the plan by email within 24 hours, cancellations by reply (he cancels in the Stripe dashboard). `/terms` added.
 - **B. Plan preview + paywall + accounts.** Supabase auth (magic link). Stripe
   Checkout subscription with `trial_period_days: 7`, EUR, monthly and annual
   prices (new; part 1's price ids are gym tiers, unused). Customer portal for

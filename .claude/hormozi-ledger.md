@@ -647,3 +647,25 @@ addictive and shareable. Kept honest two ways: the score is calibrated (most
 men 4.5 to 7) and the potential is derived from the plan's levers, not a
 second guess, so "where you could be" is literally what the plan claims to
 deliver. That gap is the reason to buy the plan.
+
+## 2026-10-11 — Offer before traffic, outreach added, content that shows the product
+Framework: $100M Leads / Core Four (warm, cold, content, paid) and the Rule of
+100; content as hook, retain, reward; $100M Money Models (an offer must exist
+before traffic can be judged); paid ads amplify what already converts.
+Decision: read on 2026-10-10 with live numbers: about 53K views since
+2026-09-26, about 20 site visits, 0 real analyses, nothing to buy, 4 TikTok
+followers, and the business got 15-20 minutes a day. Three moves, Davide
+agreed to all ("let's go with everything"): (1) the paid 90-day plan goes live
+behind the free analysis now (Stripe, 7-day trial, €59.99/year or
+€9.99/month, written and checked by hand); (2) cold outreach starts beside
+content: reply to "rate me" posts and to our own commenters with their real
+score card, aiming for 50 then 100 a day, written by Claude, sent by Davide;
+(3) a 7-day content test on 3 posts a day: 1 remake edit, 1 score reveal on a
+famous face, 1 before/after potential, judged on profile and site visits per
+format, not views. Paid ads: a €50-100 test only after the offer is live and
+there are 10+ analyses.
+Follows or diverges: **Follows.** It also ends the "content only" reading of
+marketing: content was 1 of the Core Four, and the edits rewarded viewers
+with someone else's face instead of a taste of the product.
+Reason: the constraint is views to visits, then visits to money; neither is
+fixed by more of the same edits or by ads.
