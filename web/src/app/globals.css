@@ -244,6 +244,24 @@ a { color: inherit; }
 .next-mark { width: 30px; height: 30px; margin-bottom: 4px; }
 .next h2 { margin: 0; font-size: 24px; letter-spacing: -0.03em; }
 .next p { margin: 0; font-size: 16px; line-height: 1.5; color: #d2d2d7; }
+/* the paid 90-day plan offer, under the free result */
+.offer { gap: 14px; }
+.offer-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 15px; line-height: 1.45; color: #f5f5f7; }
+.offer-list li { position: relative; padding-left: 22px; }
+.offer-list li::before { content: ""; position: absolute; left: 2px; top: 0.5em; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+.offer-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+.offer-plans button { display: grid; gap: 2px; text-align: left; padding: 14px 16px; border-radius: 16px; border: 1.5px solid #48484a; background: transparent; color: #fff; font: inherit; cursor: pointer; }
+.offer-plans button b { font-size: 17px; letter-spacing: -0.01em; }
+.offer-plans button span { font-size: 13px; color: #a1a1a6; }
+.offer-plans button[aria-checked="true"] { border-color: #fff; background: #2c2c2e; }
+.offer-plans button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.offer-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.45; color: #d2d2d7; cursor: pointer; }
+.offer-consent input { margin-top: 2px; width: 18px; height: 18px; flex: none; accent-color: #fff; }
+.offer-consent a { color: #fff; text-underline-offset: 2px; }
+.offer .offer-btn { width: 100%; background: #fff; color: var(--ink); }
+.offer-fine { margin: 0; font-size: 13px; line-height: 1.45; color: #a1a1a6; text-align: center; }
+.offer .msg.error { color: #ff6961; }
+@media (max-width: 420px) { .offer-plans { grid-template-columns: 1fr; } }
 
 /* plan section */
 .plan { background: var(--mist); padding-block: clamp(64px, 10vw, 120px); }
@@ -395,3 +413,4 @@ a { color: inherit; }
   .progress.is-on::before, .spinner, .skeleton { animation: none; }
   .progress.is-on::before { width: 100%; transform: none; opacity: 0.4; }
 }
+.plan-page { max-width: 600px; }

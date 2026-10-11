@@ -14,7 +14,7 @@ type Step =
   | { kind: "photos" }
   | { kind: "email" }
   | { kind: "working" }
-  | { kind: "result"; score: number; potential: number; read: string; levers: Lever[] };
+  | { kind: "result"; id: string | null; email: string; score: number; potential: number; read: string; levers: Lever[] };
 
 // The body step sits right after age, so the order is goal, age, body, then the rest.
 const BODY_AFTER = QUESTIONS.findIndex((q) => q.id === "age");
@@ -143,7 +143,7 @@ export function AnalysisFlow() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const body = (await response.json().catch(() => ({}))) as { error?: string; retake?: string; score?: number; potential?: number; read?: string; levers?: Lever[] };
+      const body = (await response.json().catch(() => ({}))) as { id?: string | null; error?: string; retake?: string; score?: number; potential?: number; read?: string; levers?: Lever[] };
       if (body.retake) {
         posthog.capture("analysis_retake");
         setFace(null);
@@ -159,7 +159,7 @@ export function AnalysisFlow() {
       }
       posthog.capture("analysis_done", { goal: answers.goal, score: body.score, potential: body.potential });
       setHistory([]);
-      setStep({ kind: "result", score: body.score, potential: body.potential, read: body.read, levers: body.levers });
+      setStep({ kind: "result", id: body.id ?? null, email: String(payload.email ?? ""), score: body.score, potential: body.potential, read: body.read, levers: body.levers });
     } catch {
       setStep({ kind: "email" });
       setError("No connection. Check your internet and try again.");
@@ -322,20 +322,85 @@ export function AnalysisFlow() {
                 </li>
               ))}
             </ol>
-            <div className="next">
-              <Mark className="next-mark" />
-              <h2>Your 90-day plan is next</h2>
-              <p>
-                These three, turned into one daily plan that takes you from {step.score.toFixed(1)} to {step.potential.toFixed(1)}, with a quick photo check-in each day so you actually do it. It opens soon,
-                with a 7&#8209;day free trial. We&rsquo;ll email you the day it&rsquo;s ready.
-              </p>
-            </div>
+            <PlanOffer analysis={step.id} email={step.email} score={step.score} potential={step.potential} />
             <p className="fine">A copy is on its way to your inbox. Your photos were not stored.</p>
           </div>
         ) : null}
 
         {error ? <p className="msg error flow-error" role="alert">{error}</p> : null}
       </div>
+    </div>
+  );
+}
+
+/** The paid 90-day plan, offered right under the free result (2026-10-11). */
+export function PlanOffer({ analysis, email, score, potential }: { analysis: string | null; email: string; score: number; potential: number }) {
+  const [interval, setBilling] = useState<"year" | "month">("year");
+  const [consent, setConsent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const consentId = useId();
+
+  useEffect(() => {
+    posthog.capture("plan_offer_seen");
+  }, []);
+
+  async function start() {
+    if (!consent) {
+      setError("Tick the box to agree to the terms first.");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    posthog.capture("plan_checkout_started", { interval });
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interval, email, analysis, consent }),
+      });
+      const body = (await response.json().catch(() => ({}))) as { url?: string; error?: string };
+      if (!response.ok || !body.url) throw new Error(body.error ?? "Checkout couldn't open. Try again in a moment.");
+      window.location.assign(body.url);
+    } catch (problem) {
+      setBusy(false);
+      setError(problem instanceof Error ? problem.message : "Checkout couldn't open. Try again in a moment.");
+    }
+  }
+
+  return (
+    <div className="next offer">
+      <Mark className="next-mark" />
+      <h2>Go from {score.toFixed(1)} to {potential.toFixed(1)} in 90 days</h2>
+      <p>Your 3 levers, turned into one plan written for you and checked every day, so you actually do it.</p>
+      <ul className="offer-list">
+        <li>Your personal 90-day plan, in your inbox within 24 hours</li>
+        <li>A daily check-in: reply with a photo or a line, and it gets read</li>
+        <li>A weekly review of what&rsquo;s working and what to change</li>
+      </ul>
+      <div className="offer-plans" role="radiogroup" aria-label="Billing">
+        <button type="button" role="radio" aria-checked={interval === "year"} onClick={() => setBilling("year")}>
+          <b>&euro;59.99 a year</b>
+          <span>&euro;5 a month, best value</span>
+        </button>
+        <button type="button" role="radio" aria-checked={interval === "month"} onClick={() => setBilling("month")}>
+          <b>&euro;9.99 a month</b>
+          <span>Cancel any time</span>
+        </button>
+      </div>
+      <label className="offer-consent" htmlFor={consentId}>
+        <input id={consentId} type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+        <span>
+          I agree to the <a href="/terms" target="_blank">terms</a> and ask Casdey to start my plan now. I can still withdraw within 14 days of my first payment.
+        </span>
+      </label>
+      <button type="button" className="btn offer-btn" onClick={start} disabled={busy}>
+        {busy ? "Opening checkout…" : "Start my 7-day free trial"}
+      </button>
+      <p className="offer-fine">
+        Nothing is charged for 7 days. Then {interval === "year" ? "€59.99 a year" : "€9.99 a month"} until you cancel. Cancel any time by replying &ldquo;cancel&rdquo; to any Casdey email.
+      </p>
+      {error ? <p className="msg error" role="alert">{error}</p> : null}
     </div>
   );
 }

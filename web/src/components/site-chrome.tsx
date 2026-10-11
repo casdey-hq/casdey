@@ -22,6 +22,7 @@ export function SiteFooter() {
         <span>© {new Date().getFullYear()} Casdey</span>
         <nav aria-label="Footer">
           <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
           <span>info@casdey.com</span>
         </nav>
       </div>

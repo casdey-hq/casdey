@@ -13,7 +13,7 @@ export default function Privacy() {
       <main className="legal">
         <div className="wrap">
           <h1>Privacy notice</h1>
-          <p className="updated">Last updated 5 October 2026. This covers the free analysis and the earlier waitlist.</p>
+          <p className="updated">Last updated 11 October 2026. This covers the free analysis, the paid 90-day plan, and the earlier waitlist.</p>
 
           <h2>Who we are</h2>
           <p>
@@ -33,6 +33,7 @@ export default function Privacy() {
             <li>Your answers to the quiz: what you want to improve, your age range, height, weight, and habits such as training, sleep and skincare.</li>
             <li>Your photos (a face photo, and a full-body photo if you add one), only for the time it takes to analyse them. See below.</li>
             <li>The analysis we give you.</li>
+            <li>If you start the 90-day plan: your check-in replies and any photos you choose to send by email, and your subscription status. Your card details go to Stripe and never reach Casdey.</li>
             <li>The country your connection comes from, worked out from your IP address. The IP address itself is not stored.</li>
             <li>Anonymous page statistics (pages viewed, steps of the quiz reached), collected without cookies.</li>
           </ul>
@@ -59,12 +60,13 @@ export default function Privacy() {
             <li>Supabase (database, hosted in Ireland, EU).</li>
             <li>Vercel (website hosting).</li>
             <li>Resend (sending email).</li>
+            <li>Stripe (payments, only if you start the 90-day plan).</li>
             <li>PostHog (anonymous page statistics, EU cloud).</li>
           </ul>
           <p>Some of these providers are based in the United States and protect transfers with the EU standard contractual clauses.</p>
 
           <h2>How long we keep it</h2>
-          <p>Photos: not kept at all. Everything else: until you ask us to remove it, or 12 months after your last analysis, whichever comes first.</p>
+          <p>Photos from the analysis: not kept at all. Photos you send by email for your plan: kept only while your plan runs, and deleted when you ask or when it ends. Everything else: until you ask us to remove it, or 12 months after your last analysis, whichever comes first.</p>
 
           <h2>Your rights</h2>
           <p>

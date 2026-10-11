@@ -2,6 +2,7 @@ import { after, type NextRequest } from "next/server";
 import { analyse, type Photo } from "@/lib/analysis";
 import { sendAnalysis } from "@/lib/analysis-email";
 import { alertDavide } from "@/lib/alert";
+import { supabase } from "@/lib/db";
 import { describe, validAnswers, validBody } from "@/lib/quiz";
 
 // The model call takes a while with two photos.
@@ -12,15 +13,6 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MAX_PHOTO = 2_000_000;
 const PER_EMAIL_PER_DAY = 3;
 const FAILED = "The analysis didn't go through. Try again in a moment.";
-
-function supabase(path: string, init: RequestInit & { prefer?: string } = {}) {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("Supabase is not configured");
-  const headers: Record<string, string> = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
-  if (init.prefer) headers.Prefer = init.prefer;
-  return fetch(`${url}/rest/v1/${path}`, { ...init, headers });
-}
 
 function photo(value: unknown): Photo | null {
   if (typeof value !== "string") return null;
@@ -87,12 +79,12 @@ export async function POST(request: NextRequest) {
 
     // The person sees the result straight away; the email copy goes out after the response.
     after(async () => {
-      if ((await sendAnalysis(email, result)) && row) {
+      if ((await sendAnalysis(email, result, row?.id)) && row) {
         await supabase(`analyses?id=eq.${row.id}`, { method: "PATCH", body: JSON.stringify({ email_sent_at: new Date().toISOString() }) });
       }
     });
 
-    return Response.json({ score: result.score, potential: result.potential, read: result.read, levers: result.levers });
+    return Response.json({ id: row?.id ?? null, score: result.score, potential: result.potential, read: result.read, levers: result.levers });
   } catch (error) {
     console.error("analysis error", error);
     const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);

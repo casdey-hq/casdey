@@ -8,7 +8,8 @@ function escape(value: string): string {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-export async function sendAnalysis(to: string, { score, potential, read, levers }: Result): Promise<boolean> {
+export async function sendAnalysis(to: string, { score, potential, read, levers }: Result, id?: string): Promise<boolean> {
+  const planUrl = id ? `https://www.casdey.com/plan?a=${id}` : "https://www.casdey.com/analysis";
   const key = process.env.RESEND_API_KEY;
   if (!key) return false;
 
@@ -20,7 +21,7 @@ export async function sendAnalysis(to: string, { score, potential, read, levers 
     read,
     "",
     ...levers.flatMap((lever, i) => [`${i + 1}. ${lever.title} (+${lever.gain.toFixed(1)})`, lever.why, `This week: ${lever.first_step}`, ""]),
-    "Your full 90-day plan, with a daily check-in that makes sure you actually do it, opens soon. You'll get an email the day your 7-day free trial is ready.",
+    `Go from ${score.toFixed(1)} to ${potential.toFixed(1)}: your 90-day plan, written for you, with a daily check-in so you actually do it. Start with a 7-day free trial: ${planUrl}`,
     "",
     "Your photos were not stored. If you didn't ask for this, ignore this email. To be removed at any time, reply to it.",
     "",
@@ -51,7 +52,8 @@ export async function sendAnalysis(to: string, { score, potential, read, levers 
 </tr></table></td></tr>
 <tr><td style="font-size:17px;line-height:1.55;color:#6e6e73;padding-bottom:28px">${escape(read)}</td></tr>
 ${rows}
-<tr><td style="font-size:16px;line-height:1.55;color:#6e6e73;padding:6px 0 28px">Your full 90-day plan, with a daily check-in that makes sure you actually do it, opens soon. You&rsquo;ll get an email the day your 7-day free trial is ready.</td></tr>
+<tr><td style="font-size:16px;line-height:1.55;color:#6e6e73;padding:6px 0 28px">Go from ${score.toFixed(1)} to ${potential.toFixed(1)}: your 90-day plan, written for you, with a daily check-in so you actually do it.</td></tr>
+<tr><td style="padding:0 0 28px"><a href="${planUrl}" style="display:inline-block;background:#1d1d1f;color:#ffffff;text-decoration:none;font-weight:600;font-size:16px;border-radius:999px;padding:14px 24px">Start my 7-day free trial</a></td></tr>
 <tr><td style="font-size:13px;line-height:1.5;color:#86868b;border-top:1px solid #e8e8ed;padding-top:20px">Your photos were not stored. If you didn&rsquo;t ask for this, ignore this email. To be removed at any time, reply to it.</td></tr>
 </table></td></tr></table></body></html>`;
 
