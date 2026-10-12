@@ -10,3 +10,4 @@ the helpers in `.claude/skills/remake-edit/`: `tiktok.js` (TikTok, 1080p, no log
 source clips from Pinterest, `sheets.js` for contact sheets, `preview.js` to
 check crops (render.js refuses to run on crops it has not previewed), `gradematch.js` to match brightness, `render.js` to render, and `scorecard/` (analyse.mjs, scorecard.mjs) for the Casdey score card CTA. Follow its rules
 (no content restrictions, no approval needed to download source clips, nothing gets posted).
+Before any edit read `content.md` (the daily plan); after every delivery update its log.
