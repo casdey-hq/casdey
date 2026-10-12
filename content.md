@@ -7,7 +7,7 @@ The daily content plan and the log of every edit made. **Claude reads this at th
 | --- | --- | --- | --- |
 | 1 | **Remake** (reach) | A looksmaxxing edit remade from an inspo, same cuts, song and hook, new footage. The "classics" made until 2026-10-10. | `/remake-edit`, deliver as 1080x1920 `_shorts` |
 | 2 | **Score reveal** (conversion) | A famous face edit that ends on his real score, 90-day potential and the 3 levers. Card sits at the end, at least 3.5 s. | `/remake-edit` with `analyse.mjs` then `scorecard.mjs --levers` (the Marlon selfies one is the first) |
-| 3 | **Before/after potential** (proof) | "He's a 5.8 now, this is his 90-day potential", with the 3 changes shown. | Not built yet: needs a spec and a first example (see Open) |
+| 3 | **Before/after potential** (proof) | "He's a 5.8 now, this is his 90-day potential", with the 3 changes shown. | Davide sources glow-up / before-after inspos (single person, clear before and after shot); Claude remakes with new before/after pairs and ends on the card (score, 3 levers or potential). First one still to come |
 
 Rules for every post:
 - Caption starts with the CTA. Pinned comment: "free score + 90-day potential: casdey.com".
@@ -32,5 +32,5 @@ Status: `sent` (delivered, waiting for a verdict) · `approved` · `rework` · `
 | 2026-10-11 | score reveal | Marlon selfies + score reveal (n10) | `marlon-score-reveal-final.mp4` (and `marlon-selfies-final.mp4` without the card) | sent | | |
 
 ## Open
-- Format 3 (before/after potential) has no spec yet: what is the footage (a famous face with a "now" and an "after" look? a split screen? a morph?), and who is the subject. Decide with Davide before the first one.
+- Format 3: agreed 2026-10-12 that Davide finds the glow-up inspos; Claude remakes them. If before/after source pairs are thin, say so instead of shipping a weak one. Only the first example will show whether the format works.
 - Older rows say "?" under Posted because it was never recorded; Davide corrects them once.
