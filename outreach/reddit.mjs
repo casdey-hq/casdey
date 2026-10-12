@@ -36,31 +36,49 @@ function maleAge(title) {
   return age >= 18 && age <= 45 ? age : null;
 }
 
-function reply(title, sub) {
+// Warm-up phase (new account, 2026-10-12): every reply is real advice with no
+// link. Only about 1 in 4 replies, and only in subs that allow it, gets the
+// casdey.com plug. r/Rateme and r/truerateme remove self-promotion.
+const PLUG_SUBS = new Set(["looksmaxxing", "malegrooming"]);
+const PLUG_EVERY = 4;
+const PLUGS = [
+  "If you want an objective read on what would move you most, casdey.com is free: score, 90-day potential and your top 3 changes.",
+  "I built casdey.com for exactly this: a free score, your 90-day potential and the 3 changes that matter most for your face.",
+  "If you want the numbers, casdey.com does a free analysis: score now, 90-day potential, top 3 fixes.",
+];
+
+function advice(title) {
   const t = title.toLowerCase();
   if (/anxiety|depress|ugly|hate (my|how)|insecur/.test(t))
     return "(No plug here: just be kind and give one real, specific tip about his photos. Helping is the point.)";
   if (/bald|hairline|thinning|minoxidil|finasteride|meds/.test(t))
-    return "If it keeps thinning, a short buzz with a sharp lineup usually looks better than holding on, and it shows off the face. Stubble helps balance it. If you want an objective read on what else would move you most, casdey.com is free: score, 90-day potential and your top 3 changes.";
+    return "If it keeps thinning, a short buzz with a sharp lineup usually looks better than holding on, and it shows off the face. Stubble helps balance it.";
   if (/shave|beard|stubble/.test(t))
-    return "Honestly the beard question comes down to jawline definition. Try a short, even stubble before going fully clean shaven, it usually reads sharper. If you want an objective read, casdey.com gives you a free score, your 90-day potential and the 3 changes that matter most for your face.";
+    return "The beard question comes down to jawline definition. Try a short, even stubble before going fully clean shaven, it usually reads sharper.";
   if (/hair/.test(t))
-    return "The hair works for you. Biggest lever I'd look at next is the cut framing your face: a bit more volume on top, tighter on the sides. If you want it broken down properly, casdey.com is free: score, 90-day potential, and the 3 changes that'd move you most.";
+    return "The hair works for you. The biggest lever I'd look at next is the cut framing your face: a bit more volume on top, tighter on the sides.";
   if (/tip|advice|improve|honest|help/.test(t))
-    return "Solid base. The quick wins for most guys are a sharper haircut, consistent skincare (cleanser + moisturiser + SPF), and posture in photos. For your face specifically, casdey.com gives you a free score, your 90-day potential and your own top 3 changes. Takes 2 min.";
-  if (sub === "looksmaxxing")
-    return "Good starting point, your potential is clearly higher than where you are now. If you want the exact gap, casdey.com is free: score now, 90-day potential, and the 3 levers that close it.";
-  // Identical comments across a subreddit read as spam, so the generic reply rotates.
-  return GENERIC[(reply.n = (reply.n ?? -1) + 1) % GENERIC.length];
+    return "Solid base. The quick wins for most guys are a sharper haircut, consistent skincare (cleanser + moisturiser + SPF), and posture in photos.";
+  // Identical comments across a subreddit read as spam, so the generic advice rotates.
+  return GENERIC[(advice.n = (advice.n ?? -1) + 1) % GENERIC.length];
 }
 
 const GENERIC = [
-  "Good base, you're closer to the top than you think. The fastest gains usually come from the cut, skin and how you hold your face in photos. If you want your exact numbers, casdey.com is free: your score, your 90-day potential and the 3 changes that get you there.",
-  "Solid. Honestly a sharper haircut and a bit of skincare would move you up more than anything else here. I made a free tool for exactly this, casdey.com: it gives you a score, a 90-day potential and your top 3 fixes.",
-  "Above average for sure. Lighting is doing you no favours in some of these, try daylight facing a window. If you want an honest breakdown, casdey.com does a free analysis with your score and the 3 things that'd raise it most.",
-  "You've got good features, it's mostly presentation now: hair, skin, posture. Small stuff with a big effect. casdey.com is free if you want to see your score and your 90-day potential.",
-  "Decent, and very fixable where it isn't. Biggest wins for most guys your age: grooming routine, a cut that suits your face shape, and sleep (it shows under the eyes). casdey.com gives you your own top 3 for free.",
+  "Good base, you're closer to the top than you think. The fastest gains usually come from the cut, skin and how you hold your face in photos.",
+  "Solid. A sharper haircut and a bit of skincare would move you up more than anything else here.",
+  "Above average for sure. Lighting is doing you no favours in some of these, try daylight facing a window.",
+  "You've got good features, it's mostly presentation now: hair, skin, posture. Small stuff with a big effect.",
+  "Decent, and very fixable where it isn't. Biggest wins for most guys your age: grooming routine, a cut that suits your face shape, and sleep (it shows under the eyes).",
 ];
+
+let plugCount = 0;
+/** Returns { text, plug }: the reply, and whether it carries the casdey.com link. */
+function reply(title, sub) {
+  const text = advice(title);
+  if (text.startsWith("(") || !PLUG_SUBS.has(sub.toLowerCase())) return { text, plug: false };
+  if (plugCount++ % PLUG_EVERY !== PLUG_EVERY - 1) return { text, plug: false };
+  return { text: `${text} ${PLUGS[plugCount % PLUGS.length]}`, plug: true };
+}
 
 const statePath = path.join(here, "lists", ".seen.json");
 fs.mkdirSync(path.join(here, "lists"), { recursive: true });
@@ -80,19 +98,20 @@ for (const sub of SUBS) {
   await sleep(20_000);
 }
 picks.sort((a, b) => b.updated - a.updated);
+for (const p of picks) Object.assign(p, reply(p.title, p.sub));
 const day = new Date().toISOString().slice(0, 10);
 const lines = [
   `# Reddit outreach list, ${day}`,
   "",
   `${picks.length} new posts by men 18+ asking to be rated. Open each, look at the photos first, and change the first sentence so it's about HIM (one real, specific compliment or tip). Keep casdey.com as plain text. Skip anyone who sounds down on himself.`,
   "",
-  "Subreddit rules: r/Rateme and r/truerateme remove self-promotion. If a comment there gets removed, keep giving real advice and leave casdey.com out of that sub.",
+  "Warm-up phase: the account is new, so most replies carry no link on purpose. Only rows marked WITH LINK have casdey.com. r/Rateme and r/truerateme remove self-promotion; r/truerateme also needs user flair before you can comment.",
   "",
   ...picks.flatMap((p, i) => [
     `## ${i + 1}. r/${p.sub}: ${p.title}`,
     `${p.link}  (${p.author}, ${p.age})`,
     "",
-    `> ${reply(p.title, p.sub)}`,
+    `> ${p.text}${p.plug ? "  (WITH LINK)" : ""}`,
     "",
   ]),
 ];
@@ -100,8 +119,8 @@ const out = path.join(here, "lists", `${day}.md`);
 fs.writeFileSync(out, lines.join("\n"));
 // The same list as CSV, for the Google Sheet Davide works from on his phone.
 const cell = (v) => `"${String(v).replace(/"/g, '""')}"`;
-const csv = [["Done", "#", "Subreddit", "Post", "Link", "Age", "Reply (make the first sentence about him)"].map(cell).join(",")]
-  .concat(picks.map((p, i) => ["", i + 1, `r/${p.sub}`, p.title, p.link, p.age, reply(p.title, p.sub)].map(cell).join(",")));
+const csv = [["Done", "#", "Subreddit", "Post", "Link", "Age", "Link?", "Reply (make the first sentence about him)"].map(cell).join(",")]
+  .concat(picks.map((p, i) => ["", i + 1, `r/${p.sub}`, p.title, p.link, p.age, p.plug ? "WITH LINK" : "no link", p.text].map(cell).join(",")));
 fs.writeFileSync(out.replace(/\.md$/, ".csv"), csv.join("\n"));
 for (const p of picks) seen.add(p.link);
 fs.writeFileSync(statePath, JSON.stringify([...seen].slice(-3000)));
