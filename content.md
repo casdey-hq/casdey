@@ -30,6 +30,7 @@ Status: `sent` (delivered, waiting for a verdict) · `approved` · `rework` · `
 | 2026-10-11 | remake | Marlon "with-in" (n8) | `marlon-within-final_shorts.mp4` | sent | | |
 | 2026-10-11 | remake | Ian and Paul "best duo" (n9) | `ian-paul-best-duo-final_shorts.mp4` | sent | | |
 | 2026-10-11 | score reveal | Marlon selfies + score reveal (n10) | `marlon-score-reveal-final.mp4` (and `marlon-selfies-final.mp4` without the card) | sent | | |
+| 2026-10-12 | remake | Clark Kent "why handsome men date ugly women" (n11, Tom Welling) | `clark-kent-handsome-final_shorts.mp4` | approved | | |
 
 ## Open
 - Format 3: agreed 2026-10-12 that Davide finds the glow-up inspos; Claude remakes them. If before/after source pairs are thin, say so instead of shipping a weak one. Only the first example will show whether the format works.
