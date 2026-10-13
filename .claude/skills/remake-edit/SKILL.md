@@ -11,6 +11,17 @@ text and overlays) but with new footage wherever the footage is replaceable,
 so it is not a clip-for-clip copy.
 
 ## Hard rules
+- **RULE ZERO: THE SUBJECT IS CENTRED AND NEVER CUT. THIS IS THE MISTAKE DAVIDE HAS CAUGHT ON EVERY REMAKE (2026-09-29, 09-30, 10-02, 10-03, 10-07, and again 2026-10-13 on n17, in capitals: "I'M SICK OF SEEING YOU NOT CENTER THE SUBJECT OR CUTTING IT TOO MUCH").** Everything else in a remake can be a bit off; this cannot. It is not enough to "keep it in mind" or to glance at `preview.jpg`: the n17 crops were glanced at and still shipped with faces at 60-70% of the frame height, chins cut and the subject tiny at the bottom edge. So it is a gate with numbers, and no render happens until every shot passes it:
+  1. **Run `preview.js` and open `centre.jpg`.** It shows the REAL cropped result of every shot (first, middle, last frame) with guides: **red = the vertical centre line, yellow = the eye line at 40% of the height, cyan = the 8% top and bottom margins.**
+  2. **Every tile must pass all of these:**
+     - **Horizontal:** the nose sits on the red line, at most about 5% of the width off it, in all three frames. A face drifting left or right during the slot fails.
+     - **Vertical:** the eyes sit between the yellow line and the middle (40-50% of the height). Eyes lower than 55% = fail (n17: eight of fourteen shots failed this).
+     - **Nothing cut:** the top of the hair or cap and the chin are both inside the cyan margins, in all three frames. A hood or cap may touch the top margin; hair, forehead, ears and chin never. If a chin is cut, the shot fails even if the face is "mostly there".
+     - **Size:** the face (hairline to chin) is about 30-55% of the height. A tiny subject pushed to an edge fails, and so does a face that fills the whole box.
+  3. **When a tile fails, fix it before anything else:** move the crop box (`cy`: a face sitting too low in the tile means the box must move DOWN the source, so raise `cy`; too high means lower it), pick another moment in the source, or drop the shot. Do not leave a failing tile because the clip is "good otherwise". Re-run `preview.js` after every change and open `centre.jpg` AGAIN: the fix is not done until the new tile passes.
+  4. **Wide shots (full body, pool, street):** the person is centred horizontally and the head sits in the upper half, not at an edge.
+  5. **At `side: 1` on a 9:16 clip into a square, `cx` does nothing** (the crop is the full width), so the only horizontal fix is choosing a moment where the face is already centred.
+  6. **In the wrap-up, say it passed:** "centring gate: 14/14 shots pass" only if you actually opened `centre.jpg` for the final crops. Never list "off-centre" under weak spots: that is a failure, not a weak spot.
 - **Track everything (Davide, 2026-10-12).** Before any edit request, read `content.md` (the daily plan and which format this edit serves). After every delivery, add or update its row in the log there (date, format, name, final file, status), and when Davide gives a verdict or says it was posted, update the row. He should never have to remember what was agreed.
 - **Source check before rendering (Davide, 2026-10-13, Ian red-carpet remake: "probably the worst video you ever did").** That remake shipped with 360-720p clips, a visible third-party logo in several shots and repeated moments, and the wrap-up only listed them as weak spots. If the source pool is thin (under about 1.5x the shots needed in clean, 720p+ clips, or logos that cannot be cropped out), stop BEFORE rendering: tell Davide in one line what is missing and what the options are (other sources, another inspo). Never ship it and list the flaws afterwards.
 - **No content restrictions (Davide, 2026-09-30, "drop these rules FOREVER").**
@@ -142,10 +153,14 @@ clips), not look-alikes or a similar scene.
 - **Before rendering, run `preview.js`** (`FFMPEG=... node
   .claude/skills/remake-edit/preview.js <workdir>`): it draws each shot's crop
   box and centre line on the source's first, middle and last frame of the slot
-  into `preview.jpg`. Guessing `cx` from grids was off by up to 0.2 on
-  2026-09-30 (faces landed at the frame edge); the preview shows drift, cut
-  heads and watermarks at once. Fix `cx`/`start` until every face sits on the
-  red line in all three frames.
+  into `preview.jpg`, and writes `centre.jpg`, the real cropped result with the
+  centring guides. **`centre.jpg` is the gate in RULE ZERO at the top of this
+  file: open it, check every tile against the numbers, fix, re-run, open it
+  again.** `preview.jpg` (whole source frame, thumbnail size) is only for
+  locating the crop box; judge centring on `centre.jpg`, never on it.
+  Guessing `cx` from grids was off by up to 0.2 on 2026-09-30, and on
+  2026-10-13 (n17) crops judged on `preview.jpg` alone left faces at 60-70% of
+  the height with chins cut.
 - Casting Clavicular: he was charged with raping a 17-year-old (charges filed
   2026-09-08, public 2026-09-22). Leave him out unless Davide says otherwise.
 - **Judge the face first, then the clip (Davide, 2026-10-01: "in some of the
@@ -493,6 +508,7 @@ length in frames, so the sum equals the inspo's frame count. `grade` (optional,
 top level) overrides the default look; `vf` adds a filter to one shot.
 
 ### 6. Verify before sending
+- **Centring on the RENDER (RULE ZERO, again):** the gate in `centre.jpg` checks the crops; this checks the finished video. Pull the first, middle and last frame of every replaced shot from `remake.mp4` and look at them: face centred, nothing cut, nothing tiny. Any shot that fails goes back to the gate, not into the wrap-up.
 - Frame count and duration equal the inspo's.
 - **Cuts in sync with the song (Davide, 2026-10-02, Hullo "Mogged!!": "it's
   not really in sync with the song").** The cut frames matched the inspo, but

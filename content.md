@@ -34,6 +34,8 @@ Status: `sent` (delivered, waiting for a verdict) · `approved` · `rework` · `
 | 2026-10-12 | remake | Marlon B&W selfie montage (n12), no card. The card version (8.7 now / 9.5 potential, 2.4 s, no levers) was dropped | `marlon-selfies-2-final_shorts.mp4` (card version: `marlon-score-reveal-2-final_shorts.mp4`) | sent | | |
 | 2026-10-12 | remake + card | "3 ways to make a girl text YOU first" (n13, Cam / itscamsworld). Card 2.25 s, no levers, 7.8 now / 8.8 potential (5 frames scored 7.0 to 8.4, used the one nearest the median) | `jester-text-first-card-final_shorts.mp4` | approved | | |
 | 2026-10-13 | remake | Ian Somerhalder red-carpet edit, 47 fast cuts (n14), no card | `ian-red-carpet-final_shorts.mp4` | dropped (Davide: "probably the worst video you ever did"; weak sources) | | |
+| 2026-10-13 | remake | "why are u single? because I am ugly" (n16): intro kept whole, pretty-boy montage replaced (Cam, Parsa, jrx.jace, Vinnie as a still, hooded qayro9), no card | `ugly-single-pretty-boys-final_shorts.mp4` | sent | | |
+| 2026-10-13 | remake | Marlon "mogged" (n17, inspo @darkzzzyx, 1.5M plays): bodyguard-in-crowd hook kept whole, the 13 Marlon slots recast from his own TikTok @marlon3lg (8 clips, 1080x1920), no card | `marlon-mogged-n17-final_shorts.mp4` (v2: re-centred after Davide flagged framing) | sent | | |
 
 ## Open
 - Format 3: agreed 2026-10-12 that Davide finds the glow-up inspos; Claude remakes them. If before/after source pairs are thin, say so instead of shipping a weak one. Only the first example will show whether the format works.

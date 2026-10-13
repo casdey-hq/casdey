@@ -8,6 +8,6 @@ description: Remake a short-form video edit from an inspo file, keeping the hook
 Read `.claude/skills/remake-edit/SKILL.md` as the canonical procedure and use
 the helpers in `.claude/skills/remake-edit/`: `tiktok.js` (TikTok, 1080p, no login), `pindl.js` / `pinsearch.js` to
 source clips from Pinterest, `sheets.js` for contact sheets, `preview.js` to
-check crops (render.js refuses to run on crops it has not previewed), `gradematch.js` to match brightness, `render.js` to render, and `scorecard/` (analyse.mjs, scorecard.mjs) for the Casdey score card CTA. Follow its rules
+check crops (render.js refuses to run on crops it has not previewed; open the `centre.jpg` it writes and apply RULE ZERO, the centring gate at the top of the canonical file: the subject is centred and never cut), `gradematch.js` to match brightness, `render.js` to render, and `scorecard/` (analyse.mjs, scorecard.mjs) for the Casdey score card CTA. Follow its rules
 (no content restrictions, no approval needed to download source clips, nothing gets posted).
 Before any edit read `content.md` (the daily plan); after every delivery update its log.

@@ -3,6 +3,10 @@
 // draws the crop box (green) and its centre line (red) on the full source frame,
 // and tiles them into preview.jpg, one row per shot. A face that drifts out of
 // the box or off the red line shows up here instead of in the finished video.
+// It also writes centre.jpg: the ACTUAL cropped result of every shot (first, middle, last frame) at a
+// readable size with guides: red = vertical centre line (nose goes on it), yellow = eye line at 40% of
+// the height, cyan = the 8% top and bottom margins (hair and chin must sit inside them). This is the
+// centring gate in SKILL.md: look at it and fix every shot that fails before rendering.
 // Usage: node preview.js <workdir>   (needs FFMPEG=path\to\ffmpeg.exe or ffmpeg on PATH)
 const { execFileSync } = require("child_process");
 const fs = require("fs");
@@ -19,7 +23,10 @@ fs.rmSync(tmp, { recursive: true, force: true });
 fs.mkdirSync(tmp);
 
 const dims = (f) => execFileSync(FFPROBE, ["-v", "error", "-select_streams", "v", "-show_entries", "stream=width,height", "-of", "csv=p=0", f]).toString().trim().split(",").map(Number);
-let n = 0;
+let n = 0, m = 0;
+const ctmp = path.join(dir, "preview_centre");
+fs.rmSync(ctmp, { recursive: true, force: true });
+fs.mkdirSync(ctmp);
 const shots = plan.timeline.filter((e) => e.src && !e.image);
 shots.forEach((entry, row) => {
   const src = path.join(dir, entry.src);
@@ -41,11 +48,24 @@ shots.forEach((entry, row) => {
       `drawtext=fontfile='/Windows/Fonts/arialbd.ttf':text='${row + 1} ${path.basename(entry.src).replace(/[':]/g, "")} ${t}':fontcolor=yellow:fontsize=16:x=4:y=4:box=1:boxcolor=black`,
     ].join(",");
     execFileSync(FFMPEG, ["-v", "error", "-y", "-ss", t, "-i", src, "-frames:v", "1", "-vf", vf, out]);
+    // The real crop, with the centring guides.
+    const S = 320, g = 2;
+    const cvf = [
+      `crop=${cw}:${ch}:${x}:${y}`,
+      `scale=${S}:${Math.round((S * ch) / cw)}`,
+      `drawbox=x=${S / 2 - g / 2}:y=0:w=${g}:h=ih:color=red:t=fill`,
+      `drawbox=x=0:y=ih*0.4:w=iw:h=${g}:color=yellow:t=fill`,
+      `drawbox=x=0:y=ih*0.08:w=iw:h=1:color=cyan:t=fill`,
+      `drawbox=x=0:y=ih*0.92:w=iw:h=1:color=cyan:t=fill`,
+      `drawtext=fontfile='/Windows/Fonts/arialbd.ttf':text='${row + 1} ${t}':fontcolor=yellow:fontsize=16:x=4:y=4:box=1:boxcolor=black`,
+    ].join(",");
+    execFileSync(FFMPEG, ["-v", "error", "-y", "-ss", t, "-i", src, "-frames:v", "1", "-vf", cvf, path.join(ctmp, `${String(m++).padStart(3, "0")}.png`)]);
   });
 });
 execFileSync(FFMPEG, ["-v", "error", "-y", "-i", path.join(tmp, "%03d.png"), "-vf", `tile=3x${shots.length}`, "-frames:v", "1", path.join(dir, "preview.jpg")]);
+execFileSync(FFMPEG, ["-v", "error", "-y", "-i", path.join(ctmp, "%03d.png"), "-vf", `tile=6x${Math.ceil((shots.length * 3) / 6)}:padding=2`, "-frames:v", "1", path.join(dir, "centre.jpg")]);
 // render.js refuses to run unless this stamp matches the plan's current crops,
 // so a crop changed after the preview can't reach the video unchecked
 // (2026-09-30: every crop was tightened after the preview and heads came out cut).
 fs.writeFileSync(path.join(dir, "preview.stamp"), require("./cropstamp")(plan));
-console.log(`done: ${path.join(dir, "preview.jpg")} (${shots.length} shots)`);
+console.log(`done: ${path.join(dir, "preview.jpg")} and ${path.join(dir, "centre.jpg")} (${shots.length} shots). Open centre.jpg and check every tile against the centring gate.`);
