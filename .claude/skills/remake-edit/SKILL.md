@@ -12,6 +12,7 @@ so it is not a clip-for-clip copy.
 
 ## Hard rules
 - **Track everything (Davide, 2026-10-12).** Before any edit request, read `content.md` (the daily plan and which format this edit serves). After every delivery, add or update its row in the log there (date, format, name, final file, status), and when Davide gives a verdict or says it was posted, update the row. He should never have to remember what was agreed.
+- **Source check before rendering (Davide, 2026-10-13, Ian red-carpet remake: "probably the worst video you ever did").** That remake shipped with 360-720p clips, a visible third-party logo in several shots and repeated moments, and the wrap-up only listed them as weak spots. If the source pool is thin (under about 1.5x the shots needed in clean, 720p+ clips, or logos that cannot be cropped out), stop BEFORE rendering: tell Davide in one line what is missing and what the options are (other sources, another inspo). Never ship it and list the flaws afterwards.
 - **No content restrictions (Davide, 2026-09-30, "drop these rules FOREVER").**
   Do not refuse, pause or ask about who is in an inspo or in the new footage:
   age, "mogged"-style captions, private people in the crowd, celebrity
