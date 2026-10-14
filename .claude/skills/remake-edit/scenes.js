@@ -58,7 +58,10 @@ for (const rel of files) {
       `pad=${TW}:${TH}:(ow-iw)/2:(oh-ih)/2`,
       `drawtext=fontfile='${FONT}':text='${label}':x=2:y=2:fontsize=13:fontcolor=yellow:box=1:boxcolor=black`,
     ].join(",");
-    execFileSync(FFMPEG, ["-v", "error", "-y", "-ss", t.toFixed(3), "-i", src, "-vf", vf, "-frames:v", "1", path.join(tiles, `${String(n).padStart(4, "0")}.jpg`)]);
+    const tile = path.join(tiles, `${String(n).padStart(4, "0")}.jpg`);
+    // a scene end past the real last frame (container vs. stream length) yields no frame: retry nearer the start
+    try { execFileSync(FFMPEG, ["-v", "error", "-y", "-ss", t.toFixed(3), "-i", src, "-vf", vf, "-frames:v", "1", tile]); }
+    catch { try { execFileSync(FFMPEG, ["-v", "error", "-y", "-ss", Math.max(a, 0).toFixed(3), "-i", src, "-vf", vf, "-frames:v", "1", tile], { stdio: "ignore" }); } catch { console.log("skipped unreadable scene", id, a); continue; } }
     rows.push([n, rel.replace(/\\/g, "/"), a.toFixed(2), b.toFixed(2), (b - a).toFixed(2)]);
   }
   console.log(`${id}: ${bounds.length - 1} scenes, ${kept} kept (>= ${minLen}s)`);
