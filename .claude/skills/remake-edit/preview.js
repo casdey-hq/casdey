@@ -1,5 +1,5 @@
 // Shows where each new shot's crop lands before rendering: for every source
-// entry in plan.json it grabs the first, middle and last frame of the slot,
+// entry in plan.json it grabs the five frames of the slot (start, quarter, middle, three quarters, end),
 // draws the crop box (green) and its centre line (red) on the full source frame,
 // and tiles them into preview.jpg, one row per shot. A face that drifts out of
 // the box or off the red line shows up here instead of in the finished video.
@@ -38,7 +38,7 @@ shots.forEach((entry, row) => {
   const x = Math.round(Math.min(Math.max(entry.cx * w - cw / 2, 0), w - cw));
   const y = Math.round(Math.min(Math.max(entry.cy * h - ch / 2, 0), h - ch));
   const lw = Math.max(2, Math.round(h / 180));
-  [0, Math.floor(entry.frames / 2), entry.frames - 1].forEach((f) => {
+  [0, 0.25, 0.5, 0.75, 1].map((q) => Math.min(entry.frames - 1, Math.round(q * (entry.frames - 1)))).forEach((f) => {
     const t = (entry.start + f / fps).toFixed(3);
     const out = path.join(tmp, `${String(n++).padStart(3, "0")}.png`);
     const vf = [
@@ -62,8 +62,8 @@ shots.forEach((entry, row) => {
     execFileSync(FFMPEG, ["-v", "error", "-y", "-ss", t, "-i", src, "-frames:v", "1", "-vf", cvf, path.join(ctmp, `${String(m++).padStart(3, "0")}.png`)]);
   });
 });
-execFileSync(FFMPEG, ["-v", "error", "-y", "-i", path.join(tmp, "%03d.png"), "-vf", `tile=3x${shots.length}`, "-frames:v", "1", path.join(dir, "preview.jpg")]);
-execFileSync(FFMPEG, ["-v", "error", "-y", "-i", path.join(ctmp, "%03d.png"), "-vf", `tile=6x${Math.ceil((shots.length * 3) / 6)}:padding=2`, "-frames:v", "1", path.join(dir, "centre.jpg")]);
+execFileSync(FFMPEG, ["-v", "error", "-y", "-i", path.join(tmp, "%03d.png"), "-vf", `tile=5x${shots.length}`, "-frames:v", "1", path.join(dir, "preview.jpg")]);
+execFileSync(FFMPEG, ["-v", "error", "-y", "-i", path.join(ctmp, "%03d.png"), "-vf", `tile=5x${shots.length}:padding=2`, "-frames:v", "1", path.join(dir, "centre.jpg")]);
 // render.js refuses to run unless this stamp matches the plan's current crops,
 // so a crop changed after the preview can't reach the video unchecked
 // (2026-09-30: every crop was tightened after the preview and heads came out cut).

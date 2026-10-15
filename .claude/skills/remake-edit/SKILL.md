@@ -398,7 +398,12 @@ TikTok and Instagram letterbox it fine. **Deliver only the 9:16 Shorts version
 by default (Davide, 2026-10-01)**: send `<output>_shorts.mp4` (or `remake.mp4`
 when the edit is already 9:16) and nothing else; the other format only if he
 asks. Keep the sent file under 30 MB so it reaches his phone (re-encode with
-`-crf 21 -preset slow` if bigger).
+`-crf 21 -preset slow` if bigger). **Exception, only when it happens (Davide,
+2026-10-15, n25, a 1080x1398 inspo):** if he says TikTok zooms or crops the
+padded `_shorts` file when he posts it (it seems to trim the baked-in black
+bars and refit the picture, cutting the sides), send the native unpadded
+`remake.mp4` instead (the inspo's creator had posted that size). Do not switch
+the default for other edits; keep sending `_shorts` until he reports it.
 
 **The CTA: the Casdey score card (2026-10-07; replaces the old end card and
 `endcard.js` completely).** Modelled on the PSL App edits (one inspo had 1.6M
