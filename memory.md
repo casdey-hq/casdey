@@ -259,7 +259,17 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
    video-to-waitlist path working, reach the US audience, hit 10 signups by
    2026-10-13. Then test the promise and prices before building (sell before
    build, done properly this time).
-4. At build time: **a whole new brand and aesthetic, Apple-grade** (the part 1
+4. **For the 2026-10-18 weekly review (Davide, 2026-10-17):** decide the numbers
+   behind the December goal of a €2,000 month in profit. At €9.99/month or
+   €59.99/year, that is roughly 220 monthly subscribers or about 35 annual sales
+   (before Stripe fees and AI costs, to be refined). Work backwards: paying
+   clients needed by end of November and end of October, trials needed, videos
+   and conversations needed. Davide calls €2,000 possible but not easy. First
+   real milestone is the first paying client. Also read the 7-day content test
+   that ends 2026-10-18 (`outreach.md`). Context: Abhi is still thinking about
+   the joint new app; if Casdey keeps its momentum, the likely call is Casdey
+   as the only business, with the new app postponed.
+5. At build time: **a whole new brand and aesthetic, Apple-grade** (the part 1
    v5 charcoal system is gone; the logo is kept only for now and will very
    likely change too), and the choice of iOS app vs web app.
 

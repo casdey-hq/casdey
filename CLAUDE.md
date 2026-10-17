@@ -26,7 +26,10 @@ doesn't work), 6 a day from the week of 2026-10-05. **Goals:** at least 10
 waitlist signups by 2026-10-13 (0 on 2026-10-04), December 2026 as a
 €2,000 month in profit (as set on 2026-10-04; the current goals and plan are always in
 Davide's Notion, "Journey", which he keeps updated: read it there, never
-edit it unasked). Then the choice of iOS app vs web app. Davide's personal
+edit it unasked). **Open for the 2026-10-18 weekly review:** turn the December
+€2,000 goal into numbers (paying clients needed, then the milestones for end
+of November and end of October) and read the 7-day content test; see
+`memory.md` §1, "Next steps" item 4. Then the choice of iOS app vs web app. Davide's personal
 goals and life context live in his own project, `..\davide\`.
 
 ## Read `memory.md` when the task touches
