@@ -248,7 +248,7 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
    0.68 to 0.36 points; the model had been too harsh on average men and on
    phone selfies, so the prompt now tells it to judge the face, not the
    photo. Bad photos (blur, mid-expression, steep angle) are refused, not
-   scored. Re-run with `web/scripts/calibrate.mjs <set.json>`. Scoped the same day (spec:
+   scored. Re-run with `web/scripts/calibrate.mjs <set.json>`. **Women added 2026-10-18** (Davide: the audience opens to women): a first quiz question ("Who is the analysis for?") picks `SYSTEM_MEN` (unchanged) or `SYSTEM_WOMEN` in `src/lib/analysis.ts` (levers include brows and light makeup; refuses beauty-filtered photos; never fillers, Botox or surgery). Calibrated on 9 SCUT-FBP5500 Caucasian women (younger faces picked by hand, because SCUT raters mark age down) plus 3 model stills: error 0.38, about +0.6 generous on average-looking women, top end within 0.1 to 0.4. `calibrate.mjs <set> <runs> woman` and `score-frame.mjs [--man]` take the gender. Cost: about $0.03 per analysis call (2.5k in, 1k out on Opus 5.5). Scoped the same day (spec:
    `web/MVP_PLAN.md`): a quiz before the photos (Davide's MacroFactor
    point: the investment raises expectation, but no surprise paywall),
    email to see the result, face required and body optional, check-ins

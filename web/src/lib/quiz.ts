@@ -6,6 +6,15 @@ export type Question = { id: string; title: string; hint?: string; choices: Choi
 
 export const QUESTIONS: Question[] = [
   {
+    // Picks the prompt and score scale (src/lib/analysis.ts), added 2026-10-18.
+    id: "gender",
+    title: "Who is the analysis for?",
+    choices: [
+      { value: "man", label: "A man" },
+      { value: "woman", label: "A woman" },
+    ],
+  },
+  {
     id: "goal",
     title: "What do you want to improve most?",
     choices: [
@@ -130,6 +139,6 @@ export function validBody(value: unknown): value is Body {
 export function describe(answers: Record<string, string>, body: Body): string {
   const { cm, kg } = toMetric(body);
   const lines = QUESTIONS.map((q) => `${q.title} ${q.choices.find((c) => c.value === answers[q.id])?.label}`);
-  lines.splice(2, 0, `Height ${cm} cm, weight ${kg} kg.`);
+  lines.splice(QUESTIONS.findIndex((q) => q.id === "age") + 1, 0, `Height ${cm} cm, weight ${kg} kg.`);
   return lines.join("\n");
 }

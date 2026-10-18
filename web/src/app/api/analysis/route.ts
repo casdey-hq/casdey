@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: "You've had 3 analyses today. Check your inbox for the last one, or come back tomorrow." }, { status: 429 });
     }
 
-    const result = await analyse(face, bodyPhoto, describe(body.answers, body.body));
+    const result = await analyse(face, bodyPhoto, describe(body.answers, body.body), body.answers.gender === "woman" ? "woman" : "man");
     if (!result.usable) return Response.json({ retake: result.unusable_reason });
 
     const source = typeof body.source === "string" ? body.source.slice(0, 40) : null;
