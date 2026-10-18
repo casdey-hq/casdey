@@ -669,3 +669,31 @@ marketing: content was 1 of the Core Four, and the edits rewarded viewers
 with someone else's face instead of a taste of the product.
 Reason: the constraint is views to visits, then visits to money; neither is
 fixed by more of the same edits or by ads.
+
+## 2026-10-18 — Weekly review: price stays, follow up the analysed by hand, audience opens to women
+Framework: $100M Offers (price to value, Value Equation); $100M Leads (warm
+outreach first, narrow first, More Better New); $100M Money Models (30-day
+cash).
+Read: 226K TikTok views in 7 days (n22 "how bro looks" at 160K, n16 at 44K,
+everything else 650 to 5.6K), 799 profile views, 93 followers, 9 real people
+analysed, 12 plan offers seen, 0 checkouts. n22's viewers are 57% female. The
+format test did not run as designed (format 3 was never made, score reveals
+only as end cards), so no format was picked; remakes bring every visit.
+December in numbers, at the current prices and about €7 kept per monthly sub
+(€46 per annual) after Stripe, AI and an estimated forfettario tax plus INPS:
+about 290 monthly subscribers or about 45 annual sales in December.
+Decisions (Davide):
+1. **Price stays at €9.99/month or €59.99/year.** I recommended a capped
+   coached plan at about €79-99/month (25 clients instead of 290, because the
+   plan is delivered by hand up to about 20-30). Davide kept the app price.
+   Diverges from price-to-value for a done-with-you service; accepted because
+   the plan is the app's price, sold early. Consequence: December needs volume
+   about 50x today's analyses, or a much better analysis-to-paid rate.
+2. **Warm follow-up of everyone analysed**: one personal email each from
+   Davide, asking what stopped them and offering a free hand-written first
+   week, no card. Follows (warm first; also gets the reason behind 0 of 12).
+3. **The audience opens to women too** (looksmaxxing applies to them). I had
+   proposed a men-only version of the hit format. **Diverges from "narrow
+   first"**; reason: the market answered, 57% of the best video's viewers are
+   women. Needs the analysis to work for women before content invites them
+   (prompt, levers and calibration are men-only).

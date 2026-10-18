@@ -6,7 +6,7 @@ Write the name as **Casdey** (capital C) in text and copy, since 2026-09-26 (Dav
 Casdey is Davide's business: one founder, no team, no legal entity yet (see
 `memory.md` §5). **Part 1**, a B2B win-back SaaS for gyms, was stopped on
 2026-09-26 and archived at the git tag `casdey-pt1`. **Part 2** is a **B2C
-glow-up app for men, worldwide** (first-world countries first; the research
+glow-up app for men, worldwide**, opening to women too since 2026-10-18 (the analysis is being adapted; first-world countries first; the research
 centred on 18-28, the site itself names no age), entering a proven market (Umax and peers) with
 five differentiators: close the execution gap with AI-verified daily
 check-ins, one integrated plan, total pricing trust, Apple-grade polish, and
@@ -20,16 +20,13 @@ www.casdey.com since 2026-09-26, and **on 2026-10-05 Davide decided to replace i
 (a "coming soon" loses an impulse buyer to Umax): (1) a free photo analysis
 live on the site, (2) a paid 90-day plan behind it, delivered by hand with
 daily check-ins, (3) the full app built only once people pay for (2).
-Reasoning in `memory.md` and the ledger; the build spec is `web/MVP_PLAN.md`. **2026-10-11:** step (2) is built (Stripe checkout with a 7-day trial under the result, plan written by hand), outreach started beside content, and a 7-day content test runs to 2026-10-18: `outreach.md`. Short-form videos are posting daily:
+Reasoning in `memory.md` and the ledger; the build spec is `web/MVP_PLAN.md`. **2026-10-11:** step (2) is built (Stripe checkout with a 7-day trial under the result, plan written by hand), outreach started beside content, and a 7-day content test ran to 2026-10-18: `outreach.md`. Short-form videos post 3 a day:
 looksmaxxing edits remade with `/remake-edit` (gym and motivation content
-doesn't work), 6 a day from the week of 2026-10-05. **Goals:** at least 10
-waitlist signups by 2026-10-13 (0 on 2026-10-04), December 2026 as a
-€2,000 month in profit (as set on 2026-10-04; the current goals and plan are always in
-Davide's Notion, "Journey", which he keeps updated: read it there, never
-edit it unasked). **Open for the 2026-10-18 weekly review:** turn the December
-€2,000 goal into numbers (paying clients needed, then the milestones for end
-of November and end of October) and read the 7-day content test; see
-`memory.md` §1, "Next steps" item 4. Then the choice of iOS app vs web app. Davide's personal
+doesn't work). **Goals** live in
+Davide's Notion, "Journey" (Checklist, Goals), which he keeps updated: read it there, never
+edit it unasked. December 2026 as a €2,000 month in profit; the 2026-10-18
+review put it in numbers and kept the price (ledger and `memory.md` §1,
+"Next steps" item 4). Next: the choice of iOS app vs web app. Davide's personal
 goals and life context live in his own project, `..\davide\`.
 
 ## Read `memory.md` when the task touches

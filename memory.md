@@ -269,6 +269,7 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
    that ends 2026-10-18 (`outreach.md`). Context: Abhi is still thinking about
    the joint new app; if Casdey keeps its momentum, the likely call is Casdey
    as the only business, with the new app postponed.
+   **Done on 2026-10-18** (ledger, "Weekly review"; snapshots `analytics/tiktok-2026-10-18.md` and `site-2026-10-18.md`): price kept at €9.99/€59.99, so December needs about 290 monthly subs or about 45 annual sales that month (about €7 kept per monthly sub, €46 per annual, after Stripe, AI and an estimated forfettario tax plus INPS); 9 real analyses that week, 0 plans; n22 hit 160K views with 57% female viewers, so the audience opens to women too (the analysis is being adapted); the analysed get a personal follow-up email from Davide.
 5. At build time: **a whole new brand and aesthetic, Apple-grade** (the part 1
    v5 charcoal system is gone; the logo is kept only for now and will very
    likely change too), and the choice of iOS app vs web app.
