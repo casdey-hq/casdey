@@ -11,7 +11,7 @@ const response = await fetch("https://www.casdey.com/api/analysis", {
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     email: `delivered+${Date.now()}@resend.dev`, adult: true, website: "", source: "test",
-    answers: { goal: "everything", age: "26-30", training: "3-4", sleep: "7-8", skincare: "some", skin: "none", hair: "happy", style: "decent", blocker: "consistency" },
+    answers: { gender: "man", goal: "everything", age: "26-30", training: "3-4", sleep: "7-8", skincare: "some", skin: "none", hair: "happy", style: "decent", blocker: "consistency" },
     body: { units: "metric", height: 180, weight: 78 },
     face: "data:image/jpeg;base64," + fs.readFileSync(photo).toString("base64"),
   }),
