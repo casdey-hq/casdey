@@ -697,3 +697,15 @@ Decisions (Davide):
    first"**; reason: the market answered, 57% of the best video's viewers are
    women. Needs the analysis to work for women before content invites them
    (prompt, levers and calibration are men-only).
+
+## 2026-10-21 — One channel (content), maxed on "Better"; the stop benchmark
+Framework: $100M Leads, end of Section III (p. 245): after warm outreach, "just pick one. Then, max it out" (More, Better, New); with more time than money, the one is content. Davide's own stop rule (entry 2026-10-04).
+Read: day 26 of part 2. About 250K+ TikTok views, almost all from two hits (n22 160K, n16 44K); site traffic fell from about 18 pageviews a day (10-16) to about 2 a day since 10-19; about 10 real people analysed, none since 10-18; 13 plan offers seen, 0 trials; 6 warm follow-up emails sent 10-19, 0 replies; the cold outreach planned on 10-11 never started. The site works (analyses still start and submit), so the drop is traffic, not a bug.
+Decision (Davide agreed):
+1. **Content is the one channel.** Cold outreach is not added as a second channel. Content is maxed out in order: **Better first** (judge every post on site visits, not views; every video points to casdey.com: pinned comment, the score card more often, before/after edits that show the product's promise), then More (3 a day, plus the TikTok winners on YouTube Shorts), then New. Davide sources only very good inspo from now on.
+2. **Stop benchmark:**
+   - **Gate 1, by 2026-11-15:** 100 people see the plan offer, through content. Missing it means the content-to-site path is broken: fix that, it is not a verdict on the idea.
+   - **Gate 2, after 100 offers seen:** 3+ trials and at least 1 paid = keep going and scale. 0-2 trials = change ONE thing in the offer (trial without card upfront, the coached plan at about €79-99, or a €1 first week) and test another 100. Still about 0 after the second 100 = the idea fails as sold: stop, or change niche or model. Only Gate 2 can stop the business.
+   - The December €2,000 goal is a goal, not a stop rule; at today's numbers it is very unlikely.
+Follows or diverges: **Follows** (one channel, maxed out; judged on behaviour at volume). It corrects my 10-11 and 10-21 suggestion to run outreach beside content, which spread the effort across two channels.
+Reason: 13 offers seen is too small a sample to judge the idea; the constraint is still leads, specifically views to visits.

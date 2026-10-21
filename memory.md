@@ -270,7 +270,8 @@ compressed · 4. Gotchas worth not rediscovering · 5. Legal and tax (Italy)
    the joint new app; if Casdey keeps its momentum, the likely call is Casdey
    as the only business, with the new app postponed.
    **Done on 2026-10-18** (ledger, "Weekly review"; snapshots `analytics/tiktok-2026-10-18.md` and `site-2026-10-18.md`): price kept at €9.99/€59.99, so December needs about 290 monthly subs or about 45 annual sales that month (about €7 kept per monthly sub, €46 per annual, after Stripe, AI and an estimated forfettario tax plus INPS); 9 real analyses that week, 0 plans; n22 hit 160K views with 57% female viewers, so the audience opens to women too (the analysis is being adapted); the analysed get a personal follow-up email from Davide.
-5. At build time: **a whole new brand and aesthetic, Apple-grade** (the part 1
+5. **Stop benchmark, agreed 2026-10-21** (ledger, "One channel (content)"): content is the one channel, maxed on Better first (posts judged on site visits; every video points to casdey.com), and Davide sends only very good inspo. Gate 1: 100 people see the plan offer by 2026-11-15 (PostHog `plan_offer_seen`; 13 seen up to 10-21, count from there). Gate 2, after 100 offers: 3+ trials and 1 paid = keep going; 0-2 = change one thing in the offer, test another 100; still about 0 = stop or change niche/model. Only Gate 2 can stop the business.
+6. At build time: **a whole new brand and aesthetic, Apple-grade** (the part 1
    v5 charcoal system is gone; the logo is kept only for now and will very
    likely change too), and the choice of iOS app vs web app.
 
